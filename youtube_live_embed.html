@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>直播頁面（禁止點擊）</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    .video, .chat {
+      position: relative;
+      height: 100%;
+    }
+    .video {
+      flex: 3;
+    }
+    .chat {
+      flex: 1;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 直播區塊 -->
+    <div class="video">
+      <iframe
+        src="https://www.youtube.com/embed/live_stream?channel=UCLTFweAYLbuxdnVtdqCYgIA&autoplay=1"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+      <div class="overlay"></div> <!-- 禁止點擊遮罩 -->
+    </div>
+
+    <!-- 聊天室區塊 -->
+    <div class="chat">
+      <iframe
+        src="https://www.youtube.com/live_chat?v=bRmVgNAcmaQ&embed_domain=YOUR_DOMAIN.com">
+      </iframe>
+      <div class="overlay"></div> <!-- 禁止點擊遮罩 -->
+    </div>
+  </div>
+</body>
+</html>
