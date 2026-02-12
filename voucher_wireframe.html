@@ -427,7 +427,7 @@
         <div class="input-section">
             <span class="input-label">* 新增兌換券:</span>
             <input type="text" id="voucherCodeInput" class="voucher-input" placeholder="輸入兌換碼 (測試: 隨意輸入成功, 輸入 fail 失敗)"
-                value="">
+                value="" onkeypress="if(event.key === 'Enter') addVoucher()">
             <button class="add-btn" onclick="addVoucher()">新增</button>
         </div>
         <span class="hint-text">*如新增後未在「可使用」頁籤中看到兌換券，請嘗試重新整理或退出頁面後重新進入</span>
@@ -596,9 +596,9 @@
             }
 
             // Mock Success/Fail Logic
-            if (code.toLowerCase() === 'fail' || code.includes('EXPIRED')) {
+            if (code.includes('EXPIRED')) {
                 showToast('❌ 兌換失敗：此代碼已過期', false);
-            } else if (code.includes('INVALID')) {
+            } else if (code.toLowerCase() === 'fail' || code.includes('INVALID')) {
                 showToast('❌ 兌換失敗：查無此兌換碼，請確認輸入', false);
             } else if (code.includes('USED')) {
                 showToast('❌ 兌換失敗：此兌換碼已被使用', false);
