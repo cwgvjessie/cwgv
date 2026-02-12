@@ -388,6 +388,84 @@
             box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
             transition: all 0.5s;
         }
+
+        /* RWD Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .voucher-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .add-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .sub-tabs {
+                gap: 20px;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .voucher-grid {
+                grid-template-columns: 1fr;
+                /* 1 column on mobile */
+            }
+
+            .voucher-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px 15px;
+            }
+
+            .card-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .card-action {
+                margin-left: 0;
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .use-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Floating tool adjustment */
+            div[style*="position: fixed"] {
+                position: static !important;
+                width: 100% !important;
+                box-sizing: border-box;
+                margin-top: 30px;
+                box-shadow: none !important;
+                border: 1px dashed #e6a700 !important;
+            }
+        }
     </style>
 </head>
 
@@ -430,7 +508,8 @@
                 value="" onkeypress="if(event.key === 'Enter') addVoucher()">
             <button class="add-btn" onclick="addVoucher()">新增</button>
         </div>
-        <span class="hint-text">*如新增後未在「可使用」頁籤中看到兌換券，請嘗試重新整理或退出頁面後重新進入</span>
+        <span class="hint-text">*點擊「新增」按鈕，或是按enter鍵，即可將兌換券加入會員帳戶<br>
+            *如新增後未在「可使用」頁籤中看到兌換券，請嘗試重新整理或退出頁面後重新進入</span>
 
         <!-- Sub Tabs -->
         <div class="sub-tabs">
