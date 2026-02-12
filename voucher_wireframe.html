@@ -381,6 +381,13 @@
         .toast.error {
             background-color: #f44336;
         }
+
+        .voucher-input.highlight {
+            background-color: #e8f0fe;
+            border-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
+            transition: all 0.5s;
+        }
     </style>
 </head>
 
@@ -547,6 +554,19 @@
             </div>
         </div>
 
+        <!-- Simulation Tools (Floating) -->
+        <div
+            style="position: fixed; right: 20px; bottom: 100px; width: 280px; padding: 15px; background-color: #fff; border: 1px solid #e6a700; border-left: 5px solid #e6a700; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 900;">
+            <h4 style="margin-top:0; margin-bottom: 10px; color: #856404; font-size: 16px;">🧪 模擬外部連結測試</h4>
+            <p style="font-size: 13px; margin: 0 0 10px; color: #666;">模擬「從 EDM/廣告」點擊帶參數連結：</p>
+            <ul style="font-size: 13px; padding-left: 20px; margin-bottom: 0;">
+                <li style="margin-bottom: 5px;"><a href="?code=AUTO_FILL_EXAMPLE">連結 A (模擬: 成功)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=EXPIRED_2025">連結 B (模擬: 過期)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=INVALID_CODE_123">連結 C (模擬: 代碼錯誤)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=USED_BY_OTHER_99">連結 D (模擬: 已被使用)</a></li>
+                <li><a href="?">清除網址參數</a></li>
+            </ul>
+        </div>
     </div>
 
     <!-- Toast Container -->
@@ -576,8 +596,12 @@
             }
 
             // Mock Success/Fail Logic
-            if (code.toLowerCase() === 'fail') {
-                showToast('❌ 兌換失敗：代碼無效或已過期', false);
+            if (code.toLowerCase() === 'fail' || code.includes('EXPIRED')) {
+                showToast('❌ 兌換失敗：此代碼已過期', false);
+            } else if (code.includes('INVALID')) {
+                showToast('❌ 兌換失敗：查無此兌換碼，請確認輸入', false);
+            } else if (code.includes('USED')) {
+                showToast('❌ 兌換失敗：此兌換碼已被使用', false);
             } else {
                 // Success Scenario
                 showToast('✅ 兌換成功！已歸戶至您的帳戶', true);
@@ -627,11 +651,10 @@
             if (confirm(`確認要使用兌換碼「${code}」進行兌換嗎？\n(將會跳轉至商品頁面)`)) {
                 showToast('🔄 正在導向商品頁面...', true);
 
-                // Simulate redirect delay
+                // Simulate redirect delay to show the toast first
                 setTimeout(() => {
-                    // Update UI to simulate 'Used' (Optional for demo)
-                    // In real app, this would redirect
-                    // window.location.href = '...';
+                    // Redirect to the existing page for demonstration as requested
+                    window.location.href = 'https://dev-member.gvm.com.tw/account/account_upgrade';
                 }, 1000);
             }
         }
@@ -651,6 +674,20 @@
         // Auto-focus input for convenience
         // document.getElementById('voucherCodeInput').focus();
 
+        // 4. Auto-fill Logic on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            if (code) {
+                const input = document.getElementById('voucherCodeInput');
+                input.value = code;
+                input.classList.add('highlight');
+                // showToast(`ℹ️ 已自動帶入兌換碼：${code}`, true);
+
+                // Remove highlight after animation
+                setTimeout(() => input.classList.remove('highlight'), 2000);
+            }
+        });
     </script>
 </body>
 
