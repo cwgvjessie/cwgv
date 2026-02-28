@@ -184,17 +184,48 @@
             color: #333;
         }
 
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
         .cancel-btn {
-            display: inline-block;
-            margin-top: 15px;
-            color: var(--primary-blue);
-            text-decoration: underline;
-            cursor: pointer;
+            color: #888;
             font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
         }
 
         .cancel-btn:hover {
-            color: #004494;
+            color: #666;
+        }
+
+        .change-btn {
+            display: inline-block;
+            background-color: white;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 86, 179, 0.05);
+        }
+
+        .change-btn:hover {
+            background-color: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 86, 179, 0.15);
+            transform: translateY(-1px);
         }
 
         /* Footer Disclaimer Box */
@@ -380,6 +411,88 @@
                 padding: 15px;
             }
         }
+
+        /* Modal Styles (New for Payment Simulation) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #0056b3;
+            font-size: 20px;
+        }
+
+        .payment-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .payment-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancel {
+            background-color: #eee;
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -403,7 +516,7 @@
             <a href="#" class="nav-item">會員資料</a>
             <a href="#" class="nav-item">帳號設定</a>
             <a href="#" class="nav-item">電子報訂閱</a>
-            <a href="voucher_wireframe.html" class="nav-item">兌換券</a>
+            <a href="voucher_wireframe.html" class="nav-item">折價券</a>
             <a href="#" class="nav-item">交易記錄</a>
             <a href="subscription_management.html" class="nav-item active">訂戶管理</a>
             <a href="#" class="nav-item">會員權益</a>
@@ -443,10 +556,13 @@
                         <div class="sub-info-grid">
                             <div class="sub-info-item">下次扣款日期：<span id="next-billing-date">2025/10/31</span></div>
                             <div class="sub-info-item">下次扣款金額：NT$ 399</div>
-                            <div class="sub-info-item">扣款方式：信用卡 末四碼4102</div>
+                            <div class="sub-info-item">扣款方式：信用卡 末四碼 <span id="card-last-four">4102</span></div>
                         </div>
                     </div>
-                    <div class="cancel-btn" onclick="confirmCancel()">取消自動續訂</div>
+                    <div class="btn-group">
+                        <button class="change-btn" onclick="changeCard()">更換信用卡</button>
+                        <div class="cancel-btn" onclick="confirmCancel()">取消自動續訂</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -483,7 +599,65 @@
     <div id="toast" class="toast">Message</div>
 
     <script>
-        // 1. Existing Cancel Logic
+        // 1. Change Card Logic (Enhanced Simulation)
+        function changeCard() {
+            const confirmMsg = "變更提醒：成功更換信用卡後，下一期及未來的訂閱費用將改由新卡進行扣款。是否確定前往變更？";
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            showToast("🔗 正在導向至金流加密頁面...", true);
+            setTimeout(() => {
+
+                const modal = document.getElementById('paymentModal');
+                modal.style.display = 'flex';
+                document.getElementById('cardNumberInput').focus();
+            }, 800);
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('cardNumberInput').value = '';
+        }
+
+        function submitCardChange() {
+            const input = document.getElementById('cardNumberInput');
+            const cleanValue = input.value.replace(/\s/g, '');
+
+            if (cleanValue.length < 16) {
+                alert("請輸入完整的 16 位信用卡號碼");
+                return;
+            }
+
+            const lastFour = cleanValue.slice(-4);
+            const submitBtn = document.querySelector('.btn-submit');
+
+            // 模擬處理中狀態
+            submitBtn.disabled = true;
+            submitBtn.textContent = '處理中...';
+
+            setTimeout(() => {
+                // 更新主頁面資訊
+                const cardDisplay = document.getElementById('card-last-four');
+                cardDisplay.textContent = lastFour;
+                cardDisplay.style.color = '#d00';
+                cardDisplay.style.fontWeight = 'bold';
+
+                closeModal();
+                showToast("✅ 信用卡號已成功更新為末四碼 " + lastFour, true);
+
+                // 恢復按鈕文字與狀態
+                submitBtn.disabled = false;
+                submitBtn.textContent = '確認變更';
+
+                setTimeout(() => {
+                    cardDisplay.style.color = '';
+                    cardDisplay.style.fontWeight = '';
+                }, 3000);
+            }, 1500);
+        }
+
+        // 2. Existing Cancel Logic
         function confirmCancel() {
             if (confirm("確認要取消自動續訂嗎？\n取消後將於目前的訂閱期滿後停止續訂。")) {
                 showToast("✅ 已成功取消自動續訂", true);
@@ -505,7 +679,7 @@
             }
 
             if (code.includes('EXPIRED')) {
-                showToast('❌ 兌換失敗：此代碼已過期', false);
+                showToast('❌ 兌換失敗：此兌換碼已過期', false);
             } else if (code.toLowerCase() === 'fail' || code.includes('INVALID')) {
                 showToast('❌ 兌換失敗：查無此兌換碼，請確認輸入', false);
             } else if (code.includes('USED')) {
@@ -610,6 +784,34 @@
             <a href="#" class="privacy-link">遠見‧天下文化事業群 隱私權政策</a>
         </div>
     </footer>
+    </footer>
+
+    <!-- New: Payment Simulation Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-size: 24px;">💳</span>
+                <h3>藍新金流 - 信用卡資訊變更</h3>
+            </div>
+            <div class="payment-form">
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    請輸入新的信用卡號碼以完成變更驗證。
+                </p>
+                <label for="cardNumberInput">信用卡號碼 (16位)</label>
+                <input type="text" id="cardNumberInput" placeholder="0000 0000 0000 0000" maxlength="19"
+                    inputmode="numeric"
+                    oninput="let v = this.value.replace(/[^\d]/g, '').substring(0,16); this.value = v.replace(/(.{4})/g, '$1 ').trim()">
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">取消</button>
+                    <button class="btn-submit" onclick="submitCardChange()">確認變更</button>
+                </div>
+            </div>
+            <p style="font-size: 11px; color: #999; margin-top: 20px; text-align: center;">
+                🔒 本頁面為模擬環境，資料不會被真實傳送。
+            </p>
+        </div>
+    </div>
 </body>
 
 </html>
