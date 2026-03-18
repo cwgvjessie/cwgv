@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員中心 - 訂戶管理 (Interactive)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --text-dark: #333;
+            --text-gray: #666;
+            --bg-gray: #f4f4f4;
+            --border-color: #ddd;
+            --card-header-bg: #eceef1;
+            --info-box-bg: #fff9e6;
+            --info-box-border: #f9e6b3;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: var(--text-dark);
+        }
+
+        /* Header Area */
+        header {
+            background-color: #fff;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            margin-left: 10px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background-color: #e5e5e5;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            color: #555;
+            text-decoration: none;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background-color: #fff;
+            color: #000;
+            font-weight: bold;
+            border-top: 3px solid transparent;
+            margin-top: -3px;
+            border-top-left-radius: 2px;
+            border-top-right-radius: 2px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: #fff;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 600px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 50px;
+        }
+
+        h1.page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .subscriber-id {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        /* Subscription Card Style */
+        .sub-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .sub-card-header {
+            background-color: var(--card-header-bg);
+            padding: 20px 25px;
+        }
+
+        .sub-card-title {
+            color: var(--primary-blue);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sub-card-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .sub-card-body {
+            padding: 25px;
+            background-color: #fff;
+        }
+
+        .auto-renew-info {
+            line-height: 1.8;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .auto-renew-info strong {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .sub-info-grid {
+            display: flex;
+            justify-content: flex-start;
+            gap: 100px;
+            margin-bottom: 20px;
+        }
+
+        .sub-info-item {
+            font-size: 15px;
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .cancel-btn {
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .cancel-btn:hover {
+            color: #666;
+        }
+
+        .change-btn {
+            display: inline-block;
+            background-color: white;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 86, 179, 0.05);
+        }
+
+        .change-btn:hover {
+            background-color: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 86, 179, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Footer Disclaimer Box */
+        .disclaimer-box {
+            background-color: #fff9e6;
+            border: 1px solid #f9e6b3;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* Input Section (Moved from Vouchers) */
+        .input-section {
+            background-color: #fff;
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .input-label {
+            color: #d00;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .voucher-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        .voucher-input.highlight {
+            background-color: #e8f0fe;
+            border-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
+            transition: all 0.5s;
+        }
+
+        .add-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .hint-text {
+            display: block;
+            margin-bottom: 30px;
+            margin-left: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Simulation Tools (Floating) */
+        .simulation-box {
+            position: fixed;
+            right: 20px;
+            bottom: 100px;
+            width: 280px;
+            background-color: #fff;
+            border: 1px solid #e6a700;
+            border-left: 5px solid #e6a700;
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 900;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+        .toast.success {
+            background-color: #4CAF50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+        }
+
+        .footer-logos {
+            background-color: #f5f5f5;
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-info {
+            background-color: #000;
+            color: #fff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .footer-info p {
+            margin: 0;
+            color: #fff;
+        }
+
+        .footer-info .privacy-link {
+            display: block;
+            margin-top: 5px;
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* RWD */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .nav-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                white-space: nowrap;
+            }
+
+            .sub-card-header,
+            .sub-card-body {
+                padding: 15px;
+            }
+        }
+
+        /* Modal Styles (New for Payment Simulation) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #0056b3;
+            font-size: 20px;
+        }
+
+        .payment-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .payment-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancel {
+            background-color: #eee;
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span style="color: #0056b3; font-family: 'Times New Roman', serif;">遠見</span>
+                <span style="margin-left: 10px; font-weight: bold; color: #333; font-size: 24px;">會員中心</span>
+            </div>
+            <div class="user-info">
+                <span>Hi, 1qaz</span>
+                <button class="logout-btn">登出</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <div class="nav-container">
+            <a href="#" class="nav-item">會員資料</a>
+            <a href="#" class="nav-item">帳號設定</a>
+            <a href="#" class="nav-item">電子報訂閱</a>
+            <a href="voucher_wireframe.html" class="nav-item">折價券</a>
+            <a href="#" class="nav-item">交易記錄</a>
+            <a href="subscription_management.html" class="nav-item active">訂戶管理</a>
+            <a href="#" class="nav-item">會員權益</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="page-title">會員雜誌訂閱查詢</h1>
+        <div class="subscriber-id">訂戶編號：X0713890</div>
+
+        <div id="subscription-list">
+            <!-- Card 1 -->
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <div class="sub-card-title">遠見雜誌訂閱</div>
+                    <div class="sub-card-date">2025/12/01 到期</div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <div class="sub-card-title">遠見雜誌ZINIO版訂閱</div>
+                    <div class="sub-card-date">2024/07/01 到期</div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <div class="sub-card-title">遠見線上讀訂閱</div>
+                    <div class="sub-card-date"><span id="header-expiry-date">2025/10/31</span> 到期</div>
+                </div>
+                <div class="sub-card-body" id="auto-renew-section">
+                    <div class="auto-renew-info">
+                        <strong>續訂方案：尊榮會員月訂</strong>
+                        <div class="sub-info-grid">
+                            <div class="sub-info-item">下次扣款日期：<span id="next-billing-date">2025/10/31</span></div>
+                            <div class="sub-info-item">下次扣款金額：NT$ 399</div>
+                            <div class="sub-info-item">扣款方式：信用卡 末四碼 <span id="card-last-four">4102</span></div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="change-btn" onclick="changeCard()">更換信用卡</button>
+                        <div class="cancel-btn" onclick="confirmCancel()">取消自動續訂</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+            《遠見雜誌》僅記錄您的信用卡卡末四碼，不會儲存完整的卡號資訊。我們的金流服務由藍新科技提供，並嚴格遵循 PCI-DSS（支付卡產業資料安全標準），以確保持卡人資料獲得更高層級的安全保障。
+        </div>
+
+
+        <!-- Add Voucher Section -->
+        <div class="input-section">
+            <span class="input-label">* 新增兌換券:</span>
+            <input type="text" id="voucherCodeInput" class="voucher-input" placeholder="輸入兌換碼 (測試: 隨意輸入成功, 輸入 fail 失敗)"
+                onkeypress="if(event.key === 'Enter') addVoucher()">
+            <button class="add-btn" onclick="addVoucher()">立即兌換</button>
+        </div>
+
+        <!-- Simulation Tools -->
+        <div class="simulation-box">
+            <h4 style="margin-top:0; margin-bottom: 10px; color: #856404; font-size: 16px;">🧪 模擬外部連結測試</h4>
+            <p style="font-size: 13px; margin: 0 0 10px; color: #666;">模擬「從 EDM/廣告」點擊帶參數連結：</p>
+            <ul style="font-size: 13px; padding-left: 20px; margin-bottom: 0;">
+                <li style="margin-bottom: 5px;"><a href="?code=AUTO_FILL_EXAMPLE">連結 A (成功)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=EXPIRED_2025">連結 B (過期)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=INVALID_CODE_123">連結 C (錯誤)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=USED_BY_OTHER_99">連結 D (已使用)</a></li>
+                <li><a href="?">清除網址參數</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast">Message</div>
+
+    <script>
+        // 1. Change Card Logic (Enhanced Simulation)
+        function changeCard() {
+            const confirmMsg = "變更提醒：成功更換信用卡後，下一期及未來的訂閱費用將改由新卡進行扣款。是否確定前往變更？";
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            showToast("🔗 正在導向至金流加密頁面...", true);
+            setTimeout(() => {
+
+                const modal = document.getElementById('paymentModal');
+                modal.style.display = 'flex';
+                document.getElementById('cardNumberInput').focus();
+            }, 800);
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('cardNumberInput').value = '';
+        }
+
+        function submitCardChange() {
+            const input = document.getElementById('cardNumberInput');
+            const cleanValue = input.value.replace(/\s/g, '');
+
+            if (cleanValue.length < 16) {
+                alert("請輸入完整的 16 位信用卡號碼");
+                return;
+            }
+
+            const lastFour = cleanValue.slice(-4);
+            const submitBtn = document.querySelector('.btn-submit');
+
+            // 模擬處理中狀態
+            submitBtn.disabled = true;
+            submitBtn.textContent = '處理中...';
+
+            setTimeout(() => {
+                // 更新主頁面資訊
+                const cardDisplay = document.getElementById('card-last-four');
+                cardDisplay.textContent = lastFour;
+                cardDisplay.style.color = '#d00';
+                cardDisplay.style.fontWeight = 'bold';
+
+                closeModal();
+                showToast("✅ 信用卡號已成功更新為末四碼 " + lastFour, true);
+
+                // 恢復按鈕文字與狀態
+                submitBtn.disabled = false;
+                submitBtn.textContent = '確認變更';
+
+                setTimeout(() => {
+                    cardDisplay.style.color = '';
+                    cardDisplay.style.fontWeight = '';
+                }, 3000);
+            }, 1500);
+        }
+
+        // 2. Existing Cancel Logic
+        function confirmCancel() {
+            if (confirm("確認要取消自動續訂嗎？\n取消後將於目前的訂閱期滿後停止續訂。")) {
+                showToast("✅ 已成功取消自動續訂", true);
+
+                const section = document.getElementById('auto-renew-section');
+                section.style.opacity = '0.5';
+                section.innerHTML = '<div class="auto-renew-info"><strong>已取消自動續訂</strong>預計將於 2030/01/26 終止訂閱。</div>';
+            }
+        }
+
+        // 2. Moved Voucher Logic
+        function addVoucher() {
+            const input = document.getElementById('voucherCodeInput');
+            const code = input.value.trim();
+
+            if (!code) {
+                showToast('請輸入兌換碼', false);
+                return;
+            }
+
+            if (code.includes('EXPIRED')) {
+                showToast('❌ 兌換失敗：此兌換碼已過期', false);
+            } else if (code.toLowerCase() === 'fail' || code.includes('INVALID')) {
+                showToast('❌ 兌換失敗：查無此兌換碼，請確認輸入', false);
+            } else if (code.includes('USED')) {
+                showToast('❌ 兌換失敗：此兌換碼已被使用', false);
+            } else {
+                showToast('✅ 兌換成功！訂閱期限已延長 1 個月', true);
+                extendSubscription();
+                input.value = '';
+            }
+        }
+
+        function extendSubscription() {
+            // 更新兩個位置的日期：標題與內文
+            updateElementDate('header-expiry-date');
+            updateElementDate('next-billing-date');
+        }
+
+        function updateElementDate(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            const originalText = el.textContent;
+            const matches = originalText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            let dateStr = (matches && matches.length > 0) ? matches[matches.length - 1] : "2025/10/31";
+
+            const parts = dateStr.split('/');
+            let year = parseInt(parts[0]);
+            let month = parseInt(parts[1]);
+            let day = parseInt(parts[2]);
+
+            const d = new Date(year, month - 1, day);
+            d.setMonth(d.getMonth() + 1);
+
+            const y = d.getFullYear();
+            const m = (d.getMonth() + 1).toString().padStart(2, '0');
+            const dd = d.getDate().toString().padStart(2, '0');
+            const newDateStr = `${y}/${m}/${dd}`;
+
+            el.textContent = newDateStr;
+            el.style.color = '#d00';
+            el.style.fontWeight = 'bold';
+
+            setTimeout(() => {
+                el.style.color = '';
+                el.style.fontWeight = '';
+            }, 2000);
+        }
+
+        // 3. UI Helpers
+        function showToast(message, isSuccess) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "toast show " + (isSuccess ? "success" : "error");
+
+            setTimeout(function () {
+                toast.className = toast.className.replace("show", "");
+            }, 3000);
+        }
+
+        // 4. Auto-fill Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            if (code) {
+                const input = document.getElementById('voucherCodeInput');
+                if (input) {
+                    input.value = code;
+                    input.classList.add('highlight');
+
+                    // 自動捲動至輸入框並聚焦
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    input.focus();
+
+                    setTimeout(() => input.classList.remove('highlight'), 2000);
+                }
+            }
+        });
+    </script>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logos">
+            <!-- 模擬各品牌 Logo 占位符 -->
+            <div style="background: #e42426; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                天下文化</div>
+            <div style="background: #0056b3; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">遠見
+            </div>
+            <div style="background: #f16522; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">小學
+            </div>
+            <div style="background: #e42426; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                小天下</div>
+            <div style="background: #e42426; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                未來出版</div>
+            <div style="background: #8dc63f; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                未來少年</div>
+            <div style="background: #00aeef; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                未來兒童</div>
+            <div style="background: #92278f; color: white; padding: 5px 10px; font-weight: bold; border-radius: 2px;">
+                未來Family</div>
+        </div>
+        <div class="footer-info">
+            <p>讀者服務 電話：02-2662-0012 時間：週一~週五 9:00~12:30;13:30~17:00 信箱：gvm@cwgv.com.tw</p>
+            <a href="#" class="privacy-link">遠見‧天下文化事業群 隱私權政策</a>
+        </div>
+    </footer>
+    </footer>
+
+    <!-- New: Payment Simulation Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-size: 24px;">💳</span>
+                <h3>藍新金流 - 信用卡資訊變更</h3>
+            </div>
+            <div class="payment-form">
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    請輸入新的信用卡號碼以完成變更驗證。
+                </p>
+                <label for="cardNumberInput">信用卡號碼 (16位)</label>
+                <input type="text" id="cardNumberInput" placeholder="0000 0000 0000 0000" maxlength="19"
+                    inputmode="numeric"
+                    oninput="let v = this.value.replace(/[^\d]/g, '').substring(0,16); this.value = v.replace(/(.{4})/g, '$1 ').trim()">
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">取消</button>
+                    <button class="btn-submit" onclick="submitCardChange()">確認變更</button>
+                </div>
+            </div>
+            <p style="font-size: 11px; color: #999; margin-top: 20px; text-align: center;">
+                🔒 本頁面為模擬環境，資料不會被真實傳送。
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員中心 - 兌換券 Wireframe (Interactive)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --text-dark: #333;
+            --text-gray: #666;
+            --bg-gray: #f4f4f4;
+            --border-color: #ddd;
+            --disabled-gray: #ccc;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: var(--text-dark);
+        }
+
+        /* Header Area */
+        header {
+            background-color: #fff;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            margin-left: 10px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background-color: #e5e5e5;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            color: #555;
+            text-decoration: none;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background-color: #fff;
+            color: #000;
+            font-weight: bold;
+            border-top: 3px solid transparent;
+            /* Mimic height difference */
+            margin-top: -3px;
+            /* Pop up slightly */
+            border-top-left-radius: 2px;
+            border-top-right-radius: 2px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge-new {
+            background-color: #d00;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 2px;
+            position: absolute;
+            top: -5px;
+            right: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: #fff;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 600px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 50px;
+        }
+
+        /* Input Section */
+        .input-section {
+            background-color: #fff;
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-label {
+            color: #d00;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .voucher-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .hint-text {
+            display: block;
+            margin-bottom: 30px;
+            margin-left: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Sub Status Tabs */
+        .sub-tabs {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 40px;
+        }
+
+        .sub-tab-item {
+            padding: 10px 0;
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+            position: relative;
+            border-bottom: 2px solid transparent;
+        }
+
+        .sub-tab-item:hover {
+            color: var(--primary-blue);
+        }
+
+        .sub-tab-item.active {
+            color: var(--primary-blue);
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        /* Voucher List */
+        .voucher-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 items per row */
+            gap: 20px;
+        }
+
+        .voucher-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .voucher-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Expired/Used State */
+        .voucher-card.disabled {
+            background-color: #fafafa;
+            opacity: 0.8;
+        }
+
+        .voucher-card.disabled .card-icon {
+            background-color: #999;
+        }
+
+        .voucher-card.disabled .card-code {
+            color: #666;
+        }
+
+        /* Left: Icon */
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        /* Middle: Info */
+        .card-info {
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .card-code {
+            font-size: 14px;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .card-limit {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Right: Button */
+        .card-action {
+            margin-left: 20px;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .use-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .use-btn:hover {
+            background-color: #004494;
+        }
+
+        .status-text {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status-expired {
+            color: #999;
+        }
+
+        .status-used {
+            color: #666;
+        }
+
+        .status-future {
+            color: #f90;
+        }
+
+        /* Decorative circles on card edges like a ticket */
+        .ticket-notch {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #f9f9f9;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .notch-left {
+            left: -10px;
+        }
+
+        .notch-right {
+            right: -10px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+        .toast.success {
+            background-color: #4CAF50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        .voucher-input.highlight {
+            background-color: #e8f0fe;
+            border-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
+            transition: all 0.5s;
+        }
+
+        /* RWD Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .voucher-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .add-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .sub-tabs {
+                gap: 20px;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .voucher-grid {
+                grid-template-columns: 1fr;
+                /* 1 column on mobile */
+            }
+
+            .voucher-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px 15px;
+            }
+
+            .card-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .card-action {
+                margin-left: 0;
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .use-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Floating tool adjustment */
+            div[style*="position: fixed"] {
+                position: static !important;
+                width: 100% !important;
+                box-sizing: border-box;
+                margin-top: 30px;
+                box-shadow: none !important;
+                border: 1px dashed #e6a700 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span style="color: #0056b3; font-family: 'Times New Roman', serif;">遠見</span>
+                <span style="margin-left: 10px; font-weight: bold; color: #333; font-size: 24px;">會員中心</span>
+            </div>
+            <div class="user-info">
+                <span>Hi, 1qaz</span>
+                <button class="logout-btn">登出</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <div class="nav-container">
+            <a href="#" class="nav-item">會員資料</a>
+            <a href="#" class="nav-item">帳號設定</a>
+            <a href="#" class="nav-item">電子報訂閱</a>
+            <a href="voucher_wireframe.html" class="nav-item active">
+                兌換券
+                <span class="badge-new">New</span>
+            </a>
+            <a href="#" class="nav-item">交易記錄</a>
+            <a href="subscription_management.html" class="nav-item">訂戶管理</a>
+            <a href="#" class="nav-item">會員權益</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+
+        <!-- Add Voucher Section -->
+        <div class="input-section">
+            <span class="input-label">* 新增兌換券:</span>
+            <input type="text" id="voucherCodeInput" class="voucher-input" placeholder="輸入兌換碼 (測試: 隨意輸入成功, 輸入 fail 失敗)"
+                value="" onkeypress="if(event.key === 'Enter') addVoucher()">
+            <button class="add-btn" onclick="addVoucher()">新增</button>
+        </div>
+        <span class="hint-text">*點擊「新增」按鈕，或是按enter鍵，即可將兌換券加入會員帳戶<br>
+            *如新增後未在「可使用」頁籤中看到兌換券，請嘗試重新整理或退出頁面後重新進入</span>
+
+        <!-- Sub Tabs -->
+        <div class="sub-tabs">
+            <div class="sub-tab-item active" onclick="switchTab('available', this)">可使用</div>
+            <div class="sub-tab-item" onclick="switchTab('future', this)">待啟用</div>
+            <div class="sub-tab-item" onclick="switchTab('expired', this)">已失效</div>
+            <div class="sub-tab-item" onclick="switchTab('used', this)">已使用</div>
+        </div>
+
+        <!-- Tab Content: Available -->
+        <div id="tab-available" class="voucher-grid">
+            <!-- Card 1 -->
+            <div class="voucher-card">
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M20,6H16V5C16,3.89 15.1,3 14,3H10C8.89,3 8,3.89 8,5V6H4C2.89,6 2,6.89 2,8V19C2,20.1 2.89,21 4,21H20C21.1,21 22,20.1 22,19V8C22,6.89 21.1,6 20,6M10,5H14V6H10V5M20,19H4V8H20V19Z" />
+                        <path d="M12,19L11,15H5V8H20V15H13L12,19Z" fill-opacity="0.3" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">RCJD90910 測試</div>
+                    <div class="card-code">RCJD90910TESTING</div>
+                    <div class="card-date">即日起 ~ 無使用期限</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <button class="use-btn" onclick="redeemVoucher('RCJD90910TESTING')">立即使用</button>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="voucher-card">
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M20,6H16V5C16,3.89 15.1,3 14,3H10C8.89,3 8,3.89 8,5V6H4C2.89,6 2,6.89 2,8V19C2,20.1 2.89,21 4,21H20C21.1,21 22,20.1 22,19V8C22,6.89 21.1,6 20,6M10,5H14V6H10V5M20,19H4V8H20V19Z" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">遠見雜誌電子版 一期</div>
+                    <div class="card-code">GVM2025PROMO</div>
+                    <div class="card-date">2026/02/01 ~ 2026/12/31</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <button class="use-btn" onclick="redeemVoucher('GVM2025PROMO')">立即使用</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Future -->
+        <div id="tab-future" class="voucher-grid" style="display: none;">
+            <div class="voucher-card disabled">
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">母親節特別活動</div>
+                    <div class="card-code">MOM2026GIFT</div>
+                    <div class="card-date">2028/02/01 ~ 2028/12/31</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <span class="status-text status-future">2028/02/01啟用</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Expired -->
+        <div id="tab-expired" class="voucher-grid" style="display: none;">
+            <div class="voucher-card disabled">
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">2025 新年禮包</div>
+                    <div class="card-code">HAPPY2025</div>
+                    <div class="card-date">已於 2025/01/31 到期</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <span class="status-text status-expired">已失效</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Used -->
+        <div id="tab-used" class="voucher-grid" style="display: none;">
+            <div class="voucher-card disabled">
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">2026 寒假閱讀計畫</div>
+                    <div class="card-code">WINTER2026READ</div>
+                    <div class="card-date">已於 2026/02/01 使用</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <span class="status-text status-used">已使用</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Tools (Floating) -->
+        <div
+            style="position: fixed; right: 20px; bottom: 100px; width: 280px; padding: 15px; background-color: #fff; border: 1px solid #e6a700; border-left: 5px solid #e6a700; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 900;">
+            <h4 style="margin-top:0; margin-bottom: 10px; color: #856404; font-size: 16px;">🧪 模擬外部連結測試</h4>
+            <p style="font-size: 13px; margin: 0 0 10px; color: #666;">模擬「從 EDM/廣告」點擊帶參數連結：</p>
+            <ul style="font-size: 13px; padding-left: 20px; margin-bottom: 0;">
+                <li style="margin-bottom: 5px;"><a href="?code=AUTO_FILL_EXAMPLE">連結 A (模擬: 成功)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=EXPIRED_2025">連結 B (模擬: 過期)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=INVALID_CODE_123">連結 C (模擬: 代碼錯誤)</a></li>
+                <li style="margin-bottom: 5px;"><a href="?code=USED_BY_OTHER_99">連結 D (模擬: 已被使用)</a></li>
+                <li><a href="?">清除網址參數</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast">Message</div>
+
+    <script>
+        // 1. Tab Interaction Logic
+        function switchTab(tabId, element) {
+            // Hide all lists
+            document.querySelectorAll('.voucher-grid').forEach(el => el.style.display = 'none');
+            // Show selected list
+            document.getElementById('tab-' + tabId).style.display = 'grid';
+
+            // Update active styling
+            document.querySelectorAll('.sub-tab-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // 2. Add Voucher Logic
+        function addVoucher() {
+            const input = document.getElementById('voucherCodeInput');
+            const code = input.value.trim();
+
+            if (!code) {
+                showToast('請輸入兌換碼', false);
+                return;
+            }
+
+            // Mock Success/Fail Logic
+            if (code.includes('EXPIRED')) {
+                showToast('❌ 兌換失敗：此代碼已過期', false);
+            } else if (code.toLowerCase() === 'fail' || code.includes('INVALID')) {
+                showToast('❌ 兌換失敗：查無此兌換碼，請確認輸入', false);
+            } else if (code.includes('USED')) {
+                showToast('❌ 兌換失敗：此兌換碼已被使用', false);
+            } else {
+                // Success Scenario
+                showToast('✅ 兌換成功！已歸戶至您的帳戶', true);
+
+                // Add new card to 'Available'
+                addNewCard(code);
+
+                // Switch to available tab to show it
+                const availableTabBtn = document.querySelector('.sub-tab-item');
+                switchTab('available', availableTabBtn);
+
+                // Clear input
+                input.value = '';
+            }
+        }
+
+        function addNewCard(code) {
+            const container = document.getElementById('tab-available');
+            const newCard = document.createElement('div');
+            newCard.className = 'voucher-card';
+            newCard.style.animation = 'fadeIn 0.5s';
+
+            newCard.innerHTML = `
+                <div class="ticket-notch notch-left"></div>
+                <div class="ticket-notch notch-right"></div>
+                <div class="card-icon">
+                     <svg viewBox="0 0 24 24"><path d="M20,6H16V5C16,3.89 15.1,3 14,3H10C8.89,3 8,3.89 8,5V6H4C2.89,6 2,6.89 2,8V19C2,20.1 2.89,21 4,21H20C21.1,21 22,20.1 22,19V8C22,6.89 21.1,6 20,6M10,5H14V6H10V5M20,19H4V8H20V19Z"/><path d="M12,19L11,15H5V8H20V15H13L12,19Z" fill-opacity="0.3"/></svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">新兌換商品 (${code})</div>
+                    <div class="card-code">${code.toUpperCase()}</div>
+                    <div class="card-date">即日起 ~ 2027/12/31</div>
+                    <div class="card-limit">可兌換 1 個項目</div>
+                </div>
+                <div class="card-action">
+                    <button class="use-btn" onclick="redeemVoucher('${code}')">立即使用</button>
+                </div>
+            `;
+
+            // Insert at top
+            container.insertBefore(newCard, container.firstChild);
+        }
+
+        // 3. Redeem Interaction Logic
+        function redeemVoucher(code) {
+            // Confirm dialog
+            if (confirm(`確認要使用兌換碼「${code}」進行兌換嗎？\n(將會跳轉至商品頁面)`)) {
+                showToast('🔄 正在導向商品頁面...', true);
+
+                // Simulate redirect delay to show the toast first
+                setTimeout(() => {
+                    // Redirect to the existing page for demonstration as requested
+                    window.location.href = 'https://dev-member.gvm.com.tw/account/account_upgrade';
+                }, 1000);
+            }
+        }
+
+        // Toast Helper
+        function showToast(message, isSuccess) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "toast show " + (isSuccess ? "success" : "error");
+
+            // Reset animation
+            setTimeout(function () {
+                toast.className = toast.className.replace("show", "");
+            }, 3000);
+        }
+
+        // Auto-focus input for convenience
+        // document.getElementById('voucherCodeInput').focus();
+
+        // 4. Auto-fill Logic on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            if (code) {
+                const input = document.getElementById('voucherCodeInput');
+                input.value = code;
+                input.classList.add('highlight');
+                // showToast(`ℹ️ 已自動帶入兌換碼：${code}`, true);
+
+                // Remove highlight after animation
+                setTimeout(() => input.classList.remove('highlight'), 2000);
+            }
+        });
+    </script>
+</body>
+
+</html>

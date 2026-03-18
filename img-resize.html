@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>圖片縮放工具</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.3px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.1);
+      padding: 24px;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed #d0d0d0;
+      border-radius: 8px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: #4f7cff;
+      background: #f0f4ff;
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+    .upload-hint { font-size: .85rem; color: #888; margin-top: 4px; }
+
+    /* Preview */
+    .preview-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .preview-wrap.visible { display: flex; }
+    .preview-wrap img {
+      max-width: 100%;
+      max-height: 260px;
+      border-radius: 6px;
+      border: 1px solid #e8e8e8;
+      object-fit: contain;
+    }
+    .img-info {
+      font-size: .8rem;
+      color: #666;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .reupload-btn {
+      font-size: .8rem;
+      color: #4f7cff;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Dimensions */
+    .section-title {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 10px;
+    }
+
+    .dim-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    .dim-row .field { flex: 1; }
+
+    .scale-row { margin-top: 10px; }
+    .scale-row .field { max-width: 160px; }
+
+    .field label {
+      display: block;
+      font-size: .8rem;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .field .input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .field .input-wrap:focus-within { border-color: #4f7cff; }
+    .field .input-wrap.error { border-color: #e53e3e; }
+    .field input {
+      border: none;
+      outline: none;
+      padding: 8px 10px;
+      font-size: .95rem;
+      width: 100%;
+      background: transparent;
+    }
+    .field .unit {
+      padding: 0 10px;
+      font-size: .8rem;
+      color: #aaa;
+      white-space: nowrap;
+      border-left: 1px solid #e8e8e8;
+      background: #fafafa;
+    }
+    .field .err-msg {
+      font-size: .75rem;
+      color: #e53e3e;
+      margin-top: 3px;
+      min-height: 16px;
+    }
+
+    .link-icon {
+      color: #bbb;
+      font-size: 1.2rem;
+      padding-bottom: 20px;
+      user-select: none;
+    }
+
+    /* Output */
+    .output-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .output-row .field { flex: 1; min-width: 120px; }
+
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: .95rem;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: #4f7cff; }
+
+    .quality-wrap { display: flex; align-items: center; gap: 10px; }
+    .quality-wrap input[type="range"] { flex: 1; accent-color: #4f7cff; }
+    .quality-val {
+      font-size: .85rem;
+      font-weight: 600;
+      color: #4f7cff;
+      min-width: 28px;
+      text-align: right;
+    }
+    .quality-field { display: none; }
+    .quality-field.visible { display: block; }
+
+    /* Button */
+    .download-btn {
+      width: 100%;
+      padding: 12px;
+      background: #4f7cff;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .2s, opacity .2s;
+    }
+    .download-btn:hover { background: #3a64e8; }
+    .download-btn:disabled { background: #c0c0c0; cursor: not-allowed; opacity: .7; }
+
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-toast {
+      background: #fff2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .85rem;
+      display: none;
+    }
+    .error-toast.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<h1>圖片縮放工具</h1>
+
+<div class="card">
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp">
+    <div class="upload-icon">🖼️</div>
+    <div>點擊或拖曳上傳圖片</div>
+    <div class="upload-hint">支援 JPG、PNG、WebP、GIF、BMP，最大 20MB</div>
+  </div>
+
+  <!-- Error toast -->
+  <div class="error-toast" id="errorToast"></div>
+
+  <!-- Preview -->
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" src="" alt="預覽">
+    <div class="img-info" id="imgInfo"></div>
+    <button class="reupload-btn" id="reuploadBtn">更換圖片</button>
+  </div>
+
+  <!-- Original dimensions (manual input or auto-filled from upload) -->
+  <div id="origSection">
+    <div class="section-title">原始尺寸</div>
+    <div class="dim-row">
+      <div class="field">
+        <label for="origW">原始寬度</label>
+        <div class="input-wrap" id="wrapOrigW">
+          <input type="number" id="origW" min="1" max="100000" placeholder="輸入寬度">
+          <span class="unit">px</span>
+        </div>
+        <div class="err-msg" id="errOrigW"></div>
+      </div>
+      <div class="link-icon" style="padding-bottom:20px; color:#ddd;">×</div>
+      <div class="field">
+        <label for="origH">原始高度</label>
+        <div class="input-wrap" id="wrapOrigH">
+          <input type="number" id="origH" min="1" max="100000" placeholder="輸入高度">
+          <span class="unit">px</span>
+        </div>
+        <div class="err-msg" id="errOrigH"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="border:none; border-top:1px solid #f0f0f0;">
+
+  <!-- Target dimensions -->
+  <div id="dimSection">
+    <div class="section-title">目標尺寸</div>
+    <div class="dim-row">
+      <div class="field">
+        <label for="inputW">寬度</label>
+        <div class="input-wrap" id="wrapW">
+          <input type="number" id="inputW" min="1" max="100000" placeholder="—">
+          <span class="unit">px</span>
+        </div>
+        <div class="err-msg" id="errW"></div>
+      </div>
+      <div class="link-icon">⇔</div>
+      <div class="field">
+        <label for="inputH">高度</label>
+        <div class="input-wrap" id="wrapH">
+          <input type="number" id="inputH" min="1" max="100000" placeholder="—">
+          <span class="unit">px</span>
+        </div>
+        <div class="err-msg" id="errH"></div>
+      </div>
+    </div>
+    <div class="scale-row">
+      <div class="field">
+        <label for="inputScale">縮放比例</label>
+        <div class="input-wrap" id="wrapScale">
+          <input type="number" id="inputScale" min="0.01" max="10000" step="0.1" placeholder="—">
+          <span class="unit">%</span>
+        </div>
+        <div class="err-msg" id="errScale"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output format & quality (only shown when image is loaded) -->
+  <div id="outputSection" style="display:none;">
+    <div class="section-title">輸出設定</div>
+    <div class="output-row">
+      <div class="field">
+        <label for="selectFmt">格式</label>
+        <select id="selectFmt">
+          <option value="same">與原圖相同</option>
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+          <option value="image/webp">WebP</option>
+        </select>
+      </div>
+      <div class="field quality-field" id="qualityField">
+        <label>品質 <span class="quality-val" id="qualityVal">90</span></label>
+        <div class="quality-wrap">
+          <input type="range" id="qualityRange" min="1" max="100" value="90">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download button -->
+  <button class="download-btn" id="downloadBtn" disabled>
+    <span id="btnText">縮放並下載</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+  // ── State ──
+  let origMime = '', origFileName = '';
+  let imageLoaded = false;
+  let updating = false;
+
+  // ── Elements ──
+  const fileInput     = document.getElementById('fileInput');
+  const uploadZone    = document.getElementById('uploadZone');
+  const previewWrap   = document.getElementById('previewWrap');
+  const previewImg    = document.getElementById('previewImg');
+  const imgInfo       = document.getElementById('imgInfo');
+  const reuploadBtn   = document.getElementById('reuploadBtn');
+  const errorToast    = document.getElementById('errorToast');
+  const elOrigW       = document.getElementById('origW');
+  const elOrigH       = document.getElementById('origH');
+  const wrapOrigW     = document.getElementById('wrapOrigW');
+  const wrapOrigH     = document.getElementById('wrapOrigH');
+  const errOrigW      = document.getElementById('errOrigW');
+  const errOrigH      = document.getElementById('errOrigH');
+  const inputW        = document.getElementById('inputW');
+  const inputH        = document.getElementById('inputH');
+  const inputScale    = document.getElementById('inputScale');
+  const wrapW         = document.getElementById('wrapW');
+  const wrapH         = document.getElementById('wrapH');
+  const wrapScale     = document.getElementById('wrapScale');
+  const errW          = document.getElementById('errW');
+  const errH          = document.getElementById('errH');
+  const errScale      = document.getElementById('errScale');
+  const outputSection = document.getElementById('outputSection');
+  const selectFmt     = document.getElementById('selectFmt');
+  const qualityField  = document.getElementById('qualityField');
+  const qualityRange  = document.getElementById('qualityRange');
+  const qualityVal    = document.getElementById('qualityVal');
+  const downloadBtn   = document.getElementById('downloadBtn');
+  const btnText       = document.getElementById('btnText');
+  const spinner       = document.getElementById('spinner');
+  const canvas        = document.getElementById('canvas');
+
+  // ── Getters ──
+  function getOrigW() { return parseFloat(elOrigW.value); }
+  function getOrigH() { return parseFloat(elOrigH.value); }
+  function hasValidOrig() { return isValidPx(getOrigW()) && isValidPx(getOrigH()); }
+
+  // ── Upload ──
+  function handleFile(file) {
+    showError('');
+    if (!file) return;
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp'];
+    if (!allowed.includes(file.type)) {
+      showError('不支援此格式，請上傳 JPG / PNG / WebP / GIF / BMP');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      showError('檔案大小超過 20MB，請選擇較小的檔案');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        origMime = file.type;
+        origFileName = file.name.replace(/\.[^.]+$/, '');
+        imageLoaded = true;
+
+        // Auto-fill original dims
+        elOrigW.value = img.naturalWidth;
+        elOrigH.value = img.naturalHeight;
+        clearError(wrapOrigW, errOrigW);
+        clearError(wrapOrigH, errOrigH);
+
+        previewImg.src = e.target.result;
+        imgInfo.textContent =
+          `${img.naturalWidth} × ${img.naturalHeight} px　` +
+          `${file.type.split('/')[1].toUpperCase()}　${formatBytes(file.size)}`;
+        uploadZone.style.display = 'none';
+        previewWrap.classList.add('visible');
+        outputSection.style.display = '';
+
+        // Reset target to 100%
+        inputW.value = img.naturalWidth;
+        inputH.value = img.naturalHeight;
+        inputScale.value = 100;
+        clearTargetErrors();
+        updateDownloadBtn();
+        updateQualityVisibility();
+      };
+      img.onerror = () => showError('圖片讀取失敗，請重新嘗試');
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    handleFile(e.dataTransfer.files[0]);
+  });
+
+  reuploadBtn.addEventListener('click', () => {
+    uploadZone.style.display = '';
+    previewWrap.classList.remove('visible');
+    outputSection.style.display = 'none';
+    fileInput.value = '';
+    imageLoaded = false;
+    origMime = '';
+    elOrigW.value = '';
+    elOrigH.value = '';
+    inputW.value = inputH.value = inputScale.value = '';
+    clearError(wrapOrigW, errOrigW);
+    clearError(wrapOrigH, errOrigH);
+    clearTargetErrors();
+  });
+
+  // ── Original dims manual input ──
+  // When user changes origW or origH manually, recalculate target dims if target has a value
+  function onOrigChanged() {
+    if (!hasValidOrig()) return;
+    // Re-derive target from current scale if available, else reset to 100%
+    const s = parseFloat(inputScale.value);
+    if (isValidScale(s)) {
+      syncFrom('scale');
+    } else {
+      inputW.value = getOrigW();
+      inputH.value = getOrigH();
+      inputScale.value = 100;
+    }
+    updateDownloadBtn();
+  }
+
+  elOrigW.addEventListener('input', () => {
+    const v = parseFloat(elOrigW.value);
+    if (v >= 1) { clearError(wrapOrigW, errOrigW); onOrigChanged(); }
+    else setError(wrapOrigW, errOrigW, '請輸入正整數');
+  });
+  elOrigH.addEventListener('input', () => {
+    const v = parseFloat(elOrigH.value);
+    if (v >= 1) { clearError(wrapOrigH, errOrigH); onOrigChanged(); }
+    else setError(wrapOrigH, errOrigH, '請輸入正整數');
+  });
+
+  // ── Target dimension linkage ──
+  function syncFrom(source) {
+    if (updating || !hasValidOrig()) return;
+    updating = true;
+    clearTargetErrors();
+
+    const ow = getOrigW(), oh = getOrigH();
+
+    if (source === 'w') {
+      const w = parseFloat(inputW.value);
+      if (isValidPx(w)) {
+        inputH.value = Math.max(1, Math.round(oh * (w / ow)));
+        inputScale.value = round1(w / ow * 100);
+      } else {
+        setError(wrapW, errW, '請輸入正整數');
+      }
+    } else if (source === 'h') {
+      const h = parseFloat(inputH.value);
+      if (isValidPx(h)) {
+        inputW.value = Math.max(1, Math.round(ow * (h / oh)));
+        inputScale.value = round1(h / oh * 100);
+      } else {
+        setError(wrapH, errH, '請輸入正整數');
+      }
+    } else if (source === 'scale') {
+      const s = parseFloat(inputScale.value);
+      if (isValidScale(s)) {
+        inputW.value = Math.max(1, Math.round(ow * s / 100));
+        inputH.value = Math.max(1, Math.round(oh * s / 100));
+      } else {
+        setError(wrapScale, errScale, '請輸入大於 0 的數值');
+      }
+    }
+
+    updateDownloadBtn();
+    updating = false;
+  }
+
+  inputW.addEventListener('input', () => syncFrom('w'));
+  inputH.addEventListener('input', () => syncFrom('h'));
+  inputScale.addEventListener('input', () => syncFrom('scale'));
+
+  // ── Output format / quality ──
+  function updateQualityVisibility() {
+    const mime = selectFmt.value === 'same' ? origMime : selectFmt.value;
+    qualityField.classList.toggle('visible', mime === 'image/jpeg' || mime === 'image/webp');
+  }
+
+  selectFmt.addEventListener('change', updateQualityVisibility);
+  qualityRange.addEventListener('input', () => { qualityVal.textContent = qualityRange.value; });
+
+  function getOutputMime() {
+    return selectFmt.value === 'same' ? origMime : selectFmt.value;
+  }
+
+  // ── Download ──
+  downloadBtn.addEventListener('click', async () => {
+    if (!imageLoaded) return;
+    const w = parseInt(inputW.value);
+    const h = parseInt(inputH.value);
+    if (!isValidPx(w) || !isValidPx(h)) return;
+
+    setLoading(true);
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    try {
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(previewImg, 0, 0, w, h);
+
+      const mime = getOutputMime();
+      const quality = (mime === 'image/jpeg' || mime === 'image/webp')
+        ? parseFloat(qualityRange.value) / 100 : undefined;
+      const ext = mime.split('/')[1].replace('jpeg', 'jpg');
+
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${origFileName}_${w}x${h}.${ext}`;
+        a.click();
+        URL.revokeObjectURL(url);
+        setLoading(false);
+      }, mime, quality);
+    } catch {
+      showError('縮放處理失敗，請重新嘗試');
+      setLoading(false);
+    }
+  });
+
+  // ── Helpers ──
+  function isValidPx(v)    { return Number.isFinite(v) && v >= 1; }
+  function isValidScale(v) { return Number.isFinite(v) && v > 0; }
+  function round1(v)       { return Math.round(v * 10) / 10; }
+  function formatBytes(b)  {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1048576).toFixed(1) + ' MB';
+  }
+  function showError(msg) {
+    errorToast.textContent = msg;
+    errorToast.classList.toggle('visible', !!msg);
+  }
+  function setError(wrap, errEl, msg) { wrap.classList.add('error'); errEl.textContent = msg; }
+  function clearError(wrap, errEl)    { wrap.classList.remove('error'); errEl.textContent = ''; }
+  function clearTargetErrors() {
+    clearError(wrapW, errW); clearError(wrapH, errH); clearError(wrapScale, errScale);
+  }
+  function updateDownloadBtn() {
+    const w = parseFloat(inputW.value), h = parseFloat(inputH.value);
+    downloadBtn.disabled = !(imageLoaded && isValidPx(w) && isValidPx(h));
+  }
+  function setLoading(on) {
+    downloadBtn.disabled = on;
+    btnText.style.display = on ? 'none' : '';
+    spinner.style.display = on ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>
