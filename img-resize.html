@@ -123,6 +123,8 @@
     }
     .field .input-wrap:focus-within { border-color: #4f7cff; }
     .field .input-wrap.error { border-color: #e53e3e; }
+    .field .input-wrap.readonly { background: #f5f5f5; }
+    .field .input-wrap.readonly input { color: #888; cursor: not-allowed; }
     .field input {
       border: none;
       outline: none;
@@ -151,6 +153,55 @@
       font-size: 1.2rem;
       padding-bottom: 20px;
       user-select: none;
+    }
+
+    /* Aspect ratio toggle */
+    .aspect-toggle {
+      background: none;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: .9rem;
+      line-height: 1;
+      transition: border-color .2s, background .2s, color .2s;
+      margin-bottom: 20px;
+      white-space: nowrap;
+      color: #aaa;
+    }
+    .aspect-toggle:hover { border-color: #4f7cff; background: #f0f4ff; color: #4f7cff; }
+    .aspect-toggle.locked { color: #4f7cff; border-color: #4f7cff; background: #f0f4ff; }
+
+    /* AI note */
+    .ai-note {
+      font-size: .78rem;
+      color: #7a5c00;
+      padding: 7px 11px;
+      background: #fffbeb;
+      border: 1px solid #f0d080;
+      border-radius: 6px;
+      margin-top: 10px;
+      display: none;
+    }
+    .ai-note.visible { display: block; }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      height: 4px;
+      background: #e8e8e8;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+      display: none;
+    }
+    .progress-bar-wrap.visible { display: block; }
+    .progress-bar { height: 100%; background: #4f7cff; width: 0%; transition: width .15s linear; }
+    .progress-label {
+      font-size: .75rem;
+      color: #888;
+      text-align: center;
+      margin-top: 4px;
+      min-height: 14px;
     }
 
     /* Output */
@@ -287,7 +338,7 @@
         </div>
         <div class="err-msg" id="errW"></div>
       </div>
-      <div class="link-icon">⇔</div>
+      <button class="aspect-toggle locked" id="aspectToggle" title="切換等比／非等比縮放">🔗</button>
       <div class="field">
         <label for="inputH">高度</label>
         <div class="input-wrap" id="wrapH">
@@ -297,7 +348,7 @@
         <div class="err-msg" id="errH"></div>
       </div>
     </div>
-    <div class="scale-row">
+    <div class="scale-row" id="scaleRow">
       <div class="field">
         <label for="inputScale">縮放比例</label>
         <div class="input-wrap" id="wrapScale">
@@ -307,6 +358,7 @@
         <div class="err-msg" id="errScale"></div>
       </div>
     </div>
+    <div class="ai-note" id="aiNote">⚡ 非等比模式：使用內容感知智慧縮放，避免畫面變形，處理時間較長</div>
   </div>
 
   <!-- Output format & quality (only shown when image is loaded) -->
@@ -332,10 +384,16 @@
   </div>
 
   <!-- Download button -->
-  <button class="download-btn" id="downloadBtn" disabled>
-    <span id="btnText">縮放並下載</span>
-    <div class="spinner" id="spinner"></div>
-  </button>
+  <div>
+    <button class="download-btn" id="downloadBtn" disabled>
+      <span id="btnText">縮放並下載</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+    <div class="progress-bar-wrap" id="progressBarWrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel"></div>
+  </div>
 
 </div>
 
@@ -346,44 +404,65 @@
   let origMime = '', origFileName = '';
   let imageLoaded = false;
   let updating = false;
+  let proportional = true;
 
   // ── Elements ──
-  const fileInput     = document.getElementById('fileInput');
-  const uploadZone    = document.getElementById('uploadZone');
-  const previewWrap   = document.getElementById('previewWrap');
-  const previewImg    = document.getElementById('previewImg');
-  const imgInfo       = document.getElementById('imgInfo');
-  const reuploadBtn   = document.getElementById('reuploadBtn');
-  const errorToast    = document.getElementById('errorToast');
-  const elOrigW       = document.getElementById('origW');
-  const elOrigH       = document.getElementById('origH');
-  const wrapOrigW     = document.getElementById('wrapOrigW');
-  const wrapOrigH     = document.getElementById('wrapOrigH');
-  const errOrigW      = document.getElementById('errOrigW');
-  const errOrigH      = document.getElementById('errOrigH');
-  const inputW        = document.getElementById('inputW');
-  const inputH        = document.getElementById('inputH');
-  const inputScale    = document.getElementById('inputScale');
-  const wrapW         = document.getElementById('wrapW');
-  const wrapH         = document.getElementById('wrapH');
-  const wrapScale     = document.getElementById('wrapScale');
-  const errW          = document.getElementById('errW');
-  const errH          = document.getElementById('errH');
-  const errScale      = document.getElementById('errScale');
-  const outputSection = document.getElementById('outputSection');
-  const selectFmt     = document.getElementById('selectFmt');
-  const qualityField  = document.getElementById('qualityField');
-  const qualityRange  = document.getElementById('qualityRange');
-  const qualityVal    = document.getElementById('qualityVal');
-  const downloadBtn   = document.getElementById('downloadBtn');
-  const btnText       = document.getElementById('btnText');
-  const spinner       = document.getElementById('spinner');
-  const canvas        = document.getElementById('canvas');
+  const fileInput      = document.getElementById('fileInput');
+  const uploadZone     = document.getElementById('uploadZone');
+  const previewWrap    = document.getElementById('previewWrap');
+  const previewImg     = document.getElementById('previewImg');
+  const imgInfo        = document.getElementById('imgInfo');
+  const reuploadBtn    = document.getElementById('reuploadBtn');
+  const errorToast     = document.getElementById('errorToast');
+  const elOrigW        = document.getElementById('origW');
+  const elOrigH        = document.getElementById('origH');
+  const wrapOrigW      = document.getElementById('wrapOrigW');
+  const wrapOrigH      = document.getElementById('wrapOrigH');
+  const errOrigW       = document.getElementById('errOrigW');
+  const errOrigH       = document.getElementById('errOrigH');
+  const inputW         = document.getElementById('inputW');
+  const inputH         = document.getElementById('inputH');
+  const inputScale     = document.getElementById('inputScale');
+  const wrapW          = document.getElementById('wrapW');
+  const wrapH          = document.getElementById('wrapH');
+  const wrapScale      = document.getElementById('wrapScale');
+  const errW           = document.getElementById('errW');
+  const errH           = document.getElementById('errH');
+  const errScale       = document.getElementById('errScale');
+  const outputSection  = document.getElementById('outputSection');
+  const selectFmt      = document.getElementById('selectFmt');
+  const qualityField   = document.getElementById('qualityField');
+  const qualityRange   = document.getElementById('qualityRange');
+  const qualityVal     = document.getElementById('qualityVal');
+  const downloadBtn    = document.getElementById('downloadBtn');
+  const btnText        = document.getElementById('btnText');
+  const spinner        = document.getElementById('spinner');
+  const canvas         = document.getElementById('canvas');
+  const aspectToggle   = document.getElementById('aspectToggle');
+  const aiNote         = document.getElementById('aiNote');
+  const scaleRowEl     = document.getElementById('scaleRow');
+  const progressBarWrap = document.getElementById('progressBarWrap');
+  const progressBar    = document.getElementById('progressBar');
+  const progressLabel  = document.getElementById('progressLabel');
 
   // ── Getters ──
   function getOrigW() { return parseFloat(elOrigW.value); }
   function getOrigH() { return parseFloat(elOrigH.value); }
   function hasValidOrig() { return isValidPx(getOrigW()) && isValidPx(getOrigH()); }
+
+  // ── Aspect ratio toggle ──
+  aspectToggle.addEventListener('click', () => {
+    proportional = !proportional;
+    aspectToggle.classList.toggle('locked', proportional);
+    aspectToggle.textContent = proportional ? '🔗' : '🔓';
+    aiNote.classList.toggle('visible', !proportional);
+    scaleRowEl.style.display = proportional ? '' : 'none';
+    if (proportional && hasValidOrig()) {
+      const w = parseFloat(inputW.value);
+      if (isValidPx(w)) syncFrom('w');
+    }
+    updateDownloadBtn();
+  });
 
   // ── Upload ──
   function handleFile(file) {
@@ -408,9 +487,13 @@
         origFileName = file.name.replace(/\.[^.]+$/, '');
         imageLoaded = true;
 
-        // Auto-fill original dims
+        // Auto-fill original dims and lock them
         elOrigW.value = img.naturalWidth;
         elOrigH.value = img.naturalHeight;
+        elOrigW.readOnly = true;
+        elOrigH.readOnly = true;
+        wrapOrigW.classList.add('readonly');
+        wrapOrigH.classList.add('readonly');
         clearError(wrapOrigW, errOrigW);
         clearError(wrapOrigH, errOrigH);
 
@@ -454,42 +537,20 @@
     origMime = '';
     elOrigW.value = '';
     elOrigH.value = '';
+    elOrigW.readOnly = false;
+    elOrigH.readOnly = false;
+    wrapOrigW.classList.remove('readonly');
+    wrapOrigH.classList.remove('readonly');
     inputW.value = inputH.value = inputScale.value = '';
     clearError(wrapOrigW, errOrigW);
     clearError(wrapOrigH, errOrigH);
     clearTargetErrors();
   });
 
-  // ── Original dims manual input ──
-  // When user changes origW or origH manually, recalculate target dims if target has a value
-  function onOrigChanged() {
-    if (!hasValidOrig()) return;
-    // Re-derive target from current scale if available, else reset to 100%
-    const s = parseFloat(inputScale.value);
-    if (isValidScale(s)) {
-      syncFrom('scale');
-    } else {
-      inputW.value = getOrigW();
-      inputH.value = getOrigH();
-      inputScale.value = 100;
-    }
-    updateDownloadBtn();
-  }
-
-  elOrigW.addEventListener('input', () => {
-    const v = parseFloat(elOrigW.value);
-    if (v >= 1) { clearError(wrapOrigW, errOrigW); onOrigChanged(); }
-    else setError(wrapOrigW, errOrigW, '請輸入正整數');
-  });
-  elOrigH.addEventListener('input', () => {
-    const v = parseFloat(elOrigH.value);
-    if (v >= 1) { clearError(wrapOrigH, errOrigH); onOrigChanged(); }
-    else setError(wrapOrigH, errOrigH, '請輸入正整數');
-  });
-
   // ── Target dimension linkage ──
   function syncFrom(source) {
     if (updating || !hasValidOrig()) return;
+    if (!proportional) { updateDownloadBtn(); return; }
     updating = true;
     clearTargetErrors();
 
@@ -550,14 +611,24 @@
     if (!isValidPx(w) || !isValidPx(h)) return;
 
     setLoading(true);
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    showProgress(true, 0);
 
     try {
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, w, h);
-      ctx.drawImage(previewImg, 0, 0, w, h);
+      if (proportional) {
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(previewImg, 0, 0, w, h);
+        showProgress(false);
+      } else {
+        const result = await contentAwareResize(previewImg, w, h, p => showProgress(true, p));
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(result, 0, 0, w, h);
+        showProgress(false);
+      }
 
       const mime = getOutputMime();
       const quality = (mime === 'image/jpeg' || mime === 'image/webp')
@@ -575,9 +646,185 @@
       }, mime, quality);
     } catch {
       showError('縮放處理失敗，請重新嘗試');
+      showProgress(false);
       setLoading(false);
     }
   });
+
+  // ── Seam Carving（內容感知智慧縮放）────────────────────────────────────────
+  const SC_MAX_DIM = 700; // 最大工作尺寸，控制效能
+
+  function scYield() { return new Promise(r => setTimeout(r, 0)); }
+
+  // 計算每個像素的能量（雙梯度）
+  function scEnergy(px, w, h) {
+    const e = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const xL = x > 0 ? x - 1 : 1,     xR = x < w - 1 ? x + 1 : x - 1;
+        const yU = y > 0 ? y - 1 : 1,     yD = y < h - 1 ? y + 1 : y - 1;
+        const iL = (y * w + xL) * 4, iR = (y * w + xR) * 4;
+        const iU = (yU * w + x) * 4, iD = (yD * w + x) * 4;
+        const rx = px[iR]-px[iL], gx = px[iR+1]-px[iL+1], bx = px[iR+2]-px[iL+2];
+        const ry = px[iD]-px[iU], gy = px[iD+1]-px[iU+1], by = px[iD+2]-px[iU+2];
+        e[y * w + x] = rx*rx + gx*gx + bx*bx + ry*ry + gy*gy + by*by;
+      }
+    }
+    return e;
+  }
+
+  // 動態規劃找最低能量垂直接縫
+  function scFindSeam(e, w, h) {
+    const dp   = new Float32Array(w * h);
+    const from = new Int8Array(w * h); // dx: -1, 0, 1
+    for (let x = 0; x < w; x++) dp[x] = e[x];
+    for (let y = 1; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let best = dp[(y-1)*w+x], dx = 0;
+        if (x > 0   && dp[(y-1)*w+x-1] < best) { best = dp[(y-1)*w+x-1]; dx = -1; }
+        if (x < w-1 && dp[(y-1)*w+x+1] < best) { best = dp[(y-1)*w+x+1]; dx =  1; }
+        dp[y*w+x] = e[y*w+x] + best;
+        from[y*w+x] = dx;
+      }
+    }
+    let minX = 0;
+    for (let x = 1; x < w; x++) if (dp[(h-1)*w+x] < dp[(h-1)*w+minX]) minX = x;
+    const seam = new Int32Array(h);
+    seam[h-1] = minX;
+    for (let y = h-2; y >= 0; y--) seam[y] = seam[y+1] + from[(y+1)*w+seam[y+1]];
+    return seam;
+  }
+
+  // 移除一條垂直接縫
+  function scRemove(px, w, h, seam) {
+    const nw = w - 1;
+    const out = new Uint8ClampedArray(nw * h * 4);
+    for (let y = 0; y < h; y++) {
+      const sx = seam[y], s = y * w * 4, d = y * nw * 4;
+      out.set(px.subarray(s, s + sx * 4), d);
+      out.set(px.subarray(s + (sx+1)*4, s + w*4), d + sx*4);
+    }
+    return out;
+  }
+
+  // 插入 k 條垂直接縫（放大用）
+  function scInsert(px, w, h, k) {
+    const e = scEnergy(px, w, h);
+    const seams = [];
+    for (let i = 0; i < k; i++) {
+      const seam = scFindSeam(e, w, h);
+      seams.push(seam);
+      // 標記已選接縫，避免重複選擇
+      for (let y = 0; y < h; y++) e[y * w + seam[y]] = 1e15;
+    }
+    // 對每行收集接縫 x 座標並排序後插入
+    const nw = w + k;
+    const out = new Uint8ClampedArray(nw * h * 4);
+    const rowSeams = Array.from({length: h}, () => []);
+    for (let i = 0; i < k; i++) for (let y = 0; y < h; y++) rowSeams[y].push(seams[i][y]);
+    for (let y = 0; y < h; y++) {
+      const xs = rowSeams[y].sort((a, b) => a - b);
+      let si = 0, dstX = 0;
+      for (let x = 0; x < w; x++) {
+        const so = (y * w + x) * 4, dst = (y * nw + dstX) * 4;
+        out[dst] = px[so]; out[dst+1] = px[so+1]; out[dst+2] = px[so+2]; out[dst+3] = px[so+3];
+        dstX++;
+        while (si < xs.length && xs[si] === x) {
+          const nx = Math.min(x + 1, w - 1);
+          const no = (y * w + nx) * 4, io = (y * nw + dstX) * 4;
+          out[io]   = (px[so] + px[no]) >> 1;
+          out[io+1] = (px[so+1] + px[no+1]) >> 1;
+          out[io+2] = (px[so+2] + px[no+2]) >> 1;
+          out[io+3] = (px[so+3] + px[no+3]) >> 1;
+          dstX++; si++;
+        }
+      }
+    }
+    return out;
+  }
+
+  // 轉置像素陣列（寬高對調，用於處理水平接縫）
+  function scTranspose(px, w, h) {
+    const out = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const s = (y * w + x) * 4, d = (x * h + y) * 4;
+        out[d] = px[s]; out[d+1] = px[s+1]; out[d+2] = px[s+2]; out[d+3] = px[s+3];
+      }
+    return out; // 新尺寸: 寬=h, 高=w
+  }
+
+  // 主流程：內容感知縮放
+  async function contentAwareResize(srcImg, targetW, targetH, onProgress) {
+    const srcW = srcImg.naturalWidth, srcH = srcImg.naturalHeight;
+
+    // 限制工作尺寸以控制效能，最終結果再等比放回目標尺寸
+    const scale = Math.min(1.0, SC_MAX_DIM / Math.max(srcW, srcH));
+    const workW = Math.round(srcW * scale), workH = Math.round(srcH * scale);
+    const wtW   = Math.max(1, Math.round(targetW * scale));
+    const wtH   = Math.max(1, Math.round(targetH * scale));
+
+    // 以工作尺寸繪製來源圖
+    const wc = document.createElement('canvas');
+    wc.width = workW; wc.height = workH;
+    wc.getContext('2d').drawImage(srcImg, 0, 0, workW, workH);
+    let px = wc.getContext('2d').getImageData(0, 0, workW, workH).data;
+    let cW = workW, cH = workH;
+
+    const total = Math.max(1, Math.abs(wtW - workW) + Math.abs(wtH - workH));
+    let done = 0;
+
+    // ── 調整寬度（垂直接縫） ──
+    if (wtW < cW) {
+      const cnt = cW - wtW;
+      for (let i = 0; i < cnt; i++) {
+        const e = scEnergy(px, cW, cH);
+        px = scRemove(px, cW, cH, scFindSeam(e, cW, cH));
+        cW--; done++;
+        if (i % 8 === 0) { onProgress(done / total); await scYield(); }
+      }
+    } else if (wtW > cW) {
+      px = scInsert(px, cW, cH, wtW - cW);
+      done += wtW - cW; cW = wtW;
+      onProgress(done / total); await scYield();
+    }
+
+    // ── 調整高度（轉置後處理垂直接縫，再轉置回來） ──
+    if (wtH !== cH) {
+      px = scTranspose(px, cW, cH);
+      let tW = cH, tH = cW; // 轉置後: 新寬=原高, 新高=原寬
+
+      if (wtH < tW) {
+        const cnt = tW - wtH;
+        for (let i = 0; i < cnt; i++) {
+          const e = scEnergy(px, tW, tH);
+          px = scRemove(px, tW, tH, scFindSeam(e, tW, tH));
+          tW--; done++;
+          if (i % 8 === 0) { onProgress(done / total); await scYield(); }
+        }
+      } else {
+        px = scInsert(px, tW, tH, wtH - tW);
+        done += wtH - tW; tW = wtH;
+        onProgress(done / total); await scYield();
+      }
+
+      px = scTranspose(px, tW, tH);
+      cW = tH; cH = tW;
+    }
+
+    onProgress(1);
+
+    // 將工作結果放大至目標尺寸（等比放大，無額外失真）
+    const tmp = document.createElement('canvas');
+    tmp.width = cW; tmp.height = cH;
+    tmp.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(px.buffer), cW, cH), 0, 0);
+
+    const out = document.createElement('canvas');
+    out.width = targetW; out.height = targetH;
+    out.getContext('2d').drawImage(tmp, 0, 0, targetW, targetH);
+    return out;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   // ── Helpers ──
   function isValidPx(v)    { return Number.isFinite(v) && v >= 1; }
@@ -605,6 +852,11 @@
     downloadBtn.disabled = on;
     btnText.style.display = on ? 'none' : '';
     spinner.style.display = on ? 'block' : 'none';
+  }
+  function showProgress(visible, pct = 0) {
+    progressBarWrap.classList.toggle('visible', visible);
+    progressBar.style.width = (pct * 100).toFixed(1) + '%';
+    progressLabel.textContent = visible ? `智慧縮放中… ${Math.round(pct * 100)}%` : '';
   }
 </script>
 </body>
