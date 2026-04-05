@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PWA 側邊導覽 Prototype — 文章頁</title>
+
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; color: #222; font-size: 16px; }
+
+/* ── Header ── */
+.site-header {
+  background: #fff; border-bottom: 1px solid #e5e5e5;
+  padding: 0 20px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.header-logo { font-size: 18px; font-weight: 800; color: #005596; letter-spacing: -1px; }
+.header-logo span { color: #e00; }
+.header-nav { display: flex; gap: 20px; font-size: 13px; color: #555; }
+.header-nav a { text-decoration: none; color: inherit; }
+
+/* ── Article Layout ── */
+.article-wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+
+.article-category {
+  display: inline-block;
+  background: #005596; color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 3px;
+  margin-bottom: 14px; letter-spacing: .5px;
+}
+.article-title {
+  font-size: 26px; font-weight: 800; line-height: 1.4;
+  color: #111; margin-bottom: 16px;
+}
+.article-meta {
+  display: flex; gap: 12px; font-size: 12px; color: #999;
+  margin-bottom: 24px; padding-bottom: 20px;
+  border-bottom: 1px solid #eee; align-items: center;
+}
+.article-meta .author { color: #005596; font-weight: 600; }
+.article-hero-img {
+  width: 100%; aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #005596 0%, #0088cc 60%, #00aee8 100%);
+  border-radius: 6px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.4); font-size: 13px;
+}
+.article-body { font-size: 16px; line-height: 1.85; color: #333; }
+.article-body p { margin-bottom: 22px; }
+.article-body h2 { font-size: 20px; font-weight: 700; color: #111; margin: 32px 0 14px; }
+.article-body blockquote {
+  border-left: 4px solid #005596; padding: 12px 16px;
+  background: #f5f9ff; border-radius: 0 6px 6px 0;
+  margin: 24px 0; font-style: italic; color: #444;
+}
+
+/* ── 廣告模擬 ── */
+.ad-block {
+  background: #f5f5f5; border: 1px dashed #ccc; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #bbb; font-weight: 600; letter-spacing: 1px;
+}
+.ad-inline { height: 90px; margin: 28px 0; }
+.ad-bottom { height: 60px; margin: 0; }
+
+/* ── 延伸閱讀 ── */
+.related-section { margin-top: 40px; padding-top: 28px; border-top: 2px solid #005596; }
+.related-section h3 { font-size: 15px; font-weight: 700; color: #005596; margin-bottom: 16px; }
+.related-list { display: flex; flex-direction: column; gap: 12px; }
+.related-item {
+  display: flex; gap: 12px; cursor: pointer;
+  padding: 8px; border-radius: 6px; transition: background .15s;
+}
+.related-item:hover { background: #f5f9ff; }
+.related-thumb {
+  width: 80px; height: 54px; border-radius: 4px; flex-shrink: 0;
+  background: linear-gradient(135deg, #888, #bbb);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.related-info .r-title { font-size: 13px; font-weight: 600; color: #222; line-height: 1.4; margin-bottom: 4px; }
+.related-info .r-meta  { font-size: 11px; color: #999; }
+
+/* ── 通知視窗模擬 ── */
+.notification-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid #e5e5e5;
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+  z-index: 50; font-size: 13px;
+}
+.notification-bar .notif-text { color: #333; }
+.notification-bar .notif-text strong { color: #005596; }
+.notif-actions { display: flex; gap: 8px; }
+.notif-btn {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer; transition: background .15s;
+}
+.notif-btn.primary { background: #005596; color: #fff; }
+.notif-btn.secondary { background: #f0f0f0; color: #666; }
+
+/* ══════════════════════════════════════
+   側邊導覽組合（gotop + 上下頁 + 首頁）
+   ══════════════════════════════════════ */
+.side-nav {
+  position: fixed;
+  right: 1rem;
+  bottom: 3rem;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.side-nav.visible { opacity: 1; }
+
+/* 有底部通知列時往上推 */
+body:has(.notification-bar) .side-nav {
+  bottom: 4.5rem;
+}
+
+/* 每顆按鈕基底 — 同原始 gotop 樣式 */
+.side-btn {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 50%;
+  border: 0.0625rem solid #b8b9ba;
+  background: #fff;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  transition: background .2s, border-color .2s, opacity .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  color: #555;
+}
+.side-btn:hover:not(:disabled) {
+  background: #005596; border-color: #005596; color: #fff;
+}
+.side-btn:disabled {
+  opacity: .25; cursor: default;
+}
+
+/* gotop 沿用原始半透明風格 */
+.side-btn.gotop-btn:hover { background: #fff; border-color: #b8b9ba; color: #555; }
+.side-btn.gotop-btn:hover svg { opacity: .8; }
+
+/* ── Tooltip ── */
+.side-btn { position: relative; }
+.side-btn::before {
+  content: attr(data-tip);
+  position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,.7); color: #fff;
+  font-size: 11px; white-space: nowrap;
+  padding: 3px 8px; border-radius: 4px;
+  opacity: 0; pointer-events: none; transition: opacity .15s;
+}
+.side-btn:hover::before { opacity: 1; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.75); color: #fff;
+  padding: 8px 18px; border-radius: 20px; font-size: 13px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s; z-index: 999;
+}
+.toast.show { opacity: 1; }
+
+/* ── 響應式 ── */
+@media (max-width: 992px) {
+  .site-header { padding: 0 16px; }
+  .article-wrap { padding: 24px 16px 80px; }
+  .article-title { font-size: 22px; }
+  .header-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="site-header">
+  <div class="header-logo">遠見<span>·</span>天下文化</div>
+  <nav class="header-nav">
+    <a href="#">封面故事</a>
+    <a href="#">財富</a>
+    <a href="#">ESG</a>
+    <a href="#">數位閱讀</a>
+  </nav>
+</header>
+
+<!-- ── Article ── -->
+<main class="article-wrap">
+  <div class="article-category">封面故事</div>
+  <h1 class="article-title">台灣 AI 產業新浪潮：三大趨勢解析，誰是下一個輝達受惠者？</h1>
+  <div class="article-meta">
+    <span class="author">林佳賢</span>
+    <span>2026-04-05</span>
+    <span>閱讀時間 8 分鐘</span>
+    <span>👁 12,840</span>
+  </div>
+
+  <div class="article-hero-img">封面圖片 16:9</div>
+
+  <div class="article-body">
+    <p>生成式 AI 浪潮席捲全球，台灣憑藉半導體優勢，正站在最關鍵的轉型路口。從輝達供應鏈到自主 AI 模型，本期《遠見》深度剖析三個改變台灣未來的核心趨勢。</p>
+
+    <blockquote>「AI 不是威脅，是台灣產業升級最好的機會。」— 台積電研發副總裁</blockquote>
+
+    <h2>趨勢一：CoWoS 先進封裝進入超競爭時代</h2>
+    <p>隨著 AI 晶片需求暴增，CoWoS 先進封裝產能成為兵家必爭之地。台積電、日月光、矽品等大廠紛紛加碼擴產，但供給追趕需求的速度仍不足。分析師預估，2026 年 CoWoS 缺口仍高達 30%。</p>
+    <p>對此，輝達執行長黃仁勳透露，正積極與台灣供應鏈合作，強化 GB200 及下一代 Rubin 架構的封裝產能。這對台灣在地封裝廠商而言，是難得的黃金視窗。</p>
+
+    <!-- 廣告 -->
+    <div class="ad-block ad-inline">AD — 336×90</div>
+
+    <h2>趨勢二：邊緣 AI 裝置打開台灣 ODM 新藍海</h2>
+    <p>隨著大型語言模型逐漸輕量化，邊緣 AI 裝置市場開始爆發。研調機構預估，2026 年全球邊緣 AI 裝置出貨量將突破 8 億台，台灣 ODM 廠商具備快速整合供應鏈的優勢，有望吃下全球 40% 的訂單。</p>
+    <p>廣達、仁寶、緯創等大廠已陸續與 Meta、Google、Microsoft 簽訂 AI PC 及 AI 邊緣伺服器的長期合約，預計為台灣代工業帶來超過 3,000 億台幣的新增產值。</p>
+
+    <h2>趨勢三：台灣自主 AI 模型啟動「主權 AI」布局</h2>
+    <p>在地緣政治風險升溫的背景下，政府與產業界開始積極推動「主權 AI」計畫。行政院宣布投入 100 億台幣建立台灣繁體中文基礎模型，並與台大、清大、成大等頂尖大學合作，建立 AI 人才培訓管道。</p>
+    <p>台灣 AI 雲（TWCC）已成為國內企業訓練大型模型的首選平台，月活躍使用者在過去一年成長了 340%，顯示本土 AI 應用需求正在快速成熟。</p>
+
+    <p>面對 AI 浪潮，台灣的優勢在於製造與設計的深度整合能力。然而，軟體人才的短缺與法規環境的落後，仍是產業升級的最大挑戰。如何在硬體強項之外，建立完整的 AI 軟體生態系，將是決定台灣能否在 AI 時代保持競爭力的關鍵。</p>
+  </div>
+
+  <!-- 延伸閱讀 -->
+  <div class="related-section">
+    <h3>延伸閱讀</h3>
+    <div class="related-list">
+      <div class="related-item">
+        <div class="related-thumb">💰</div>
+        <div class="related-info">
+          <div class="r-title">2026 下半年投資布局：法人最看好的五大板塊</div>
+          <div class="r-meta">2026.04 · 財富管理</div>
+        </div>
+      </div>
+      <div class="related-item">
+        <div class="related-thumb">🌱</div>
+        <div class="related-info">
+          <div class="r-title">淨零路上的台灣企業：誰做到了，誰還在說</div>
+          <div class="r-meta">2026.04 · ESG 永續</div>
+        </div>
+      </div>
+      <div class="related-item">
+        <div class="related-thumb">🏥</div>
+        <div class="related-info">
+          <div class="r-title">超高齡社會的照護危機：2030 年缺口怎麼補</div>
+          <div class="r-meta">2026.04 · 健康醫療</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部廣告 -->
+  <div style="margin-top: 40px;">
+    <div class="ad-block ad-bottom">AD — 728×60</div>
+  </div>
+</main>
+
+<!-- ── 通知視窗（模擬底部佔位）── -->
+<div class="notification-bar" id="notifBar">
+  <span class="notif-text">訂閱<strong>遠見電子報</strong>，每週精選 5 篇重要報導</span>
+  <div class="notif-actions">
+    <button class="notif-btn primary">訂閱</button>
+    <button class="notif-btn secondary" onclick="document.getElementById('notifBar').style.display='none'">✕</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     側邊導覽組合
+     ══════════════════════════════ -->
+<div class="side-nav" id="sideNav">
+
+  <!-- Gotop（原始樣式保留）-->
+  <button class="side-btn gotop-btn" data-tip="回頂部"
+          onclick="scrollToTop()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+  </button>
+
+  <!-- 上頁 -->
+  <button class="side-btn" id="btnBack" data-tip="上一頁"
+          onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </button>
+
+  <!-- 下頁 -->
+  <button class="side-btn" id="btnForward" data-tip="下一頁"
+          onclick="goForward()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </button>
+
+  <!-- 回首頁 -->
+  <button class="side-btn" data-tip="回首頁"
+          onclick="goHome()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+    </svg>
+  </button>
+
+</div>
+
+
+<script>
+// ── PWA 偵測 ──
+const isPWA = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+
+function goBack() {
+  history.back();
+}
+
+function goForward() {
+  history.forward();
+}
+
+function goHome() {
+  window.location.href = '/';
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 捲動超過 300px 才顯示 side-nav ──
+const sideNav = document.getElementById('sideNav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 300) {
+    sideNav.classList.add('visible');
+  } else {
+    sideNav.classList.remove('visible');
+  }
+}, { passive: true });
+
+</script>
+</body>
+</html>
