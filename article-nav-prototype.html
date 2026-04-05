@@ -173,6 +173,47 @@ body:has(.notification-bar) .side-nav {
 }
 .toast.show { opacity: 1; }
 
+/* ── 方案切換 Toggle ── */
+.mode-toggle {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 999;
+  background: #fff; border: 1px solid #ddd; border-radius: 20px;
+  display: flex; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12); font-size: 12px;
+}
+.mode-btn {
+  padding: 6px 14px; border: none; background: transparent;
+  cursor: pointer; font-size: 12px; font-weight: 600; color: #888;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.mode-btn.active { background: #005596; color: #fff; }
+
+/* ── Minimal-UI Chrome Bar（預設隱藏）── */
+.minimal-chrome {
+  display: none;
+  position: sticky; top: 0; z-index: 101;
+  background: #f4f4f4; border-bottom: 1px solid #d0d0d0;
+  padding: 5px 8px;
+  align-items: center; gap: 6px;
+}
+.minimal-chrome.show { display: flex; }
+.mc-btn {
+  border: none; background: transparent;
+  font-size: 16px; cursor: pointer; color: #444;
+  padding: 3px 6px; border-radius: 4px; line-height: 1;
+  transition: background .15s;
+}
+.mc-btn:disabled { opacity: .3; cursor: default; }
+.mc-btn:not(:disabled):hover { background: #e0e0e0; }
+.mc-title {
+  flex: 1; font-size: 11px; color: #333; font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;
+}
+.mc-share { font-size: 14px; }
+
+/* minimal-ui 模式下隱藏 side-nav */
+body.mode-minimal .side-nav { display: none !important; }
+
 /* ── 響應式 ── */
 @media (max-width: 992px) {
   .site-header { padding: 0 16px; }
@@ -183,6 +224,20 @@ body:has(.notification-bar) .side-nav {
 </style>
 </head>
 <body>
+
+<!-- ── 方案切換 Toggle ── -->
+<div class="mode-toggle">
+  <button class="mode-btn active" onclick="setMode('standalone')">側邊按鈕（Standalone）</button>
+  <button class="mode-btn"        onclick="setMode('minimal')">Minimal-UI</button>
+</div>
+
+<!-- ── Minimal-UI Chrome Bar（瀏覽器原生列模擬）── -->
+<div class="minimal-chrome" id="minimalChrome">
+  <button class="mc-btn" id="mcBack"    onclick="goBack()"    disabled>&#8592;</button>
+  <button class="mc-btn" id="mcForward" onclick="goForward()" disabled>&#8594;</button>
+  <div class="mc-title">gvm.com.tw</div>
+  <button class="mc-btn mc-share">&#8679;</button>
+</div>
 
 <!-- ── Header ── -->
 <header class="site-header">
@@ -309,9 +364,22 @@ body:has(.notification-bar) .side-nav {
 
 
 <script>
-// ── PWA 偵測 ──
-const isPWA = window.matchMedia('(display-mode: standalone)').matches
-            || window.navigator.standalone === true;
+// ── 方案切換 ──
+function setMode(mode) {
+  const btns = document.querySelectorAll('.mode-btn');
+  const chrome = document.getElementById('minimalChrome');
+  if (mode === 'minimal') {
+    document.body.classList.add('mode-minimal');
+    chrome.classList.add('show');
+    btns[0].classList.remove('active');
+    btns[1].classList.add('active');
+  } else {
+    document.body.classList.remove('mode-minimal');
+    chrome.classList.remove('show');
+    btns[0].classList.add('active');
+    btns[1].classList.remove('active');
+  }
+}
 
 function goBack() {
   history.back();
