@@ -453,32 +453,9 @@
 
     <!-- 指定捐贈表單 -->
     <div id="designated-form">
-
-      <!-- 收件學校名稱 -->
-      <div class="form-group">
-        <div class="form-label">收件學校名稱（先選縣市再選學校）：</div>
-        <div class="school-row">
-          <select id="county-select">
-            <option value="">縣市</option>
-          </select>
-
-          <div class="searchable-wrap">
-            <input type="text" class="searchable-input" id="school-search"
-                   placeholder="學校" disabled autocomplete="off" readonly>
-            <div class="dropdown-list" id="school-dropdown"></div>
-          </div>
-        </div>
-
-
-        <div class="school-address-row" id="school-address-row">
-          學校地址：<span id="school-address-text"></span>
-        </div>
-      </div>
-
       <!-- 收件學校名稱2 -->
       <div class="form-group">
-        <div class="form-label"><span class="required">*</span>收件學校名稱（直接選學校）：</div>
-        <div style="font-size:11px;color:#bbb;margin-bottom:6px;">※ prototype 測試：可輸入「忠孝」查看搜尋效果</div>
+        <div class="form-label"><span class="required">*</span>收件學校名稱：</div>
         <div class="searchable-wrap" style="max-width:420px">
           <input type="text" class="searchable-input" id="school2-search"
                  placeholder="輸入關鍵字搜尋學校…" autocomplete="off">
@@ -492,10 +469,13 @@
       <!-- 收件窗口 -->
       <div class="form-group">
         <label class="form-label" for="recipient-input">
-          <span class="required">*</span>收件窗口：
+          <span class="required">*</span>收件窗口：<span style="font-weight:400;font-size:12px;color:#888;">（限15字）</span>
         </label>
-        <input type="text" class="text-input" id="recipient-input"
-               placeholder="請輸入收件處室或年級、班級、收件者姓名等。">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <input type="text" class="text-input" id="recipient-input"
+                 placeholder="請輸入收件處室或年級、班級、收件者姓名等。" maxlength="15">
+          <span class="char-count" id="recipient-count">0 / 15</span>
+        </div>
       </div>
 
       <!-- 名條註記 -->
@@ -4204,112 +4184,6 @@ const SCHOOL_DATA = {
 };
 
 // ──────────────────────────────────────────────
-// 初始化縣市下拉選單
-// ──────────────────────────────────────────────
-const countySelect = document.getElementById('county-select');
-COUNTIES.forEach(c => {
-  const opt = document.createElement('option');
-  opt.value = c;
-  opt.textContent = c;
-  countySelect.appendChild(opt);
-});
-
-// ──────────────────────────────────────────────
-// Searchable School Dropdown
-// ──────────────────────────────────────────────
-const schoolSearch = document.getElementById('school-search');
-const schoolDropdown = document.getElementById('school-dropdown');
-const schoolAddressRow = document.getElementById('school-address-row');
-const schoolAddressText = document.getElementById('school-address-text');
-
-let currentSchools = [];
-let selectedSchool = null;
-
-function renderDropdown(filter = '') {
-  const q = filter.trim().toLowerCase();
-  const matched = q
-    ? currentSchools.filter(s => s.name.toLowerCase().includes(q) || s.code.includes(q))
-    : currentSchools;
-
-  schoolDropdown.innerHTML = '';
-  if (matched.length === 0) {
-    schoolDropdown.innerHTML = '<div class="dropdown-item"><span class="school-no-result">查無符合學校</span></div>';
-    return;
-  }
-  matched.forEach(s => {
-    const item = document.createElement('div');
-    item.className = 'dropdown-item';
-    item.innerHTML = `<span class="school-name">${s.name}</span><span class="school-type">${s.type}</span>`;
-    item.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      selectSchool(s);
-    });
-    schoolDropdown.appendChild(item);
-  });
-}
-
-function selectSchool(s) {
-  selectedSchool = s;
-  schoolSearch.value = s.name;
-  schoolSearch.readOnly = false;
-  schoolDropdown.classList.remove('open');
-  schoolAddressText.textContent = `${s.zip}${s.address}`;
-  schoolAddressRow.classList.add('visible');
-}
-
-function clearSchool() {
-  selectedSchool = null;
-  schoolSearch.value = '';
-  schoolAddressRow.classList.remove('visible');
-  schoolAddressText.textContent = '';
-}
-
-countySelect.addEventListener('change', () => {
-  const county = countySelect.value;
-  clearSchool();
-  if (county && SCHOOL_DATA[county]) {
-    currentSchools = SCHOOL_DATA[county];
-    schoolSearch.disabled = false;
-    schoolSearch.readOnly = false;
-    schoolSearch.placeholder = '輸入關鍵字搜尋學校…';
-    schoolSearch.focus();
-  } else {
-    currentSchools = [];
-    schoolSearch.disabled = true;
-    schoolSearch.placeholder = '學校';
-    schoolDropdown.classList.remove('open');
-  }
-});
-
-schoolSearch.addEventListener('focus', () => {
-  if (!schoolSearch.disabled) {
-    renderDropdown(schoolSearch.value);
-    schoolDropdown.classList.add('open');
-  }
-});
-
-schoolSearch.addEventListener('input', () => {
-  selectedSchool = null;
-  schoolAddressRow.classList.remove('visible');
-  renderDropdown(schoolSearch.value);
-  schoolDropdown.classList.add('open');
-});
-
-schoolSearch.addEventListener('blur', () => {
-  setTimeout(() => schoolDropdown.classList.remove('open'), 150);
-});
-
-// 點擊外部關閉下拉
-document.addEventListener('click', (e) => {
-  if (!schoolSearch.contains(e.target) && !schoolDropdown.contains(e.target)) {
-    schoolDropdown.classList.remove('open');
-  }
-  if (!school2Search.contains(e.target) && !school2Dropdown.contains(e.target)) {
-    school2Dropdown.classList.remove('open');
-  }
-});
-
-// ──────────────────────────────────────────────
 // 收件學校2（跨縣市搜尋，不需先選縣市）
 // ──────────────────────────────────────────────
 const school2Search = document.getElementById('school2-search');
@@ -4337,7 +4211,7 @@ function renderSchool2Dropdown(q) {
     matched.slice(0, 40).forEach(s => {
       const item = document.createElement('div');
       item.className = 'dropdown-item';
-      item.innerHTML = `<span class="school-name">${s.name}</span><span class="school-type">${s.county}・${s.type}</span>`;
+      item.innerHTML = `<span class="school-name">${s.county} ${s.name}</span>`;
       item.addEventListener('mousedown', e => {
         e.preventDefault();
         school2Search.value = s.name;
@@ -4367,6 +4241,14 @@ school2Search.addEventListener('blur', () => {
 // ──────────────────────────────────────────────
 // 名條字數計算 & 帶入小朋友姓名
 // ──────────────────────────────────────────────
+const recipientInput = document.getElementById('recipient-input');
+const recipientCount  = document.getElementById('recipient-count');
+recipientInput.addEventListener('input', () => {
+  const len = recipientInput.value.length;
+  recipientCount.textContent = `${len} / 15`;
+  recipientCount.style.color = len > 12 ? '#c00' : '#aaa';
+});
+
 const nameTagInput = document.getElementById('name-tag-input');
 const charCount = document.getElementById('char-count');
 const copyNameBtn = document.getElementById('copy-child-name-btn');
