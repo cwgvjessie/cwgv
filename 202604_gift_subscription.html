@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訂購表單 Prototype</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 24px;
+    font-size: 14px;
+  }
+
+  .container { max-width: 760px; margin: 0 auto; }
+
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+
+  .card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8e8e8;
+    color: #222;
+  }
+
+  /* ── 商品選擇 ── */
+  .product-group { margin-bottom: 10px; }
+  .product-group h3 {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 5px;
+    padding-left: 2px;
+  }
+
+  /* 橫向 wrap 佈局 */
+  .item-table {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .item-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 10px 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+    user-select: none;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  .item-row:hover { border-color: #c00; background: #fff8f8; }
+  .item-row.selected { border-color: #c00; background: #fff0f0; }
+  .item-row.selected .row-name { color: #c00; }
+
+  .item-row input { accent-color: #c00; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+  .row-name { font-size: 14px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-item { background: #e8f4e8; color: #2a7a2a; }
+  .badge-donation { background: #fff0e0; color: #c06000; }
+  .badge-plan { background: #e8eeff; color: #2040aa; }
+
+  /* 購物車摘要 */
+  #cart-summary {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #555;
+    min-height: 38px;
+  }
+  #cart-summary .empty { color: #bbb; font-style: italic; }
+  #cart-summary .tag {
+    display: inline-block;
+    background: #c00;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px 4px 2px 0;
+    font-size: 12px;
+  }
+
+  /* ── 小朋友資料區 ── */
+  #child-section { border-left: 4px solid #c00; }
+
+  .child-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .child-header h2 { border: none; padding: 0; margin: 0; }
+
+  .child-fields {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .child-field { display: flex; flex-direction: column; gap: 5px; }
+  .child-field label { font-size: 13px; color: #333; }
+  .child-field label .required { color: #c00; }
+
+  .birthday-row { display: flex; gap: 8px; }
+  .birthday-row select { height: 36px; min-width: 90px; font-size: 14px; }
+
+  /* ── 公益捐贈區 ── */
+  #donation-section { border-left: 4px solid #c00; }
+
+  .donation-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .info-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #c00;
+    color: #fff;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    cursor: help;
+  }
+  .donation-header h2 { border: none; padding: 0; margin: 0; }
+
+  .donation-type {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 20px;
+  }
+  .donation-type label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .donation-type input { accent-color: #c00; width: 16px; height: 16px; }
+
+  /* ── 表單欄位 ── */
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  .form-label .required { color: #c00; }
+
+  /* 學校選擇列 */
+  .school-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  select {
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color .15s;
+  }
+  select:focus { border-color: #c00; }
+  select:disabled { background: #f5f5f5; color: #aaa; cursor: not-allowed; }
+
+  #county-select { min-width: 140px; }
+
+  /* Searchable dropdown */
+  .searchable-wrap {
+    position: relative;
+    min-width: 220px;
+    flex: 1;
+  }
+
+  .searchable-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 32px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+  }
+  .searchable-input:focus { border-color: #c00; }
+  .searchable-input:disabled { background-color: #f5f5f5; color: #aaa; cursor: not-allowed; }
+
+  .dropdown-list {
+    display: none;
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #c00;
+    border-radius: 5px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  }
+  .dropdown-list.open { display: block; }
+
+  .dropdown-item {
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: background .1s;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.4;
+  }
+  .dropdown-item:last-child { border-bottom: none; }
+  .dropdown-item:hover, .dropdown-item.active { background: #fff0f0; }
+  .dropdown-item .school-name { font-weight: 500; }
+  .dropdown-item .school-type { font-size: 11px; color: #888; margin-left: 4px; }
+  .dropdown-item .school-no-result { color: #aaa; font-style: italic; }
+
+  /* 地址自動帶入 */
+  .school-address-row {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+    display: none;
+  }
+  .school-address-row.visible { display: block; }
+  .school-address-row span { color: #333; font-weight: 500; }
+
+  /* 文字輸入框 */
+  .text-input {
+    width: 100%;
+    max-width: 460px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .text-input:focus { border-color: #c00; }
+
+  .field-hint {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* 帶入小朋友姓名按鈕 */
+  .copy-name-btn {
+    margin-left: 10px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    color: #c00;
+    background: #fff;
+    border: 1px solid #c00;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    vertical-align: middle;
+  }
+  .copy-name-btn:hover { background: #c00; color: #fff; }
+  .copy-name-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* 名條註記 */
+  .name-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .name-tag-row .text-input { max-width: 200px; }
+  .share-suffix { font-size: 14px; color: #333; white-space: nowrap; }
+  .char-count { font-size: 12px; color: #aaa; }
+
+  /* 不指定捐贈訊息 */
+  #no-designation-msg {
+    display: none;
+    padding: 12px 16px;
+    background: #f8f8f8;
+    border-radius: 6px;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* 動畫 */
+  .fade-in {
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RWD */
+  @media (max-width: 540px) {
+    .school-row { flex-direction: column; }
+    #county-select { width: 100%; }
+    .searchable-wrap { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ══════════════════ 商品選擇 ══════════════════ -->
+  <div class="card">
+    <h2>選購商品</h2>
+
+    <!-- 料號（複選） -->
+    <div class="product-group">
+      <h3>加購料號（可複選）</h3>
+      <div class="item-table">
+        <label class="item-row">
+          <input type="checkbox" name="item" value="料號111111">
+          <span class="row-name">料號111111</span>
+          <span class="badge badge-item">料號</span>
+        </label>
+        <label class="item-row">
+          <input type="checkbox" name="item" value="料號22222">
+          <span class="row-name">料號22222</span>
+          <span class="badge badge-item">料號</span>
+        </label>
+        <label class="item-row">
+          <input type="checkbox" name="item" value="料號33333">
+          <span class="row-name">料號33333</span>
+          <span class="badge badge-item">料號</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 方案（單選，互斥） -->
+    <div class="product-group">
+      <h3>選擇方案（單選）</h3>
+      <div class="item-table">
+        <label class="item-row">
+          <input type="radio" name="plan" value="" checked>
+          <span class="row-name">無</span>
+        </label>
+        <label class="item-row">
+          <input type="radio" name="plan" value="方案111111不含贈閱方案">
+          <span class="row-name">方案111111不含贈閱方案</span>
+          <span class="badge badge-plan">方案</span>
+        </label>
+        <label class="item-row">
+          <input type="radio" name="plan" value="方案222222不含贈閱方案">
+          <span class="row-name">方案222222不含贈閱方案</span>
+          <span class="badge badge-plan">方案</span>
+        </label>
+        <label class="item-row">
+          <input type="radio" name="plan" value="方案33333含贈閱方案">
+          <span class="row-name">方案33333含贈閱方案</span>
+          <span class="badge badge-donation">含贈閱 ✦ 公益捐贈</span>
+        </label>
+        <label class="item-row">
+          <input type="radio" name="plan" value="方案44444含贈閱方案">
+          <span class="row-name">方案44444含贈閱方案</span>
+          <span class="badge badge-donation">含贈閱 ✦ 公益捐贈</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 購物車摘要 -->
+    <div id="cart-summary"><span class="empty">尚未選擇任何商品</span></div>
+  </div>
+
+  <!-- ══════════════════ 小朋友資料（選任一方案即顯示） ══════════════════ -->
+  <div class="card" id="child-section" style="display:none">
+    <div class="child-header">
+      <div class="info-icon">i</div>
+      <h2>小朋友資料</h2>
+    </div>
+    <div class="child-fields">
+      <div class="child-field">
+        <label for="child-name"><span class="required">*</span>小朋友姓名</label>
+        <input type="text" class="text-input" id="child-name" style="max-width:200px">
+      </div>
+      <div class="child-field">
+        <label><span class="required">*</span>小朋友生日</label>
+        <div class="birthday-row">
+          <select id="birth-year">
+            <option value="">西元年</option>
+          </select>
+          <select id="birth-month">
+            <option value="">月份</option>
+            <option>1月</option><option>2月</option><option>3月</option>
+            <option>4月</option><option>5月</option><option>6月</option>
+            <option>7月</option><option>8月</option><option>9月</option>
+            <option>10月</option><option>11月</option><option>12月</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ 公益捐贈計劃（條件顯示） ══════════════════ -->
+  <div class="card" id="donation-section" style="display:none">
+
+    <div class="donation-header">
+      <div class="info-icon" title="公益捐贈計劃說明">i</div>
+      <h2>【點亮閱讀的燈｜公益捐贈計劃】收件資料</h2>
+    </div>
+
+    <!-- 指定／不指定捐贈 -->
+    <div class="donation-type">
+      <label>
+        <input type="radio" name="donationType" value="指定" checked>
+        指定捐贈
+      </label>
+      <label>
+        <input type="radio" name="donationType" value="不指定">
+        不指定捐贈
+      </label>
+    </div>
+
+    <!-- 指定捐贈表單 -->
+    <div id="designated-form">
+
+      <!-- 收件學校名稱 -->
+      <div class="form-group">
+        <div class="form-label"><span class="required">*</span>收件學校名稱：</div>
+        <div class="school-row">
+          <select id="county-select">
+            <option value="">縣市</option>
+          </select>
+
+          <div class="searchable-wrap">
+            <input type="text" class="searchable-input" id="school-search"
+                   placeholder="學校" disabled autocomplete="off" readonly>
+            <div class="dropdown-list" id="school-dropdown"></div>
+          </div>
+        </div>
+        <div class="school-address-row" id="school-address-row">
+          學校地址：<span id="school-address-text"></span>
+        </div>
+      </div>
+
+      <!-- 收件窗口 -->
+      <div class="form-group">
+        <label class="form-label" for="recipient-input">
+          <span class="required">*</span>收件窗口：
+        </label>
+        <input type="text" class="text-input" id="recipient-input"
+               placeholder="請輸入收件處室或年級、班級、收件者姓名等。">
+      </div>
+
+      <!-- 名條註記 -->
+      <div class="form-group">
+        <div class="form-label">
+          名條註記：<span style="font-weight:400;color:#888;font-size:12px;">（選填）</span>
+          <button type="button" id="copy-child-name-btn" class="copy-name-btn" title="帶入小朋友姓名">＋ 帶入小朋友姓名</button>
+        </div>
+        <div class="name-tag-row">
+          <span class="share-suffix">由</span>
+          <input type="text" class="text-input" id="name-tag-input"
+                 placeholder="王小名" maxlength="15">
+          <span class="share-suffix">分享。</span>
+          <span class="char-count" id="char-count">0 / 15</span>
+        </div>
+        <div class="field-hint">*請輸入分享人或分享單位，限15個中文字以內。</div>
+      </div>
+
+    </div>
+
+    <!-- 不指定捐贈訊息 -->
+    <div id="no-designation-msg">
+      您選擇不指定捐贈學校，我們將依公益合作學校名單，統一分配捐贈。感謝您的愛心！
+    </div>
+
+  </div><!-- /donation-section -->
+
+</div><!-- /container -->
+
+<script>
+// ──────────────────────────────────────────────
+// 學校資料（縣市由北至南）
+// ──────────────────────────────────────────────
+const COUNTIES = [
+  "基隆市","臺北市","新北市","桃園市","新竹市","新竹縣",
+  "苗栗縣","臺中市","彰化縣","南投縣","雲林縣",
+  "嘉義市","嘉義縣","臺南市","高雄市","屏東縣",
+  "宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"
+];
+
+const SCHOOL_DATA = {
+  "基隆市": [
+    { code:"020101", name:"基隆市立中正國小", type:"公立", zip:"202", address:"基隆市中正區信一路181號" },
+    { code:"020102", name:"基隆市立仁愛國小", type:"公立", zip:"200", address:"基隆市仁愛區孝一路30號" },
+    { code:"020103", name:"基隆市立信義國小", type:"公立", zip:"201", address:"基隆市信義區深溪路57號" },
+  ],
+  "臺北市": [
+    { code:"030101", name:"臺北市立忠孝國小", type:"公立", zip:"100", address:"臺北市中正區忠孝東路一段115號" },
+    { code:"030102", name:"臺北市立建安國小", type:"公立", zip:"106", address:"臺北市大安區建安街57號" },
+    { code:"030103", name:"臺北市立興雅國小", type:"公立", zip:"110", address:"臺北市信義區松德路23號" },
+    { code:"030104", name:"臺北市立南湖國小", type:"公立", zip:"114", address:"臺北市內湖區康寧路三段200號" },
+    { code:"030105", name:"臺北市立永吉國小", type:"公立", zip:"110", address:"臺北市信義區永吉路252號" },
+    { code:"030201", name:"私立復興小學", type:"私立", zip:"104", address:"臺北市中山區大直街85號" },
+  ],
+  "新北市": [
+    { code:"011301", name:"私立淡江高中附設國小", type:"私立", zip:"251", address:"新北市淡水區真理街26號" },
+    { code:"011302", name:"私立康橋高中附設國小", type:"私立", zip:"231", address:"新北市新店區頂城五街80號" },
+    { code:"011307", name:"新北市裕德高級中等學校附設國小", type:"私立", zip:"236", address:"新北市土城區擺接堡路1號" },
+    { code:"010301", name:"國立華僑高中附設國中", type:"公立", zip:"220", address:"新北市板橋區大觀路一段32號" },
+    { code:"011301b", name:"私立淡江高中附設國中", type:"私立", zip:"251", address:"新北市淡水區真理街26號" },
+    { code:"011302b", name:"私立康橋高中附設國中", type:"私立", zip:"231", address:"新北市新店區華城路800號" },
+    { code:"011306", name:"私立金陵女中附設國中", type:"私立", zip:"241", address:"新北市三重區重新路五段656號" },
+    { code:"010101", name:"新北市立板橋國小", type:"公立", zip:"220", address:"新北市板橋區府中路38號" },
+    { code:"010102", name:"新北市立三重國小", type:"公立", zip:"241", address:"新北市三重區重新路一段50號" },
+  ],
+  "桃園市": [
+    { code:"040101", name:"桃園市立文昌國小", type:"公立", zip:"330", address:"桃園市桃園區文昌路267號" },
+    { code:"040102", name:"桃園市立中埔國小", type:"公立", zip:"320", address:"桃園市中壢區中埔一街171號" },
+    { code:"040103", name:"桃園市立大有國小", type:"公立", zip:"338", address:"桃園市蘆竹區大有路300號" },
+    { code:"040201", name:"私立方濟小學", type:"私立", zip:"330", address:"桃園市桃園區中正路835號" },
+  ],
+  "新竹市": [
+    { code:"050101", name:"新竹市立新竹國小", type:"公立", zip:"300", address:"新竹市東區中山路96號" },
+    { code:"050102", name:"新竹市立關埔國小", type:"公立", zip:"302", address:"新竹市北區關埔路128號" },
+    { code:"050103", name:"新竹市立光武國中", type:"公立", zip:"300", address:"新竹市東區光武里牛埔路123號" },
+  ],
+  "新竹縣": [
+    { code:"060101", name:"竹北市立竹北國小", type:"公立", zip:"302", address:"新竹縣竹北市文興路一段162號" },
+    { code:"060102", name:"竹東鎮立竹東國小", type:"公立", zip:"310", address:"新竹縣竹東鎮北興路1號" },
+  ],
+  "苗栗縣": [
+    { code:"070101", name:"苗栗市立苗栗國小", type:"公立", zip:"360", address:"苗栗縣苗栗市中正路1241號" },
+    { code:"070102", name:"頭份市立頭份國小", type:"公立", zip:"351", address:"苗栗縣頭份市中正路232號" },
+  ],
+  "臺中市": [
+    { code:"080101", name:"臺中市立大同國小", type:"公立", zip:"400", address:"臺中市中區建國路90號" },
+    { code:"080102", name:"臺中市立忠孝國小", type:"公立", zip:"404", address:"臺中市北區永興路149號" },
+    { code:"080103", name:"臺中市立惠文國小", type:"公立", zip:"408", address:"臺中市南屯區大隆路270號" },
+    { code:"080104", name:"臺中市立西屯國小", type:"公立", zip:"407", address:"臺中市西屯區西屯路三段49號" },
+    { code:"080201", name:"私立明道中學附設國小", type:"私立", zip:"414", address:"臺中市烏日區中山路一段497號" },
+  ],
+  "彰化縣": [
+    { code:"090101", name:"彰化市立彰化國小", type:"公立", zip:"500", address:"彰化縣彰化市中山路二段2號" },
+    { code:"090102", name:"員林市立員林國小", type:"公立", zip:"510", address:"彰化縣員林市員林大道二段366號" },
+  ],
+  "南投縣": [
+    { code:"100101", name:"南投市立南投國小", type:"公立", zip:"540", address:"南投縣南投市彰南路一段300號" },
+    { code:"100102", name:"埔里鎮立埔里國小", type:"公立", zip:"545", address:"南投縣埔里鎮清新里中山路四段226號" },
+  ],
+  "雲林縣": [
+    { code:"110101", name:"斗六市立斗六國小", type:"公立", zip:"640", address:"雲林縣斗六市府文路111號" },
+    { code:"110102", name:"虎尾鎮立虎尾國小", type:"公立", zip:"632", address:"雲林縣虎尾鎮光復路120號" },
+  ],
+  "嘉義市": [
+    { code:"120101", name:"嘉義市立嘉義國小", type:"公立", zip:"600", address:"嘉義市東區成仁街218號" },
+    { code:"120102", name:"嘉義市立北興國中", type:"公立", zip:"600", address:"嘉義市東區北興街1號" },
+  ],
+  "嘉義縣": [
+    { code:"130101", name:"太保市立太保國小", type:"公立", zip:"612", address:"嘉義縣太保市祥和二路東段1號" },
+    { code:"130102", name:"朴子市立朴子國小", type:"公立", zip:"613", address:"嘉義縣朴子市中正路136號" },
+  ],
+  "臺南市": [
+    { code:"140101", name:"臺南市立成功國小", type:"公立", zip:"700", address:"臺南市中西區成功路160號" },
+    { code:"140102", name:"臺南市立安平國小", type:"公立", zip:"708", address:"臺南市安平區安平路702號" },
+    { code:"140103", name:"臺南市立崇明國小", type:"公立", zip:"717", address:"臺南市仁德區中山路800號" },
+    { code:"140201", name:"私立長榮女中附設國小", type:"私立", zip:"700", address:"臺南市中西區長榮路一段188號" },
+  ],
+  "高雄市": [
+    { code:"150101", name:"高雄市立鹽埕國小", type:"公立", zip:"803", address:"高雄市鹽埕區瀨南街186號" },
+    { code:"150102", name:"高雄市立博愛國小", type:"公立", zip:"806", address:"高雄市前鎮區博愛二路318號" },
+    { code:"150103", name:"高雄市立光華國小", type:"公立", zip:"807", address:"高雄市三民區光華一路164號" },
+    { code:"150104", name:"高雄市立文府國小", type:"公立", zip:"830", address:"高雄市鳳山區文府路111號" },
+    { code:"150201", name:"私立復文國中", type:"私立", zip:"807", address:"高雄市三民區懷安街71號" },
+  ],
+  "屏東縣": [
+    { code:"160101", name:"屏東市立屏東國小", type:"公立", zip:"900", address:"屏東縣屏東市中山路79號" },
+    { code:"160102", name:"屏東市立大同國小", type:"公立", zip:"900", address:"屏東縣屏東市廣東路365號" },
+  ],
+  "宜蘭縣": [
+    { code:"170101", name:"宜蘭市立宜蘭國小", type:"公立", zip:"260", address:"宜蘭縣宜蘭市中山路二段145號" },
+    { code:"170102", name:"羅東鎮立羅東國小", type:"公立", zip:"265", address:"宜蘭縣羅東鎮中正路33號" },
+  ],
+  "花蓮縣": [
+    { code:"180101", name:"花蓮市立花蓮國小", type:"公立", zip:"970", address:"花蓮縣花蓮市中山路196號" },
+    { code:"180102", name:"花蓮市立明義國小", type:"公立", zip:"970", address:"花蓮縣花蓮市中正路500號" },
+  ],
+  "臺東縣": [
+    { code:"190101", name:"臺東市立臺東國小", type:"公立", zip:"950", address:"臺東縣臺東市中山路275號" },
+    { code:"190102", name:"臺東市立中心國小", type:"公立", zip:"950", address:"臺東縣臺東市中心路260號" },
+  ],
+  "澎湖縣": [
+    { code:"200101", name:"馬公市立馬公國小", type:"公立", zip:"880", address:"澎湖縣馬公市石泉里10號" },
+  ],
+  "金門縣": [
+    { code:"210101", name:"金城鎮立金城國小", type:"公立", zip:"893", address:"金門縣金城鎮環島北路一段1號" },
+  ],
+  "連江縣": [
+    { code:"220101", name:"南竿鄉立介壽國小", type:"公立", zip:"209", address:"連江縣南竿鄉介壽村1號" },
+  ],
+};
+
+// ──────────────────────────────────────────────
+// 初始化縣市下拉選單
+// ──────────────────────────────────────────────
+const countySelect = document.getElementById('county-select');
+COUNTIES.forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c;
+  opt.textContent = c;
+  countySelect.appendChild(opt);
+});
+
+// ──────────────────────────────────────────────
+// Searchable School Dropdown
+// ──────────────────────────────────────────────
+const schoolSearch = document.getElementById('school-search');
+const schoolDropdown = document.getElementById('school-dropdown');
+const schoolAddressRow = document.getElementById('school-address-row');
+const schoolAddressText = document.getElementById('school-address-text');
+
+let currentSchools = [];
+let selectedSchool = null;
+
+function renderDropdown(filter = '') {
+  const q = filter.trim().toLowerCase();
+  const matched = q
+    ? currentSchools.filter(s => s.name.toLowerCase().includes(q) || s.code.includes(q))
+    : currentSchools;
+
+  schoolDropdown.innerHTML = '';
+  if (matched.length === 0) {
+    schoolDropdown.innerHTML = '<div class="dropdown-item"><span class="school-no-result">查無符合學校</span></div>';
+    return;
+  }
+  matched.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item';
+    item.innerHTML = `<span class="school-name">${s.name}</span><span class="school-type">${s.type}</span>`;
+    item.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      selectSchool(s);
+    });
+    schoolDropdown.appendChild(item);
+  });
+}
+
+function selectSchool(s) {
+  selectedSchool = s;
+  schoolSearch.value = s.name;
+  schoolSearch.readOnly = false;
+  schoolDropdown.classList.remove('open');
+  schoolAddressText.textContent = `${s.zip}${s.address}`;
+  schoolAddressRow.classList.add('visible');
+}
+
+function clearSchool() {
+  selectedSchool = null;
+  schoolSearch.value = '';
+  schoolAddressRow.classList.remove('visible');
+  schoolAddressText.textContent = '';
+}
+
+countySelect.addEventListener('change', () => {
+  const county = countySelect.value;
+  clearSchool();
+  if (county && SCHOOL_DATA[county]) {
+    currentSchools = SCHOOL_DATA[county];
+    schoolSearch.disabled = false;
+    schoolSearch.readOnly = false;
+    schoolSearch.placeholder = '輸入關鍵字搜尋學校…';
+    schoolSearch.focus();
+  } else {
+    currentSchools = [];
+    schoolSearch.disabled = true;
+    schoolSearch.placeholder = '學校';
+    schoolDropdown.classList.remove('open');
+  }
+});
+
+schoolSearch.addEventListener('focus', () => {
+  if (!schoolSearch.disabled) {
+    renderDropdown(schoolSearch.value);
+    schoolDropdown.classList.add('open');
+  }
+});
+
+schoolSearch.addEventListener('input', () => {
+  selectedSchool = null;
+  schoolAddressRow.classList.remove('visible');
+  renderDropdown(schoolSearch.value);
+  schoolDropdown.classList.add('open');
+});
+
+schoolSearch.addEventListener('blur', () => {
+  setTimeout(() => schoolDropdown.classList.remove('open'), 150);
+});
+
+// 點擊外部關閉下拉
+document.addEventListener('click', (e) => {
+  if (!schoolSearch.contains(e.target) && !schoolDropdown.contains(e.target)) {
+    schoolDropdown.classList.remove('open');
+  }
+});
+
+// ──────────────────────────────────────────────
+// 名條字數計算 & 帶入小朋友姓名
+// ──────────────────────────────────────────────
+const nameTagInput = document.getElementById('name-tag-input');
+const charCount = document.getElementById('char-count');
+const copyNameBtn = document.getElementById('copy-child-name-btn');
+const childNameInput = document.getElementById('child-name');
+
+function updateCharCount() {
+  const len = nameTagInput.value.length;
+  charCount.textContent = `${len} / 15`;
+  charCount.style.color = len > 12 ? '#c00' : '#aaa';
+}
+
+nameTagInput.addEventListener('input', updateCharCount);
+
+copyNameBtn.addEventListener('click', () => {
+  const name = childNameInput.value.trim();
+  if (!name) {
+    childNameInput.focus();
+    childNameInput.style.outline = '2px solid #c00';
+    setTimeout(() => childNameInput.style.outline = '', 1500);
+    return;
+  }
+  nameTagInput.value = name.slice(0, 15);
+  updateCharCount();
+  nameTagInput.focus();
+});
+
+// ──────────────────────────────────────────────
+// 西元年下拉初始化
+// ──────────────────────────────────────────────
+const birthYearSelect = document.getElementById('birth-year');
+const currentYear = new Date().getFullYear();
+for (let y = currentYear; y >= currentYear - 18; y--) {
+  const opt = document.createElement('option');
+  opt.value = y;
+  opt.textContent = y;
+  birthYearSelect.appendChild(opt);
+}
+
+// ──────────────────────────────────────────────
+// 商品選擇邏輯
+// ──────────────────────────────────────────────
+const DONATION_PLANS = new Set(["方案33333含贈閱方案", "方案44444含贈閱方案"]);
+
+const cartSummary = document.getElementById('cart-summary');
+const childSection = document.getElementById('child-section');
+const donationSection = document.getElementById('donation-section');
+const allLabels = document.querySelectorAll('.item-row');
+
+function showSection(el) {
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    el.classList.add('fade-in');
+    setTimeout(() => el.classList.remove('fade-in'), 300);
+  }
+}
+
+// 更新 label 選中樣式
+function updateLabelStyle() {
+  allLabels.forEach(label => {
+    const input = label.querySelector('input');
+    label.classList.toggle('selected', input.checked);
+  });
+}
+
+// 計算已選商品
+function getSelectedItems() {
+  const items = [...document.querySelectorAll('input[name="item"]:checked')].map(i => i.value);
+  const plan = document.querySelector('input[name="plan"]:checked');
+  return { items, plan: plan ? plan.value : null };
+}
+
+// 更新購物車摘要
+function updateCart() {
+  const { items, plan } = getSelectedItems();
+  updateLabelStyle();
+
+  const all = [...items, ...(plan ? [plan] : [])];
+  if (all.length === 0) {
+    cartSummary.innerHTML = '<span class="empty">尚未選擇任何商品</span>';
+  } else {
+    cartSummary.innerHTML = all.map(v => `<span class="tag">${v}</span>`).join('');
+  }
+
+  // 小朋友資料：選任一方案即顯示
+  if (plan) {
+    showSection(childSection);
+  } else {
+    childSection.style.display = 'none';
+  }
+
+  // 公益捐贈：僅含贈閱方案才顯示
+  const hasDonation = plan && DONATION_PLANS.has(plan);
+  if (hasDonation) {
+    showSection(donationSection);
+  } else {
+    donationSection.style.display = 'none';
+  }
+}
+
+document.querySelectorAll('input[name="item"]').forEach(cb => cb.addEventListener('change', updateCart));
+document.querySelectorAll('input[name="plan"]').forEach(rb => rb.addEventListener('change', updateCart));
+
+// ──────────────────────────────────────────────
+// 指定／不指定捐贈切換
+// ──────────────────────────────────────────────
+const designatedForm = document.getElementById('designated-form');
+const noDesignationMsg = document.getElementById('no-designation-msg');
+
+document.querySelectorAll('input[name="donationType"]').forEach(rb => {
+  rb.addEventListener('change', () => {
+    if (rb.value === '指定') {
+      designatedForm.style.display = 'block';
+      noDesignationMsg.style.display = 'none';
+    } else {
+      designatedForm.style.display = 'none';
+      noDesignationMsg.style.display = 'block';
+    }
+  });
+});
+</script>
+</body>
+</html>
