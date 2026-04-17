@@ -347,7 +347,7 @@
 
     <!-- 料號（複選） -->
     <div class="product-group">
-      <h3>加購料號（可複選）</h3>
+      <h3>模擬購物車：加購料號（可複選）</h3>
       <div class="item-table">
         <label class="item-row">
           <input type="checkbox" name="item" value="料號111111">
@@ -369,7 +369,7 @@
 
     <!-- 方案（單選，互斥） -->
     <div class="product-group">
-      <h3>選擇方案（單選）</h3>
+      <h3>模擬購物車：選擇方案（單選）</h3>
       <div class="item-table">
         <label class="item-row">
           <input type="radio" name="plan" value="" checked>
@@ -468,8 +468,24 @@
             <div class="dropdown-list" id="school-dropdown"></div>
           </div>
         </div>
+
+
         <div class="school-address-row" id="school-address-row">
           學校地址：<span id="school-address-text"></span>
+        </div>
+      </div>
+
+      <!-- 收件學校名稱2 -->
+      <div class="form-group">
+        <div class="form-label">收件學校名稱 2 (參考)：<span style="font-weight:400;color:#888;font-size:12px;">（選填）</span></div>
+        <div style="font-size:11px;color:#bbb;margin-bottom:6px;">※ prototype 測試：可輸入「忠孝」查看搜尋效果</div>
+        <div class="searchable-wrap" style="max-width:420px">
+          <input type="text" class="searchable-input" id="school2-search"
+                 placeholder="輸入關鍵字搜尋學校…" autocomplete="off">
+          <div class="dropdown-list" id="school2-dropdown"></div>
+        </div>
+        <div class="school-address-row" id="school2-address-row">
+          學校地址：<span id="school2-address-text"></span>
         </div>
       </div>
 
@@ -495,7 +511,7 @@
           <span class="share-suffix">分享。</span>
           <span class="char-count" id="char-count">0 / 15</span>
         </div>
-        <div class="field-hint">*請輸入分享人或分享單位，限15個中文字以內。</div>
+        <div class="field-hint">*請輸入分享人或分享單位，限15個中文字以內。留白則不顯示分享人。</div>
       </div>
 
     </div>
@@ -570,6 +586,7 @@ const SCHOOL_DATA = {
     { code:"080103", name:"臺中市立惠文國小", type:"公立", zip:"408", address:"臺中市南屯區大隆路270號" },
     { code:"080104", name:"臺中市立西屯國小", type:"公立", zip:"407", address:"臺中市西屯區西屯路三段49號" },
     { code:"080201", name:"私立明道中學附設國小", type:"私立", zip:"414", address:"臺中市烏日區中山路一段497號" },
+    { code:"080105", name:"臺中市立忠孝國中", type:"公立", zip:"404", address:"臺中市北區忠孝路505號" },
   ],
   "彰化縣": [
     { code:"090101", name:"彰化市立彰化國小", type:"公立", zip:"500", address:"彰化縣彰化市中山路二段2號" },
@@ -732,6 +749,64 @@ document.addEventListener('click', (e) => {
   if (!schoolSearch.contains(e.target) && !schoolDropdown.contains(e.target)) {
     schoolDropdown.classList.remove('open');
   }
+  if (!school2Search.contains(e.target) && !school2Dropdown.contains(e.target)) {
+    school2Dropdown.classList.remove('open');
+  }
+});
+
+// ──────────────────────────────────────────────
+// 收件學校2（跨縣市搜尋，不需先選縣市）
+// ──────────────────────────────────────────────
+const school2Search = document.getElementById('school2-search');
+const school2Dropdown = document.getElementById('school2-dropdown');
+const school2AddressRow = document.getElementById('school2-address-row');
+const school2AddressText = document.getElementById('school2-address-text');
+
+// 所有學校攤平成一個陣列
+const ALL_SCHOOLS = Object.entries(SCHOOL_DATA).flatMap(([county, schools]) =>
+  schools.map(s => ({ ...s, county }))
+);
+
+function renderSchool2Dropdown(q) {
+  const keyword = q.trim().toLowerCase();
+  const matched = keyword
+    ? ALL_SCHOOLS.filter(s => s.name.toLowerCase().includes(keyword) || s.county.includes(keyword))
+    : [];
+
+  school2Dropdown.innerHTML = '';
+  if (!keyword) { school2Dropdown.classList.remove('open'); return; }
+
+  if (matched.length === 0) {
+    school2Dropdown.innerHTML = '<div class="dropdown-item"><span class="school-no-result">查無符合學校</span></div>';
+  } else {
+    matched.slice(0, 40).forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'dropdown-item';
+      item.innerHTML = `<span class="school-name">${s.name}</span><span class="school-type">${s.county}・${s.type}</span>`;
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        school2Search.value = s.name;
+        school2AddressText.textContent = `${s.zip}${s.address}`;
+        school2AddressRow.classList.add('visible');
+        school2Dropdown.classList.remove('open');
+      });
+      school2Dropdown.appendChild(item);
+    });
+  }
+  school2Dropdown.classList.add('open');
+}
+
+school2Search.addEventListener('input', () => {
+  school2AddressRow.classList.remove('visible');
+  renderSchool2Dropdown(school2Search.value);
+});
+
+school2Search.addEventListener('focus', () => {
+  if (school2Search.value.trim()) renderSchool2Dropdown(school2Search.value);
+});
+
+school2Search.addEventListener('blur', () => {
+  setTimeout(() => school2Dropdown.classList.remove('open'), 150);
 });
 
 // ──────────────────────────────────────────────
