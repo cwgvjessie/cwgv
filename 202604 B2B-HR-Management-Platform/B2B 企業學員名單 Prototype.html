@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B 企業學員名單 Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f1f5f9; }
+        .glass-card { background: rgba(255,255,255,0.97); border: 1px solid rgba(226,232,240,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 1rem; }
+        #mobile-menu { display:none; }
+        #mobile-menu.open { display:block; }
+        .modal-bg { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:50; align-items:center; justify-content:center; padding:16px; }
+        .modal-bg.open { display:flex; }
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+        tbody tr:hover td { background:#f8fafc; }
+        tbody tr:hover td.sticky-col { background:#f8fafc; }
+        .sticky-col { position:sticky; background:white; z-index:2; }
+        .sticky-col-0 { left:0; }
+        .sticky-col-1 { left:40px; }
+        #toast { transition: opacity 0.3s, transform 0.3s; }
+        
+        /* Table Layout Standard */
+        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-block: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 1100px; }
+        th { background: #f8fafc; padding: 12px 16px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 12px; position:sticky; top:0; z-index:10; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        /* Sticky Column Enhancements */
+        .sticky-col { position:sticky; background:white; z-index:5 !important; }
+        th.sticky-col { z-index:15 !important; }
+        .sticky-col-shadow { box-shadow: 4px 0 8px -2px rgba(0,0,0,0.05); }
+
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+<!-- Top Navbar -->
+<nav class="bg-slate-900 text-white h-14 flex items-center px-4 md:px-8 shrink-0 sticky top-0 z-30 shadow-lg">
+    <div class="flex items-center gap-3 mr-8">
+        <div class="w-7 h-7 bg-red-600 rounded flex items-center justify-center font-bold text-base shrink-0">V</div>
+        <span class="font-bold tracking-wider text-sm whitespace-nowrap">B2B 企業後台</span>
+    </div>
+    <div class="hidden md:flex items-center gap-1 flex-1">
+        <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+            總覽儀表板
+        </a>
+        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/15 text-red-400 border border-red-500/30 text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            人員管理
+        </a>
+        <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            操作紀錄
+        </a>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+        <span class="hidden sm:block text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full truncate max-w-[180px]">天下文化集團 2026</span>
+        
+        <!-- Notification Bell -->
+        <div class="relative group mt-1">
+            <button class="relative p-1.5 text-slate-400 hover:text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-slate-900"></span>
+            </button>
+            <div class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div class="px-4 py-2 border-b border-slate-100 font-semibold text-sm text-slate-800 flex justify-between items-center">
+                    最新推播
+                    <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">未讀 1</span>
+                </div>
+                <div class="divide-y divide-slate-50">
+                    <a href="#" class="block p-3 hover:bg-slate-50 transition bg-red-50/30">
+                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">🔥 2026 早鳥續約專屬方案</h4>
+                        <p class="text-[11px] text-slate-500 line-clamp-2">感謝貴公司支持，即日起至月底前完成續約，享名額升級不加價！</p>
+                        <span class="text-[10px] text-slate-400 mt-1 block">剛剛</span>
+                    </a>
+                    <a href="#" class="block p-3 hover:bg-slate-50 transition">
+                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">📢 HR 實體交流讀書會報名</h4>
+                        <p class="text-[11px] text-slate-500 line-clamp-2">探討如何運用 AI 提升選育用留效率，限額 30 名免費報名。</p>
+                        <span class="text-[10px] text-slate-400 mt-1 block">昨天</span>
+                    </a>
+                    <a href="#" class="block p-3 hover:bg-slate-50 transition opacity-60">
+                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">遠見線上讀：系統維護公告</h4>
+                        <p class="text-[11px] text-slate-500 line-clamp-2">系統將於本週日凌晨 02:00-04:00 進行升級，期間將暫停服務。</p>
+                        <span class="text-[10px] text-slate-400 mt-1 block">3 天前</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Dropdown (Hover) -->
+        <div class="relative group mt-1 ml-1 cursor-pointer">
+            <div class="w-8 h-8 rounded-full bg-red-900/60 text-red-300 flex items-center justify-center font-bold text-[10px] border border-red-700 shrink-0 hover:bg-red-800 transition">管理員</div>
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-50">
+                    <p class="text-sm font-bold text-slate-800 truncate">主要管理者</p>
+                    <p class="text-xs text-slate-400 truncate mt-0.5">hr.admin@cw.com.tw</p>
+                </div>
+                <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition">修改密碼</a>
+                <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center justify-between">
+                    協同管理者設定
+                    <span class="bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded text-[10px]">2</span>
+                </a>
+                <div class="border-t border-slate-50"></div>
+                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">登出</a>
+            </div>
+        </div>
+        <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-1.5 rounded hover:bg-slate-700 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </div>
+</nav>
+
+    <!-- Marketing Banner -->
+    <div id="marketing-banner" class="bg-indigo-600 text-white text-xs font-medium px-4 py-2 flex items-center justify-center relative shadow-inner z-20">
+        <span class="bg-indigo-800 text-[10px] px-2 py-0.5 rounded-full mr-3 shrink-0 hidden sm:inline-block">行銷公告</span>
+        <span class="mr-1">🔥 2026 早鳥續約方案！月底前完成續約享「名額免費升級 20%」</span>
+        <a href="#" class="underline hover:text-indigo-200 shrink-0 whitespace-nowrap">查看詳情 →</a>
+        <button onclick="document.getElementById('marketing-banner').style.display='none'" class="absolute right-2 sm:right-4 p-1 rounded-full hover:bg-indigo-700 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="md:hidden bg-slate-800 text-white px-4 py-3 space-y-1 sticky top-14 z-20 shadow-md">
+    <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+        總覽儀表板
+    </a>
+    <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-400 text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        人員管理
+    </a>
+    <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        操作紀錄
+    </a>
+    <div class="pt-2 border-t border-slate-700 text-xs text-slate-500 px-3 pb-1">天下文化集團 2026</div>
+</div>
+
+<!-- Main -->
+<main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <div class="max-w-7xl mx-auto space-y-5">
+
+        <!-- Page Title -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">人員管理</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">行政狀態即時同步｜名額變動立即生效</p>
+                </div>
+                <button class="flex items-center gap-1 text-[11px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 px-2 py-1 rounded transition self-start mt-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    頁面手冊
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 flex flex-col">
+                <span class="text-xs text-slate-500 mb-1">總名額</span>
+                <span id="kpi-total" class="text-2xl font-black text-slate-800">200</span>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 mb-1">
+                    <div id="kpi-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all" style="width:71%"></div>
+                </div>
+                <span id="kpi-pct" class="text-[10px] text-slate-400">71% 使用中</span>
+            </div>
+            <div class="glass-card p-4 flex flex-col">
+                <span class="text-xs text-slate-500 mb-1">已開通</span>
+                <span id="kpi-active" class="text-2xl font-black text-emerald-600">—</span>
+                <span class="text-[10px] text-slate-400 mt-auto pt-2">含接替排程席位</span>
+            </div>
+            <div class="glass-card p-4 flex flex-col">
+                <span class="text-xs text-slate-500 mb-1">未開通（佔用名額）</span>
+                <span id="kpi-pending" class="text-2xl font-black text-amber-500">—</span>
+                <span class="text-[10px] text-amber-600 mt-auto pt-2 font-medium">⚠ 名額已佔用</span>
+            </div>
+            <div class="glass-card p-4 flex flex-col">
+                <span class="text-xs text-slate-500 mb-1">停用</span>
+                <span id="kpi-suspended" class="text-2xl font-black text-red-500">—</span>
+                <span class="text-[10px] text-slate-400 mt-auto pt-2">名額已釋出</span>
+            </div>
+        </div>
+
+        <!-- Filter + Action Bar -->
+        <div class="glass-card p-4 flex flex-col sm:flex-row gap-3 flex-wrap">
+            <div class="relative flex-1 min-w-[180px]">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="search-input" type="text" placeholder="搜尋姓名或信箱…" class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-slate-50" oninput="applyFilters()">
+            </div>
+            <select id="status-filter" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300 cursor-pointer" onchange="applyFilters()">
+                <option value="">全部狀態</option>
+                <option value="active">已開通</option>
+                <option value="pending">未開通</option>
+                <option value="suspended">停用中</option>
+                <option value="scheduled_suspend">排程停用</option>
+                <option value="succession">待接替</option>
+            </select>
+            <select id="dept-filter" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300 cursor-pointer" onchange="applyFilters()">
+                <option value="">全部部門</option>
+            </select>
+            <div class="flex gap-2 shrink-0">
+                <button onclick="openModal('modal-import')" class="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    批次匯入
+                </button>
+                <button onclick="openModal('modal-add')" class="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    新增學員
+                </button>
+                <button onclick="exportCSV()" class="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    匯出名單
+                </button>
+            </div>
+        </div>
+
+        <!-- Batch Action Bar -->
+        <div id="batch-bar" class="hidden glass-card p-3 flex items-center gap-3 border-l-4 border-indigo-500">
+            <span id="batch-count" class="text-sm font-semibold text-indigo-700 shrink-0"></span>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="batchAction('resend')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-amber-50 hover:border-amber-300 text-slate-700 hover:text-amber-700 transition">重新發送開通信</button>
+                <button onclick="batchAction('suspend')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-red-50 hover:border-red-300 text-slate-700 hover:text-red-600 transition">停用</button>
+                <button onclick="batchAction('remove')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition">移除（釋出名額）</button>
+            </div>
+            <button onclick="clearSelection()" class="ml-auto text-xs text-slate-400 hover:text-slate-600 shrink-0">取消選取</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+
+                        <tr class="border-b border-slate-100 bg-slate-50">
+                            <th class="w-10 px-3 py-3 sticky-col sticky-col-0 bg-slate-50 border-r border-slate-100">
+                                <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded accent-indigo-600 cursor-pointer">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 sticky-col sticky-col-1 bg-slate-50 border-r border-slate-100 whitespace-nowrap">姓名</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">信箱</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">部門</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">職稱</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">狀態</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">開通日期</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">最後登入</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">有效閱讀篇數</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="member-tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span id="table-count">共 0 筆</span>
+                <div class="flex gap-1">
+                    <button class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-50 opacity-40 cursor-default">‹</button>
+                    <button class="px-2.5 py-1 rounded bg-indigo-600 text-white text-xs">1</button>
+                    <button class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-50 opacity-40 cursor-default">›</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-8"></div>
+    </div>
+</main>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- 新增學員 -->
+<div id="modal-add" class="modal-bg" onclick="if(event.target===this)closeModal('modal-add')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="font-bold text-base text-slate-800">新增學員</h3>
+            <button onclick="closeModal('modal-add')" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form onsubmit="submitAdd(event)" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="add-name" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="王小明">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">部門</label>
+                    <input type="text" id="add-dept" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="業務部">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">信箱 <span class="text-red-500">*</span></label>
+                <input type="email" id="add-email" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="wang@company.com">
+                <p id="add-email-err" class="hidden text-xs text-red-500 mt-1">此信箱已存在於名單中</p>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">職稱</label>
+                <input type="text" id="add-title" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="業務主任">
+            </div>
+            <!-- Succession Toggle -->
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <label class="flex items-center gap-3 cursor-pointer select-none">
+                    <input type="checkbox" id="add-suc-toggle" onchange="toggleAddSuccession()" class="w-4 h-4 rounded accent-indigo-600">
+                    <div>
+                        <span class="text-sm font-medium text-slate-700">此為權益接替排程</span>
+                        <p class="text-[11px] text-slate-400 mt-0.5">指定接替對象與生效日，接替日起自動切換</p>
+                    </div>
+                </label>
+                <div id="add-suc-fields" class="hidden mt-4 space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">接替對象 <span class="text-red-500">*</span></label>
+                        <select id="add-replacing" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            <option value="">選擇被接替的學員</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">接替生效日期 <span class="text-red-500">*</span></label>
+                        <input type="date" id="add-suc-date" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    </div>
+                    <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                        接替日前：被接替學員保有權益（1 席）<br>
+                        接替日起：系統自動切換，被接替學員名額釋出，此學員開通
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="button" onclick="closeModal('modal-add')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">確認新增</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 批次匯入 -->
+<div id="modal-import" class="modal-bg" onclick="if(event.target===this)closeModal('modal-import')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="font-bold text-base text-slate-800">批次匯入學員</h3>
+            <button onclick="closeModal('modal-import')" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div id="drop-zone" class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-indigo-300 hover:bg-indigo-50/30 transition cursor-pointer" onclick="document.getElementById('csv-file').click()">
+                <svg class="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <p class="text-sm font-medium text-slate-600">點擊上傳 CSV 檔案</p>
+                <p class="text-xs text-slate-400 mt-1">或將檔案拖曳至此區域</p>
+                <input type="file" id="csv-file" accept=".csv" class="hidden" onchange="handleCSV(this)">
+            </div>
+            <div id="csv-preview" class="hidden text-xs bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <p class="font-semibold text-emerald-700 mb-1.5">✓ 已載入檔案</p>
+                <p id="csv-info" class="text-slate-600"></p>
+            </div>
+            <div class="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1">
+                <p class="font-medium text-slate-600">CSV 欄位格式（依序）</p>
+                <p class="font-mono text-[11px] text-slate-500">姓名, 信箱, 部門, 職稱</p>
+                <p class="text-[11px] text-amber-600">信箱重複者將略過並於結果中提示</p>
+            </div>
+            <a href="#" class="flex items-center gap-1.5 text-xs text-indigo-600 hover:underline" onclick="showToast('範本下載中…（模擬）');return false;">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                下載 CSV 範本
+            </a>
+            <div class="flex gap-3 pt-1">
+                <button onclick="closeModal('modal-import')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+                <button onclick="submitImport()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">確認匯入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 權益接替（從行操作觸發） -->
+<div id="modal-succession" class="modal-bg" onclick="if(event.target===this)closeModal('modal-succession')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-1">
+            <h3 class="font-bold text-base text-slate-800">設定權益接替</h3>
+            <button onclick="closeModal('modal-succession')" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <p id="suc-subtitle" class="text-xs text-slate-500 mb-4"></p>
+        <form onsubmit="submitSuccession(event)" class="space-y-4">
+            <div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed">
+                接替日前：<strong id="suc-from-name"></strong> 保有權益（1 席）<br>
+                接替日起：系統自動切換，名額轉給接替人，<strong id="suc-from-name2"></strong> 自動移除
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">接替人姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="suc-name" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="李四">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">部門</label>
+                    <input type="text" id="suc-dept" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">接替人信箱 <span class="text-red-500">*</span></label>
+                <input type="email" id="suc-email" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="li@company.com">
+                <p id="suc-email-err" class="hidden text-xs text-red-500 mt-1">此信箱已存在於名單中</p>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">職稱</label>
+                <input type="text" id="suc-title" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">接替生效日期 <span class="text-red-500">*</span></label>
+                <input type="date" id="suc-date" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="button" onclick="closeModal('modal-succession')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">確認設定</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 確認停用 -->
+<div id="modal-suspend" class="modal-bg" onclick="if(event.target===this)closeModal('modal-suspend')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+        </div>
+        <h3 class="font-bold text-base text-center text-slate-800 mb-2">停用學員</h3>
+        <p id="suspend-names" class="text-sm text-center text-slate-700 font-medium mb-4"></p>
+        <div class="mb-4">
+            <label class="block text-xs font-medium text-slate-600 mb-1">停用生效時間</label>
+            <input type="date" id="suspend-date" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+            <p class="text-[11px] text-slate-400 mt-1.5">留空或今日（含）以前 → 立即生效；未來日期 → 排程停用</p>
+        </div>
+        <div class="text-xs text-slate-500 space-y-1 mb-5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+            <p>停用後學員<strong>無法登入</strong>，名額<strong>立即釋出</strong></p>
+            <p class="text-slate-400 text-[11px]">歷史閱讀數據保留於企業報表</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeModal('modal-suspend')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+            <button onclick="confirmSuspend()" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition">確認停用</button>
+        </div>
+    </div>
+</div>
+
+<!-- 確認移除 -->
+<div id="modal-remove" class="modal-bg" onclick="if(event.target===this)closeModal('modal-remove')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </div>
+        <h3 class="font-bold text-base text-center text-slate-800 mb-2">確認移除</h3>
+        <p id="remove-names" class="text-sm text-center text-slate-700 font-medium mb-3"></p>
+        <div class="text-xs text-center text-slate-500 space-y-1 mb-2">
+            <p>移除後名額<strong>立即釋出</strong></p>
+            <p>歷史閱讀數據保留於企業報表</p>
+        </div>
+        <p class="text-xs text-center text-red-500 font-semibold mb-6">此操作不可撤銷</p>
+        <div class="flex gap-3">
+            <button onclick="closeModal('modal-remove')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+            <button onclick="confirmRemove()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">確認移除</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-none opacity-0 translate-y-2">
+    <div id="toast-msg" class="bg-slate-900 text-white text-sm px-5 py-3 rounded-xl shadow-xl font-medium whitespace-nowrap"></div>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────
+let MEMBERS = [
+    { id:1,  name:'王小明', email:'wang@tw.com',   dept:'業務部', title:'業務主任',   status:'active',     activatedAt:'2026-01-15', lastLogin:'2026-04-17', reads:47  },
+    { id:2,  name:'陳美玲', email:'chen@tw.com',   dept:'行銷部', title:'行銷經理',   status:'active',     activatedAt:'2026-01-15', lastLogin:'2026-04-16', reads:89  },
+    { id:3,  name:'林志豪', email:'lin@tw.com',    dept:'研發部', title:'工程師',     status:'pending',    activatedAt:null,         lastLogin:null,         reads:0   },
+    { id:4,  name:'張雅婷', email:'chang@tw.com',  dept:'人資部', title:'人資專員',   status:'active',     activatedAt:'2026-02-01', lastLogin:'2026-04-15', reads:62  },
+    { id:5,  name:'劉建國', email:'liu@tw.com',    dept:'財務部', title:'財務長',     status:'suspended',  activatedAt:'2026-01-15', lastLogin:'2026-03-10', reads:12  },
+    { id:6,  name:'黃淑芬', email:'huang@tw.com',  dept:'法務部', title:'法務專員',   status:'pending',    activatedAt:null,         lastLogin:null,         reads:0   },
+    { id:7,  name:'吳冠廷', email:'wu@tw.com',     dept:'業務部', title:'業務代表',   status:'active',     activatedAt:'2026-02-15', lastLogin:'2026-04-10', reads:28, successionDate:'2026-05-01', successionTo:'趙志明' },
+    { id:8,  name:'趙志明', email:'chao@tw.com',   dept:'業務部', title:'業務代表',   status:'succession', activatedAt:null,         lastLogin:null,         reads:0,  successionDate:'2026-05-01', replacingName:'吳冠廷', replacingId:7 },
+    { id:9,  name:'蔡佳穎', email:'tsai@tw.com',   dept:'行銷部', title:'行銷專員',   status:'active',     activatedAt:'2026-01-15', lastLogin:'2026-04-17', reads:104 },
+    { id:10, name:'許文雄', email:'hsu@tw.com',    dept:'研發部', title:'資深工程師', status:'active',     activatedAt:'2026-03-01', lastLogin:'2026-04-12', reads:33  },
+    { id:11, name:'鄭雅文', email:'cheng@tw.com',  dept:'公關部', title:'公關主任',   status:'pending',    activatedAt:null,         lastLogin:null,         reads:0   },
+    { id:12, name:'謝明宏', email:'hsieh@tw.com',  dept:'財務部', title:'財務專員',   status:'active',     activatedAt:'2026-01-20', lastLogin:'2026-04-14', reads:55  },
+    { id:13, name:'周慧君', email:'chou@tw.com',   dept:'法務部', title:'法務主任',   status:'active',     activatedAt:'2026-02-10', lastLogin:'2026-04-16', reads:41  },
+    { id:14, name:'賴俊賢', email:'lai@tw.com',    dept:'研發部', title:'工程師',     status:'suspended',  activatedAt:'2026-01-15', lastLogin:'2026-02-20', reads:5   },
+    { id:15, name:'洪雅琪', email:'hung@tw.com',   dept:'人資部', title:'人資助理',   status:'pending',    activatedAt:null,         lastLogin:null,         reads:0   },
+];
+
+// 補足假資料，使「已使用名額 (Active + Pending)」能夠對齊 Dashboard 的 142 人
+// 目前預設資料中：Active 有 8 人, Pending 有 4 人，共 12 人。還欠缺 130 人。
+for(let i=16; i<=145; i++) {
+    MEMBERS.push({ 
+        id: i, name: `技術專員_${i}`, email: `tech${i}@tw.com`, dept: '資訊部', title: '工程師', 
+        status: 'active', activatedAt: '2026-03-05', lastLogin: '2026-04-18', reads: Math.floor(Math.random() * 50) + 1 
+    });
+}
+
+const TOTAL_SEATS = 200;
+const STATUS_LABEL = { active:'已開通', pending:'未開通', suspended:'停用中', scheduled_suspend:'排程停用', succession:'待接替' };
+const STATUS_CLS   = {
+    active:            'bg-emerald-50 text-emerald-700 border-emerald-200',
+    pending:           'bg-amber-50 text-amber-700 border-amber-200',
+    suspended:         'bg-red-50 text-red-700 border-red-200',
+    scheduled_suspend: 'bg-orange-50 text-orange-700 border-orange-200',
+    succession:        'bg-violet-50 text-violet-700 border-violet-200',
+};
+
+let selectedIds = new Set();
+let currentTargetId = null;
+let nextId = 20;
+
+// ── KPI ─────────────────────────────────────────────
+function updateKPI() {
+    const active    = MEMBERS.filter(m => ['active','succession','scheduled_suspend'].includes(m.status)).length;
+    const pending   = MEMBERS.filter(m => m.status === 'pending').length;
+    const suspended = MEMBERS.filter(m => m.status === 'suspended').length;
+    const used      = active + pending; // suspended 名額已釋出，不計入使用中
+    const pct       = Math.round(used / TOTAL_SEATS * 100);
+    document.getElementById('kpi-active').textContent    = active;
+    document.getElementById('kpi-pending').textContent   = pending;
+    document.getElementById('kpi-suspended').textContent = suspended;
+    document.getElementById('kpi-bar').style.width       = pct + '%';
+    document.getElementById('kpi-pct').textContent       = pct + '% 使用中';
+}
+
+// ── Filters ─────────────────────────────────────────
+function getFiltered() {
+    const q    = document.getElementById('search-input').value.toLowerCase();
+    const st   = document.getElementById('status-filter').value;
+    const dept = document.getElementById('dept-filter').value;
+    return MEMBERS.filter(m => {
+        if (q    && !m.name.toLowerCase().includes(q) && !m.email.toLowerCase().includes(q)) return false;
+        if (st   && m.status !== st)   return false;
+        if (dept && m.dept   !== dept) return false;
+        return true;
+    });
+}
+
+function applyFilters() { renderTable(); }
+
+function initDeptFilter() {
+    const depts = [...new Set(MEMBERS.map(m => m.dept))].sort();
+    const sel = document.getElementById('dept-filter');
+    depts.forEach(d => {
+        const o = document.createElement('option');
+        o.value = d; o.textContent = d;
+        sel.appendChild(o);
+    });
+}
+
+// ── Render ───────────────────────────────────────────
+function renderTable() {
+    const rows = getFiltered();
+    document.getElementById('table-count').textContent = `共 ${rows.length} 筆`;
+
+    document.getElementById('member-tbody').innerHTML = rows.map(m => {
+        const chk = selectedIds.has(m.id) ? 'checked' : '';
+
+        // Succession badge under name
+        let subLine = '';
+        if (m.status === 'active' && m.successionDate) {
+            subLine = `<span class="inline-flex items-center gap-1 text-[10px] text-violet-600 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded-full mt-1 whitespace-nowrap">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                ${m.successionTo}｜${m.successionDate}
+            </span>`;
+        }
+        if (m.status === 'succession') {
+            subLine = `<span class="text-[10px] text-violet-500 mt-0.5 block">接替 ${m.replacingName}｜${m.successionDate} 生效</span>`;
+        }
+        if (m.status === 'scheduled_suspend') {
+            subLine = `<span class="text-[10px] text-orange-500 mt-0.5 block">排程停用｜${m.suspendDate} 生效</span>`;
+        }
+
+        return `<tr class="border-b border-slate-50 last:border-0">
+            <td class="px-3 py-3 sticky-col sticky-col-0 border-r border-slate-50">
+                <input type="checkbox" ${chk} onchange="toggleSelect(${m.id},this)" class="w-4 h-4 rounded accent-indigo-600 cursor-pointer">
+            </td>
+            <td class="px-4 py-3 sticky-col sticky-col-1 border-r border-slate-50">
+                <div class="flex flex-col">
+                    <span class="font-medium text-slate-800 whitespace-nowrap">${m.name}</span>
+                    ${subLine}
+                </div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-500">${m.email}</td>
+            <td class="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">${m.dept}</td>
+            <td class="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">${m.title}</td>
+            <td class="px-4 py-3">
+                <span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full border ${STATUS_CLS[m.status]}">${STATUS_LABEL[m.status]}</span>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">${m.activatedAt ?? '—'}</td>
+            <td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">${m.lastLogin ?? '—'}</td>
+            <td class="px-4 py-3 text-right text-sm font-semibold ${m.reads > 0 ? 'text-slate-800' : 'text-slate-300'}">${m.reads > 0 ? m.reads : '—'}</td>
+            <td class="px-4 py-3 text-right">${buildRowActions(m)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function buildRowActions(m) {
+    const btns = [];
+    if (m.status === 'pending') {
+        btns.push(`<button onclick="resendEmail(${m.id})" class="text-[11px] text-amber-600 hover:text-amber-700 hover:underline">重發信</button>`);
+    }
+    if ((m.status === 'active' || m.status === 'suspended') && !m.successionDate) {
+        btns.push(`<button onclick="openSuccession(${m.id})" class="text-[11px] text-violet-600 hover:text-violet-700 hover:underline">設定接替</button>`);
+    }
+    if (m.status === 'suspended') {
+        btns.push(`<button onclick="restoreMember(${m.id})" class="text-[11px] text-emerald-600 hover:text-emerald-700 hover:underline">重新開通</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
+    } else if (m.status === 'scheduled_suspend') {
+        btns.push(`<button onclick="cancelScheduledSuspend(${m.id})" class="text-[11px] text-orange-600 hover:text-orange-700 hover:underline">取消排程</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
+    } else if (m.status === 'succession') {
+        btns.push(`<button onclick="cancelSuccession(${m.id})" class="text-[11px] text-slate-400 hover:text-slate-600 hover:underline">取消接替</button>`);
+    } else {
+        btns.push(`<button onclick="openSuspend(${m.id})" class="text-[11px] text-red-400 hover:text-red-600 hover:underline">停用</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
+    }
+    return `<div class="flex items-center justify-end gap-3 whitespace-nowrap">${btns.join('')}</div>`;
+}
+
+// ── Selection ────────────────────────────────────────
+function toggleSelect(id, el) {
+    if (el.checked) selectedIds.add(id); else selectedIds.delete(id);
+    updateBatchBar();
+}
+function toggleSelectAll(el) {
+    getFiltered().forEach(m => { if (el.checked) selectedIds.add(m.id); else selectedIds.delete(m.id); });
+    renderTable();
+    updateBatchBar();
+}
+function clearSelection() {
+    selectedIds.clear();
+    document.getElementById('select-all').checked = false;
+    renderTable();
+    updateBatchBar();
+}
+function updateBatchBar() {
+    const n = selectedIds.size;
+    const bar = document.getElementById('batch-bar');
+    if (n > 0) {
+        bar.classList.remove('hidden');
+        document.getElementById('batch-count').textContent = `已選取 ${n} 人`;
+    } else {
+        bar.classList.add('hidden');
+    }
+}
+
+// ── Batch actions ────────────────────────────────────
+function batchAction(type) {
+    const names = MEMBERS.filter(m => selectedIds.has(m.id)).map(m => m.name).join('、');
+    if (type === 'resend') {
+        showToast(`已重新發送開通信給：${names}`);
+        window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
+        clearSelection();
+        return;
+    }
+    if (type === 'suspend') {
+        document.getElementById('suspend-names').textContent = names;
+        openModal('modal-suspend');
+        return;
+    }
+    if (type === 'remove') {
+        document.getElementById('remove-names').textContent = names;
+        openModal('modal-remove');
+        return;
+    }
+}
+
+// ── Row actions ──────────────────────────────────────
+function resendEmail(id) {
+    const m = MEMBERS.find(m => m.id === id);
+    showToast(`已重新發送開通信給 ${m.name}`);
+    window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
+}
+
+function restoreMember(id) {
+    const used = MEMBERS.filter(m => ['active','succession','scheduled_suspend','pending'].includes(m.status)).length;
+    if (used >= TOTAL_SEATS) {
+        showToast('⚠ 名額已滿，無法重新開通');
+        return;
+    }
+    const m = MEMBERS.find(m => m.id === id);
+    m.status = 'active';
+    renderTable();
+    updateKPI();
+    showToast(`${m.name} 已重新開通`);
+}
+
+function cancelScheduledSuspend(id) {
+    const m = MEMBERS.find(m => m.id === id);
+    m.status = 'active';
+    delete m.suspendDate;
+    renderTable();
+    updateKPI();
+    showToast(`${m.name} 的排程停用已取消`);
+}
+
+function cancelSuccession(id) {
+    const successor = MEMBERS.find(m => m.id === id);
+    const predecessor = MEMBERS.find(m => m.id === successor.replacingId);
+    if (predecessor) { delete predecessor.successionDate; delete predecessor.successionTo; }
+    MEMBERS = MEMBERS.filter(m => m.id !== id);
+    renderTable();
+    updateKPI();
+    showToast('接替排程已取消');
+}
+
+function openSuccession(id) {
+    currentTargetId = id;
+    const m = MEMBERS.find(m => m.id === id);
+    document.getElementById('suc-subtitle').textContent = `為「${m.name}」設定離職後的權益接替人`;
+    document.getElementById('suc-from-name').textContent  = m.name;
+    document.getElementById('suc-from-name2').textContent = m.name;
+    ['suc-name','suc-dept','suc-email','suc-title','suc-date'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('suc-email-err').classList.add('hidden');
+    openModal('modal-succession');
+}
+
+function openSuspend(id) {
+    currentTargetId = id;
+    selectedIds.clear();
+    const m = MEMBERS.find(m => m.id === id);
+    document.getElementById('suspend-names').textContent = m.name;
+    document.getElementById('suspend-date').value = '';
+    openModal('modal-suspend');
+}
+
+function openRemove(id) {
+    currentTargetId = id;
+    selectedIds.clear();
+    const m = MEMBERS.find(m => m.id === id);
+    document.getElementById('remove-names').textContent = m.name;
+    openModal('modal-remove');
+}
+
+// ── Modal form submissions ────────────────────────────
+function submitAdd(e) {
+    e.preventDefault();
+    const name  = document.getElementById('add-name').value.trim();
+    const email = document.getElementById('add-email').value.trim();
+    const dept  = document.getElementById('add-dept').value.trim();
+    const title = document.getElementById('add-title').value.trim();
+    const errEl = document.getElementById('add-email-err');
+
+    if (MEMBERS.find(m => m.email === email)) {
+        errEl.classList.remove('hidden');
+        return;
+    }
+    errEl.classList.add('hidden');
+
+    const isSuc = document.getElementById('add-suc-toggle').checked;
+    const id    = nextId++;
+
+    if (isSuc) {
+        const replacingId  = parseInt(document.getElementById('add-replacing').value);
+        const date         = document.getElementById('add-suc-date').value;
+        const replacing    = MEMBERS.find(m => m.id === replacingId);
+        if (!replacingId || !date) return;
+        MEMBERS.push({ id, name, email, dept, title, status:'succession', activatedAt:null, lastLogin:null, reads:0,
+            successionDate:date, replacingName:replacing?.name, replacingId });
+        if (replacing) { replacing.successionDate = date; replacing.successionTo = name; }
+        showToast(`接替排程已設定：${replacing?.name} → ${name}（${date} 生效）`);
+    } else {
+        MEMBERS.push({ id, name, email, dept, title, status:'pending', activatedAt:null, lastLogin:null, reads:0 });
+        showToast(`${name} 已新增，開通信已發送`);
+        window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
+    }
+
+    closeModal('modal-add');
+    e.target.reset();
+    document.getElementById('add-suc-fields').classList.add('hidden');
+    renderTable();
+    updateKPI();
+}
+
+function submitSuccession(e) {
+    e.preventDefault();
+    const m      = MEMBERS.find(m => m.id === currentTargetId);
+    const name   = document.getElementById('suc-name').value.trim();
+    const email  = document.getElementById('suc-email').value.trim();
+    const dept   = document.getElementById('suc-dept').value.trim();
+    const title  = document.getElementById('suc-title').value.trim();
+    const date   = document.getElementById('suc-date').value;
+    const errEl  = document.getElementById('suc-email-err');
+
+    if (MEMBERS.find(x => x.email === email)) {
+        errEl.classList.remove('hidden');
+        return;
+    }
+    errEl.classList.add('hidden');
+
+    const id = nextId++;
+    MEMBERS.push({ id, name, email, dept, title, status:'succession', activatedAt:null, lastLogin:null, reads:0,
+        successionDate:date, replacingName:m.name, replacingId:currentTargetId });
+    m.successionDate = date;
+    m.successionTo   = name;
+
+    closeModal('modal-succession');
+    renderTable();
+    updateKPI();
+    showToast(`權益接替已設定：${m.name} → ${name}（${date} 生效）`);
+}
+
+function confirmSuspend() {
+    const ids = selectedIds.size > 0 ? [...selectedIds] : [currentTargetId];
+    const dateVal = document.getElementById('suspend-date').value;
+    const today = new Date().toISOString().split('T')[0];
+    const isImmediate = !dateVal || dateVal <= today;
+
+    ids.forEach(id => {
+        const m = MEMBERS.find(m => m.id === id);
+        if (!m) return;
+        if (isImmediate) {
+            m.status = 'suspended';
+            delete m.suspendDate;
+        } else {
+            m.status = 'scheduled_suspend';
+            m.suspendDate = dateVal;
+        }
+    });
+    closeModal('modal-suspend');
+    clearSelection();
+    renderTable();
+    updateKPI();
+    showToast(isImmediate ? '已停用，名額立即釋出' : `已排程停用（${dateVal} 生效），名額於停用日釋出`);
+}
+
+function confirmRemove() {
+    const ids = selectedIds.size > 0 ? [...selectedIds] : [currentTargetId];
+    ids.forEach(id => { MEMBERS = MEMBERS.filter(m => m.id !== id); });
+    closeModal('modal-remove');
+    clearSelection();
+    renderTable();
+    updateKPI();
+    showToast('已移除，名額已釋出');
+}
+
+function submitImport() {
+    closeModal('modal-import');
+    document.getElementById('csv-preview').classList.add('hidden');
+    document.getElementById('csv-file').value = '';
+    showToast('批次匯入完成，開通信已自動發送（模擬）');
+    window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
+}
+
+function exportCSV() {
+    showToast('已匯出學員名單（不含勤學榜排名）');
+}
+
+// ── Succession toggle in Add modal ───────────────────
+function toggleAddSuccession() {
+    const on = document.getElementById('add-suc-toggle').checked;
+    document.getElementById('add-suc-fields').classList.toggle('hidden', !on);
+    if (on) {
+        const sel = document.getElementById('add-replacing');
+        sel.innerHTML = '<option value="">選擇被接替的學員</option>';
+        MEMBERS.filter(m => m.status === 'active' && !m.successionDate).forEach(m => {
+            const o = document.createElement('option');
+            o.value = m.id;
+            o.textContent = `${m.name}（${m.dept}）`;
+            sel.appendChild(o);
+        });
+    }
+}
+
+// ── CSV preview ──────────────────────────────────────
+function handleCSV(input) {
+    if (input.files.length) {
+        document.getElementById('csv-preview').classList.remove('hidden');
+        document.getElementById('csv-info').textContent = `${input.files[0].name}｜預計新增 12 筆，略過 2 筆（信箱重複）`;
+    }
+}
+
+// ── Modals ───────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── Toast ────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.style.opacity   = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        t.style.opacity   = '0';
+        t.style.transform = 'translateX(-50%) translateY(8px)';
+    }, 3000);
+}
+
+// ── Init ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    initDeptFilter();
+    renderTable();
+    updateKPI();
+
+    // Reset toast position
+    const t = document.getElementById('toast');
+    t.style.transform = 'translateX(-50%) translateY(8px)';
+});
+</script>
+</body>
+</html>

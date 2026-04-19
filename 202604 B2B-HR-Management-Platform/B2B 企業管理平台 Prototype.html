@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遠見線上讀 B2B 企業管理平台 Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+    <style>
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f1f5f9; }
+        .glass-card { background: rgba(255,255,255,0.97); border: 1px solid rgba(226,232,240,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .glass-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.09); }
+        .heatmap-cell { width:100%; height:100%; min-height:28px; border-radius:4px; transition:transform 0.15s, box-shadow 0.15s; cursor:pointer; position:relative; }
+        .heatmap-cell:hover { transform:scale(1.18); box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:20; }
+        #hm-tooltip { pointer-events:none; position:fixed; z-index:999; background:#1e293b; color:#f8fafc; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:500; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); opacity:0; transition:opacity 0.15s; line-height:1.6; }
+        #hm-tooltip.show { opacity:1; }
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+        /* Mobile nav drawer */
+        #mobile-menu { display:none; }
+        #mobile-menu.open { display:block; }
+        
+        /* Table Layout Standard */
+        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-block: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 500px; }
+        th { background: #f8fafc; padding: 10px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 12px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 13px; }
+        
+        /* Floating Shortcut Icon */
+        .floating-shortcut { position: fixed; bottom: 2rem; right: 2rem; width: 64px; height: 64px; background: #ef4444; color: white; border-radius: 50%; display: flex; flex-direction: column; items-center; justify-content: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); z-index: 100; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; text-decoration: none; border: 2px solid white; }
+        .floating-shortcut:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6); background: #dc2626; }
+        .floating-shortcut svg { width: 24px; height: 24px; margin-bottom: 2px; }
+        .floating-shortcut span { font-size: 10px; font-weight: 800; transform: scale(0.9); }
+
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Heatmap Tooltip -->
+    <div id="hm-tooltip"></div>
+
+    <!-- Top Navbar -->
+    <nav class="bg-slate-900 text-white h-14 flex items-center px-4 md:px-8 shrink-0 sticky top-0 z-30 shadow-lg">
+        <!-- Brand -->
+        <div class="flex items-center gap-3 mr-8">
+            <div class="w-7 h-7 bg-red-600 rounded flex items-center justify-center font-bold text-base shrink-0">V</div>
+            <span class="font-bold tracking-wider text-sm whitespace-nowrap">B2B 企業管理平台</span>
+        </div>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-1 flex-1">
+            <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/15 text-red-400 border border-red-500/30 text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+                總覽儀表板
+            </a>
+            <a href="B2B%20%E4%BC%81%E6%A5%AD%E5%AD%B8%E5%93%A1%E5%90%8D%E5%96%AE%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                人員管理
+            </a>
+            <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                操作紀錄
+            </a>
+        </div>
+
+        <!-- Right: Company + User -->
+        <div class="ml-auto flex items-center gap-3">
+            <span class="hidden sm:block text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full truncate max-w-[180px]">天下文化集團 2026</span>
+            
+            <!-- Notification Bell -->
+            <div class="relative mt-1" id="bell-wrapper">
+                <button onclick="toggleBell(event)" class="relative p-1.5 text-slate-400 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="bell-badge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-slate-900"></span>
+                </button>
+                <div id="bell-dropdown" class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-100 z-50 hidden">
+                    <div class="px-4 py-2 border-b border-slate-100 font-semibold text-sm text-slate-800 flex justify-between items-center">
+                        最新推播
+                        <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">未讀 1</span>
+                    </div>
+                    <div class="divide-y divide-slate-50">
+                        <a href="javascript:void(0)" onclick="openPushDetail('earlyBird'); closeBell()" class="block p-3 hover:bg-slate-50 transition bg-red-50/30">
+                            <h4 id="bell-item-1-title" class="text-xs font-bold text-slate-800 mb-0.5">🔥 2026 早鳥續約專屬方案</h4>
+                            <p id="bell-item-1-body" class="text-[11px] text-slate-500 line-clamp-2">感謝貴公司支持，即日起至月底前完成續約，享名額升級不加價！</p>
+                            <span id="bell-item-1-time" class="text-[10px] text-slate-400 mt-1 block">剛剛</span>
+                        </a>
+                        <a href="javascript:void(0)" onclick="openPushDetail('event'); closeBell()" class="block p-3 hover:bg-slate-50 transition">
+                            <h4 class="text-xs font-bold text-slate-800 mb-0.5">📢 HR 實體交流讀書會報名</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2">探討如何運用 AI 提升選育用留效率，限額 30 名免費報名。</p>
+                            <span class="text-[10px] text-slate-400 mt-1 block">昨天</span>
+                        </a>
+                        <a href="javascript:void(0)" onclick="openPushDetail('maintenance'); closeBell()" class="block p-3 hover:bg-slate-50 transition opacity-60">
+                            <h4 class="text-xs font-bold text-slate-800 mb-0.5">遠見線上讀：系統維護公告</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2">系統將於本週日凌晨 02:00-04:00 進行升級，期間將暫停服務。</p>
+                            <span class="text-[10px] text-slate-400 mt-1 block">3 天前</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Dropdown (Hover) -->
+            <div class="relative group mt-1 ml-1 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-red-900/60 text-red-300 flex items-center justify-center font-bold text-[10px] border border-red-700 shrink-0 hover:bg-red-800 transition">管理員</div>
+                <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-slate-50">
+                        <p class="text-sm font-bold text-slate-800 truncate">主要管理者</p>
+                        <p class="text-xs text-slate-400 truncate mt-0.5">admin@cw.com.tw</p>
+                    </div>
+                    <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition">修改密碼</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center justify-between">
+                        協同管理者設定
+                        <span class="bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded text-[10px]">2</span>
+                    </a>
+                    <div class="border-t border-slate-50"></div>
+                    <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">登出</a>
+                </div>
+            </div>
+            <!-- Mobile Hamburger -->
+            <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-1.5 rounded hover:bg-slate-700 transition" aria-label="選單">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Marketing Banner -->
+    <div id="marketing-banner" class="bg-indigo-600 text-white text-xs font-medium px-4 py-2 flex items-center justify-center relative shadow-inner z-20">
+        <span class="bg-indigo-800 text-[10px] px-2 py-0.5 rounded-full mr-3 shrink-0 hidden sm:inline-block">行銷公告</span>
+        <span class="mr-1">🔥 2026 早鳥續約方案！月底前完成續約享「名額免費升級 20%」</span>
+        <a href="javascript:void(0)" onclick="openPushDetail('earlyBird')" class="underline hover:text-indigo-200 shrink-0 whitespace-nowrap">查看詳情 →</a>
+        <button onclick="document.getElementById('marketing-banner').style.display='none'" class="absolute right-2 sm:right-4 p-1 rounded-full hover:bg-indigo-700 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="md:hidden bg-slate-800 text-white px-4 py-3 space-y-1 sticky top-14 z-20 shadow-md">
+        <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-400 text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+            總覽儀表板
+        </a>
+        <a href="B2B%20%E4%BC%81%E6%A5%AD%E5%AD%B8%E5%93%A1%E5%90%8D%E5%96%AE%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            人員管理
+        </a>
+        <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            操作紀錄
+        </a>
+        <div class="pt-2 border-t border-slate-700 text-xs text-slate-500 px-3 pb-1">天下文化集團 2026</div>
+    </div>
+
+    <!-- Page Content -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div class="max-w-7xl mx-auto space-y-6">
+
+            <!-- Page Title + Status -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div class="flex items-center gap-3">
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800">總覽儀表板</h1>
+                        <p class="text-xs text-slate-400 mt-0.5">行為數據每日凌晨更新（T+1）｜行政狀態即時同步</p>
+                    </div>
+                    <button class="flex items-center gap-1 text-[11px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 px-2 py-1 rounded transition self-start mt-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        頁面手冊
+                    </button>
+                </div>
+                <span class="flex items-center self-start sm:self-auto text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>即時狀態更新中
+                </span>
+            </div>
+
+            <!-- KPIs Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- 名額 -->
+                <!-- 名額使用率 (近 90% 行銷觸發態) -->
+                <div class="glass-card p-5 flex flex-col col-span-2 sm:col-span-1 border-2 border-orange-100 bg-orange-50/30">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-semibold text-orange-600 px-2 py-0.5 bg-orange-100 rounded-full">用量預警</span>
+                        <span class="text-xs font-medium text-slate-500">名額使用率</span>
+                    </div>
+                    <div class="flex items-end gap-1 mt-1">
+                        <span class="text-3xl font-black text-slate-800">182</span>
+                        <span class="text-lg text-slate-400 font-medium mb-0.5">/200</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mt-2 mb-3">
+                        <div class="bg-gradient-to-r from-indigo-500 to-orange-500 h-2.5 rounded-full" style="width:91%"></div>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-auto">
+                        <p class="text-[11px] text-orange-700 font-medium leading-tight">⚠ 剩餘名額僅 9% (18 席)，建議提前申請名額擴充，確保同仁閱讀權益。</p>
+                        <button onclick="submitUpsellRequest('seats')" class="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-lg transition-all shadow-md shadow-orange-200 flex items-center justify-center gap-1.5 mt-1">
+                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                           立即洽詢額度擴充
+                        </button>
+                        <a href="Email%20Templates.html#tab4" target="_blank" class="text-[10px] text-orange-600 hover:text-orange-800 text-center underline underline-offset-2 decoration-orange-400/50">預覽名額擴充通知信 (內部通報)</a>
+                    </div>
+                </div>
+
+                <!-- 開通率 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <span class="text-xs font-medium text-slate-500 mb-2">系統開通率</span>
+                    <span class="text-4xl font-black text-indigo-600 mt-1">71%</span>
+                    <span class="text-xs text-slate-400 mt-auto pt-3">142 人已完成開通</span>
+                </div>
+
+                <!-- 閱讀時長 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <span class="text-xs font-medium text-slate-500 mb-2">平均閱讀時長（人/月）</span>
+                    <div class="flex items-baseline gap-1 mt-1">
+                        <span class="text-4xl font-black text-rose-500">2.4</span>
+                        <span class="text-sm font-medium text-rose-600">小時</span>
+                    </div>
+                    <span class="text-xs text-emerald-600 mt-auto pt-3 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        較上月 +12%
+                    </span>
+                </div>
+
+                <!-- 到期日 (近 60 天 行銷觸發態) -->
+                <div class="glass-card p-5 flex flex-col bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 text-white ring-2 ring-indigo-400 ring-offset-2">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-semibold text-indigo-200 px-2 py-0.5 bg-white/10 rounded-full border border-white/20 italic">Renewal Season</span>
+                        <span class="text-xs font-medium text-slate-400">專案到期日</span>
+                    </div>
+                    <span class="text-2xl font-bold mt-1">2026/06/15</span>
+                    <div class="mt-2 mb-4">
+                        <span class="text-xs text-indigo-300 font-medium">距今僅剩 </span>
+                        <span class="text-xl font-black text-amber-400">57</span>
+                        <span class="text-xs text-indigo-300 font-medium"> 天</span>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-auto">
+                        <button onclick="submitUpsellRequest('renewal')" class="w-full py-2 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            立即啟動續約洽詢
+                        </button>
+                        <a href="Email%20Templates.html#tab1" target="_blank" class="text-[10px] text-indigo-300 hover:text-white text-center underline underline-offset-2 decoration-indigo-400/50">預覽系統到期通知信 (行銷版位)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PV Line Chart -->
+            <div class="glass-card p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">每日閱讀 PV 趨勢</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">全體學員每日有效閱讀頁次</p>
+                    </div>
+                    <div class="flex gap-1" id="pv-toggle"></div>
+                </div>
+                <div class="relative h-[180px] md:h-[220px]">
+                    <canvas id="pvChart"></canvas>
+                </div>
+            </div>
+
+
+            <!-- Articles + Word Cloud -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+
+                <!-- Top Articles -->
+                <div class="glass-card p-5 border-t-4 border-indigo-500 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800">全站熱門文章 Top 10</h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="art-toggle"></div>
+                    <div id="art-list" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
+                </div>
+
+                <!-- 勤學榜 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            透明勤學榜 Top 10
+                            <span class="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full border border-red-200 shrink-0">企業管理員限定</span>
+                        </h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="lb-toggle"></div>
+                    <div id="lb-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
+                </div>
+            </div>
+            <!-- Heatmap + Leaderboard -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+                <!-- Heatmap -->
+                <div class="glass-card p-5 lg:col-span-2 flex flex-col min-h-[320px]">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800">活躍時間熱度圖</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">全體學員近 30 天各時段累計有效閱讀次數</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200 shrink-0">T+1</span>
+                    </div>
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <!-- X Axis -->
+                        <div class="flex w-full mb-1.5 pl-[44px] pr-1">
+                            <div class="flex-1 text-center text-[9px] text-slate-400">00</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">01</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">02</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">03</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">04</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">05</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">06</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">07</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">08</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">09</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">10</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">11</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">12</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">13</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">14</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">15</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">16</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">17</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">18</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">19</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">20</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">21</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">22</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">23</div>
+                        </div>
+                        <!-- Rows -->
+                        <div id="heatmap-rows" class="flex flex-col gap-[3px] w-full flex-1 pr-1 pb-1"></div>
+                    </div>
+                    <!-- Legend -->
+                    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                        <span class="text-[10px] text-slate-400">低</span>
+                        <div class="flex gap-1 flex-1">
+                            <div class="flex-1 h-2 rounded" style="background:#f1f5f9"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#bfdbfe"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#60a5fa"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#3b82f6"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#6366f1"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#8b5cf6"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#ec4899"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#ef4444"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">高</span>
+                    </div>
+                </div>
+
+                <!-- 文章分類 Word Cloud -->
+                <div class="glass-card p-5 border-t-4 border-rose-400 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800">員工興趣：文章分類</h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="wc-toggle"></div>
+                    <div id="canvas-container" class="flex-1 flex justify-center items-center w-full min-h-[220px]">
+                        <canvas id="wordCloudCanvas" width="500" height="240" style="width:100%;height:100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-8"></div>
+        </div>
+    </main>
+
+    <script>
+        // ── PV Chart ───────────────────────────────────────────────
+        function genPVData(days) {
+            const labels = [], values = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                labels.push(`${d.getMonth()+1}/${d.getDate()}`);
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                const base = isWeekend ? 120 : 480;
+                values.push(Math.floor(base + Math.random() * 200 - 50 + Math.sin(i * 0.4) * 80));
+            }
+            return { labels, values };
+        }
+
+        let pvChart = null;
+        function renderPVChart(days) {
+            const { labels, values } = genPVData(days);
+            const ctx = document.getElementById('pvChart').getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, 'rgba(99,102,241,0.25)');
+            grad.addColorStop(1, 'rgba(99,102,241,0)');
+            if (pvChart) pvChart.destroy();
+            pvChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        backgroundColor: grad,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: days <= 7 ? 4 : 2,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            bodyFont: { size: 13, weight: '600' },
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                title: items => items[0].label,
+                                label: item => `PV：${item.raw.toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#94a3b8', font: { size: 11 },
+                                maxTicksLimit: days <= 7 ? 7 : days <= 14 ? 7 : 10,
+                                maxRotation: 0
+                            },
+                            border: { display: false }
+                        },
+                        y: {
+                            position: 'left',
+                            grid: { color: 'rgba(148,163,184,0.12)' },
+                            ticks: { color: '#94a3b8', font: { size: 11 }, maxTicksLimit: 5 },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ── Mock Data ──────────────────────────────────────────────
+        const LEADERBOARD = {
+            7:  [{n:'陳建明',c:'陳',v:18},{n:'李思穎',c:'李',v:15},{n:'黃志偉',c:'黃',v:14},{n:'林雅惠',c:'林',v:12},{n:'吳俊宏',c:'吳',v:11},{n:'王美玲',c:'王',v:9},{n:'張文凱',c:'張',v:8},{n:'劉怡君',c:'劉',v:7},{n:'蔡明哲',c:'蔡',v:6},{n:'許雅婷',c:'許',v:5}],
+            14: [{n:'林雅惠',c:'林',v:29},{n:'陳建明',c:'陳',v:27},{n:'吳俊宏',c:'吳',v:22},{n:'黃志偉',c:'黃',v:20},{n:'王美玲',c:'王',v:17},{n:'李思穎',c:'李',v:15},{n:'許雅婷',c:'許',v:13},{n:'張文凱',c:'張',v:11},{n:'劉怡君',c:'劉',v:10},{n:'蔡明哲',c:'蔡',v:8}],
+            30: [{n:'陳建明',c:'陳',v:45},{n:'林雅惠',c:'林',v:38},{n:'黃志偉',c:'黃',v:32},{n:'吳俊宏',c:'吳',v:28},{n:'李思穎',c:'李',v:21},{n:'王美玲',c:'王',v:19},{n:'張文凱',c:'張',v:16},{n:'劉怡君',c:'劉',v:14},{n:'許雅婷',c:'許',v:11},{n:'蔡明哲',c:'蔡',v:9}]
+        };
+        const TAG_COLORS = {
+            '話題':'text-pink-600 bg-pink-50', '國際':'text-emerald-600 bg-emerald-50',
+            '科技':'text-cyan-600 bg-cyan-50','金融':'text-amber-600 bg-amber-50',
+            '產經':'text-slate-600 bg-slate-100','AI':'text-indigo-600 bg-indigo-50',
+            '教育':'text-violet-600 bg-violet-50','生活':'text-teal-600 bg-teal-50',
+            'AI 趨勢':'text-indigo-600 bg-indigo-50','領導管理':'text-emerald-600 bg-emerald-50',
+            'ESG 永續':'text-cyan-600 bg-cyan-50','理財投資':'text-amber-600 bg-amber-50',
+            '職涯發展':'text-slate-600 bg-slate-100','數位轉型':'text-violet-600 bg-violet-50',
+            '總體經濟':'text-blue-600 bg-blue-50','心理成長':'text-pink-600 bg-pink-50',
+            '溝通技巧':'text-teal-600 bg-teal-50','敏捷開發':'text-orange-600 bg-orange-50'
+        };
+        const ARTICLES = {
+            7:  [
+                {tag:'話題',title:'2026媽祖遶境進香：大甲VS.白沙屯差異解析！為何百萬信徒追隨？',url:'https://www.gvm.com.tw/article/119947',v:1120},
+                {tag:'國際',title:'西方濾鏡碎一地？「這國」的好感度竟然反超美國',url:'https://www.gvm.com.tw/article/129486',v:980},
+                {tag:'科技',title:'為什麼甩不掉後視鏡裡那台慢車？數學定律解釋原因',url:'https://www.gvm.com.tw/article/129455',v:850},
+                {tag:'AI',title:'Claude是什麼？Opus 4.7懂設計簡報？怎麼用？',url:'https://www.gvm.com.tw/article/129467',v:810},
+                {tag:'產經',title:'台積電法說三關鍵，魏哲家全說了！揭擴廠進度',url:'https://www.gvm.com.tw/article/129449',v:775},
+                {tag:'金融',title:'全球愈動盪，「黃金」價格愈高？黃金仍是最後避風港？',url:'https://www.gvm.com.tw/article/129352',v:720},
+                {tag:'產經',title:'蘋果50年迎戰AI大考',url:'https://www.gvm.com.tw/topic/2350',v:680},
+                {tag:'話題',title:'十五五規劃來了，台灣該關注何事？',url:'https://www.gvm.com.tw/topic/2346',v:640},
+                {tag:'AI',title:'AI縮短新藥開發時程，台灣精準醫療計畫加速突圍',url:'https://www.gvm.com.tw/article/129415',v:590},
+                {tag:'生活',title:'主婦健忘拖10年變「中度失智」，醫嘆：錯過黃金關鍵10年',url:'https://www.gvm.com.tw/article/129458',v:510}
+            ],
+            14: [
+                {tag:'產經',title:'台積電法說三關鍵，魏哲家全說了！揭擴廠進度',url:'https://www.gvm.com.tw/article/129449',v:1640},
+                {tag:'話題',title:'2026媽祖遶境進香：大甲VS.白沙屯差異解析！為何百萬信徒追隨？',url:'https://www.gvm.com.tw/article/119947',v:1520},
+                {tag:'金融',title:'全球愈動盪，「黃金」價格愈高？黃金仍是最後避風港？',url:'https://www.gvm.com.tw/article/129352',v:1350},
+                {tag:'科技',title:'為什麼甩不掉後視鏡裡那台慢車？數學定律解釋原因',url:'https://www.gvm.com.tw/article/129455',v:1280},
+                {tag:'AI',title:'Claude是什麼？Opus 4.7懂設計簡報？怎麼用？',url:'https://www.gvm.com.tw/article/129467',v:1190},
+                {tag:'產經',title:'跟著台積電走！「關渡學」照護模式6月前進亞利桑那',url:'https://www.gvm.com.tw/article/129487',v:1115},
+                {tag:'產經',title:'蘋果50年迎戰AI大考',url:'https://www.gvm.com.tw/topic/2350',v:980},
+                {tag:'金融',title:'少子化、不婚效應！「一家三口」已成過去式，房仲：房市新時代來臨',url:'https://www.gvm.com.tw/article/129473',v:840},
+                {tag:'時事新知',title:'馬斯克宣布AI5晶片投片，特斯拉大漲8%！',url:'https://www.gvm.com.tw/article/129448',v:730},
+                {tag:'教育',title:'K型社會下，Z世代的困境與籌碼',url:'https://www.gvm.com.tw/article/129457',v:680}
+            ],
+            30: [
+                {tag:'產經',title:'台積電法說三關鍵，魏哲家全說了！揭擴廠進度',url:'https://www.gvm.com.tw/article/129449',v:3850},
+                {tag:'AI',title:'Claude是什麼？Opus 4.7懂設計簡報？怎麼用？',url:'https://www.gvm.com.tw/article/129467',v:3420},
+                {tag:'話題',title:'2026媽祖遶境進香：大甲VS.白沙屯差異解析！為何百萬信徒追隨？',url:'https://www.gvm.com.tw/article/119947',v:3150},
+                {tag:'科技',title:'為什麼甩不掉後視鏡裡那台慢車？數學定律解釋原因',url:'https://www.gvm.com.tw/article/129455',v:2840},
+                {tag:'理財投資',title:'如何讓錢替你賺錢？高盛首席投資專家揭密「1%有錢人」的投資智慧',url:'https://www.gvm.com.tw/article/129395',v:2680},
+                {tag:'金融',title:'全球愈動盪，「黃金」價格愈高？黃金仍是最後避風港？',url:'https://www.gvm.com.tw/article/129352',v:2410},
+                {tag:'產經',title:'蘋果50年迎戰AI大考',url:'https://www.gvm.com.tw/topic/2350',v:2290},
+                {tag:'時事新知',title:'馬斯克宣布AI5晶片投片，特斯拉大漲8%！',url:'https://www.gvm.com.tw/article/129448',v:2150},
+                {tag:'話題',title:'中國政策祭利多，房市邁向漫長復甦之路',url:'https://www.gvm.com.tw/article/129251',v:1980},
+                {tag:'國際',title:'西方濾鏡碎一地？「這國」的好感度竟然反超美國',url:'https://www.gvm.com.tw/article/129486',v:1850}
+            ]
+        };
+        const WC_DATA = {
+            7:  [['AI 趨勢',45],['領導管理',38],['數位轉型',30],['職涯發展',25],['溝通技巧',22],['敏捷開發',18],['心理成長',15],['OKR',20],['遠距辦公',12],['時間管理',17]],
+            14: [['領導管理',48],['AI 趨勢',44],['ESG 永續',36],['跨世代溝通',32],['數位轉型',28],['職涯發展',26],['溝通技巧',23],['理財投資',20],['敏捷開發',16],['OKR',22],['心理成長',18],['總體經濟',14]],
+            30: [['領導管理',50],['AI 趨勢',45],['ESG 永續',40],['跨世代溝通',38],['企業經營',35],['數位轉型',32],['職涯發展',28],['理財投資',25],['心理成長',22],['總體經濟',20],['敏捷開發',18],['專案管理',16],['自我實現',15],['OKR',24],['綠能',14],['溝通技巧',26],['遠距辦公',12],['時間管理',21]]
+        };
+
+        // ── Toggle Helper ──────────────────────────────────────────
+        function makePeriodToggle(containerId, periods, defaultP, onChange) {
+            const el = document.getElementById(containerId);
+            let cur = defaultP;
+            periods.forEach(p => {
+                const btn = document.createElement('button');
+                btn.textContent = p + '天';
+                btn.dataset.p = p;
+                btn.className = p === defaultP
+                    ? 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white transition'
+                    : 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition';
+                btn.onclick = () => {
+                    if (cur === p) return;
+                    cur = p;
+                    el.querySelectorAll('button').forEach(b => {
+                        b.className = b.dataset.p == p
+                            ? 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white transition'
+                            : 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition';
+                    });
+                    onChange(p);
+                };
+                el.appendChild(btn);
+            });
+        }
+
+        // ── Render Leaderboard ─────────────────────────────────────
+        function renderLeaderboard(period) {
+            const el = document.getElementById('lb-list');
+            el.innerHTML = '';
+            LEADERBOARD[period].forEach((item, i) => {
+                const rankColor = i===0?'text-amber-500 font-bold':i===1?'text-slate-400 font-bold':i===2?'text-orange-400 font-bold':'text-slate-400';
+                const crown = i===0?'<span class="absolute -top-1 -right-1 text-[10px]">👑</span>':'';
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 text-center text-sm ${rankColor}">${i+1}</span>
+                        <div class="w-8 h-8 rounded-full ${i===0?'bg-amber-100 text-amber-700':'bg-slate-100 text-slate-500'} flex items-center justify-center text-xs font-bold relative">${item.c}${crown}</div>
+                        <span class="text-sm ${i<3?'font-semibold text-slate-700':'font-medium text-slate-600'}">${item.n}</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-800">${item.v} <span class="text-xs text-slate-400 font-normal">篇</span></span>`;
+                el.appendChild(div);
+            });
+        }
+
+        // ── Render Articles ────────────────────────────────────────
+        function renderArticles(period) {
+            const el = document.getElementById('art-list');
+            el.innerHTML = '';
+            const numColors = ['text-indigo-300','text-slate-300','text-slate-300','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200'];
+            ARTICLES[period].forEach((item, i) => {
+                const tagCls = TAG_COLORS[item.tag] || 'text-slate-600 bg-slate-100';
+                const a = document.createElement('a');
+                a.href = item.url || '#'; a.target = '_blank';
+                a.className = 'flex items-start gap-3 p-2 -mx-1 rounded-lg hover:bg-slate-50 transition group border border-transparent hover:border-indigo-100';
+                a.innerHTML = `
+                    <span class="font-black text-lg italic ${numColors[i]} shrink-0 leading-none mt-0.5 w-5 text-right">${i+1}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-[10px] font-bold ${tagCls} px-2 py-0.5 rounded shrink-0">${item.tag}</span>
+                            <span class="text-xs text-slate-400 ml-auto shrink-0">${item.v.toLocaleString()}</span>
+                        </div>
+                        <p class="text-sm font-medium text-slate-800 group-hover:text-indigo-600 transition leading-snug truncate">${item.title}</p>
+                    </div>`;
+                el.appendChild(a);
+            });
+        }
+
+        // ── Render Word Cloud ──────────────────────────────────────
+        let wcPeriod = 30;
+        function renderWordCloud(period) {
+            wcPeriod = period;
+            const c = document.getElementById('canvas-container');
+            const cv = document.getElementById('wordCloudCanvas');
+            cv.width  = c.offsetWidth || 400;
+            cv.height = c.offsetHeight || 240;
+            WordCloud(cv, {
+                list: WC_DATA[period],
+                gridSize: 8,
+                weightFactor: cv.offsetWidth > 400 ? 1.1 : 0.65,
+                fontFamily: 'Inter, PingFang TC, sans-serif',
+                color: () => ['#ef4444','#f59e0b','#10b981','#3b82f6','#6366f1','#8b5cf6','#ec4899','#0f766e','#0ea5e9','#d97706'][Math.floor(Math.random()*10)],
+                rotateRatio: 0.2, rotationSteps: 2,
+                backgroundColor: 'transparent', shape: 'circle'
+            });
+        }
+
+        // ── Tooltip ────────────────────────────────────────────────
+        const tip = document.getElementById('hm-tooltip');
+        const showTip = (e, text) => {
+            tip.innerHTML = text.replace('\n', '<br>');
+            tip.classList.add('show');
+            moveTip(e);
+        };
+        const moveTip = e => {
+            const x = e.clientX + 14, y = e.clientY - 10;
+            const overRight = x + tip.offsetWidth > window.innerWidth - 8;
+            tip.style.left = (overRight ? e.clientX - tip.offsetWidth - 14 : x) + 'px';
+            tip.style.top  = y + 'px';
+        };
+        const hideTip = () => tip.classList.remove('show');
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ── [聯動] 檢查 SA 後台是否有新發布的推播 ──────────────
+            const rawPush = localStorage.getItem('latest_push');
+            if (rawPush) {
+                try {
+                    const pushData = JSON.parse(rawPush);
+
+                    // 1. 更新 Topbar 行銷橫幅
+                    const bannerText = document.querySelector('#marketing-banner span.mr-1');
+                    const bannerLink = document.querySelector('#marketing-banner a');
+                    if (bannerText) bannerText.textContent = '📣 ' + pushData.title;
+                    if (bannerLink) bannerLink.onclick = () => triggerSAPush(pushData);
+
+                    // 2. 更新通知鈴鐺第一則
+                    const firstBellTitle = document.querySelector('.divide-y a:first-child h4');
+                    const firstBellBody  = document.querySelector('.divide-y a:first-child p');
+                    const firstBellTime  = document.querySelector('.divide-y a:first-child span');
+                    if (firstBellTitle) firstBellTitle.textContent = pushData.title;
+                    if (firstBellBody)  firstBellBody.textContent  = typeof pushData.content === 'string'
+                        ? pushData.content.replace(/<[^>]+>/g, '').substring(0, 60) + '...'
+                        : pushData.content;
+                    if (firstBellTime)  firstBellTime.textContent  = '剛剛 · SA 最新推播';
+
+                    // 3. 500ms 後自動彈出推播 Modal（模擬主動觸發）
+                    setTimeout(() => triggerSAPush(pushData), 500);
+
+                    // 清除 localStorage（避免重新整理後再次彈出）
+                    localStorage.removeItem('latest_push');
+                } catch(e) { console.error('[SA Push] 解析失敗', e); }
+            }
+
+            // ── Init Toggles ───────────────────────────────────────
+            makePeriodToggle('lb-toggle',  [7,14,30], 30, p => renderLeaderboard(p));
+            makePeriodToggle('art-toggle', [7,14,30], 30, p => renderArticles(p));
+            makePeriodToggle('wc-toggle',  [7,14,30], 30, p => renderWordCloud(p));
+            makePeriodToggle('pv-toggle',  [7,14,30], 30, p => renderPVChart(p));
+            renderLeaderboard(30);
+            renderArticles(30);
+            renderPVChart(30);
+            setTimeout(() => renderWordCloud(30), 120);
+
+            // Heatmap
+            const container = document.getElementById('heatmap-rows');
+            const days = ['週一','週二','週三','週四','週五','週六','週日'];
+            const data = [];
+            for (let d = 0; d < 7; d++) {
+                let row = [];
+                for (let h = 0; h < 24; h++) {
+                    let v = Math.random() * 200;
+                    if (d === 4 && h >= 14 && h <= 17) v += 8000;
+                    if (d === 2 && h >= 9  && h <= 11) v += 3000;
+                    if (h >= 9 && h <= 18) v += 800 + Math.random() * 500;
+                    if (h >= 0 && h <= 5)  v = Math.random() < 0.2 ? Math.floor(Math.random() * 20) : 0;
+                    row.push(Math.floor(v));
+                }
+                data.push(row);
+            }
+            const color = v => {
+                if (v === 0)    return '#f1f5f9';
+                if (v < 300)    return '#bfdbfe';
+                if (v < 700)    return '#60a5fa';
+                if (v < 1500)   return '#3b82f6';
+                if (v < 3500)   return '#6366f1';
+                if (v < 6000)   return '#8b5cf6';
+                if (v < 9000)   return '#ec4899';
+                return '#ef4444';
+            };
+            const label = v => v === 0 ? '—' : v < 1000 ? `${v} 次` : `${(v/1000).toFixed(1)}K 次`;
+            data.forEach((row, di) => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'flex items-center w-full flex-1 gap-[3px]';
+                const lbl = document.createElement('div');
+                lbl.className = 'w-[38px] text-right text-[10px] text-slate-500 font-semibold shrink-0 mr-1';
+                lbl.innerText = days[di];
+                rowEl.appendChild(lbl);
+                row.forEach((v, hi) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell flex-1';
+                    cell.style.backgroundColor = color(v);
+                    const tipText = `${days[di]}　${String(hi).padStart(2,'0')}:00 – ${String(hi+1).padStart(2,'0')}:00\n${label(v)}`;
+                    cell.addEventListener('mouseenter', e => showTip(e, tipText));
+                    cell.addEventListener('mousemove',  e => moveTip(e));
+                    cell.addEventListener('mouseleave', hideTip);
+                    cell.addEventListener('click',      e => showTip(e, tipText));
+                    rowEl.appendChild(cell);
+                });
+                container.appendChild(rowEl);
+            });
+
+            // Word Cloud
+            const wcData = [
+                ['領導管理',50],['AI 趨勢',45],['ESG 永續',40],['跨世代溝通',38],
+                ['企業經營',35],['數位轉型',32],['職涯發展',28],['理財投資',25],
+                ['心理成長',22],['總體經濟',20],['敏捷開發',18],['專案管理',16],
+                ['自我實現',15],['OKR',24],['綠能',14],['溝通技巧',26],
+                ['遠距辦公',12],['時間管理',21]
+            ];
+            const renderCloud = () => {
+                const c = document.getElementById('canvas-container');
+                const cv = document.getElementById('wordCloudCanvas');
+                cv.width  = c.offsetWidth;
+                cv.height = c.offsetHeight || 260;
+                WordCloud(cv, {
+                    list: wcData,
+                    gridSize: 8,
+                    weightFactor: cv.offsetWidth > 400 ? 1.0 : 0.6,
+                    fontFamily: 'Inter, PingFang TC, sans-serif',
+                    color: () => ['#ef4444','#f59e0b','#10b981','#3b82f6','#6366f1','#8b5cf6','#ec4899','#0f766e'][Math.floor(Math.random()*8)],
+                    rotateRatio: 0.2,
+                    rotationSteps: 2,
+                    backgroundColor: 'transparent',
+                    shape: 'circle'
+                });
+            };
+            setTimeout(renderCloud, 120);
+            window.addEventListener('resize', () => {
+                clearTimeout(window._wcTimer);
+                window._wcTimer = setTimeout(renderCloud, 300);
+            });
+        });
+
+        // ── Smart Upsell Logic ─────────────────────────────
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 animate-in slide-in-from-right-full duration-300 flex items-center gap-3';
+            toast.innerHTML = `
+                <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
+                ${message}
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('transition-all', 'duration-300', 'opacity-0', 'translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function submitUpsellRequest(type) {
+            const msg = type === 'seats' ? '名額擴充洽詢' : '合約續約洽詢';
+            const showSuccess = () => {
+                document.getElementById('upsell-modal-title').textContent = `${msg}需求已提交`;
+                document.getElementById('upsell-modal-body').textContent = `遠見業務部已收到您的${msg}意願。您的專屬服務窗口將於 24 小時內與您聯繫。`;
+                document.getElementById('upsell-modal').classList.remove('hidden');
+            };
+            
+            showToast(`正在發送${msg}需求給遠見業務部...`);
+            setTimeout(showSuccess, 1500);
+        }
+        function closeUpsellModal() {
+            document.getElementById('upsell-modal').classList.add('hidden');
+        }
+    </script>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col gap-2"></div>
+
+    <!-- Smart Upsell Success Modal -->
+    <div id="upsell-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="bg-indigo-600 p-8 flex justify-center">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                </div>
+            </div>
+            <div class="p-8 text-center">
+                <h3 id="upsell-modal-title" class="text-xl font-bold text-slate-800 mb-3">需求已提交</h3>
+                <p id="upsell-modal-body" class="text-sm text-slate-500 leading-relaxed mb-8">
+                    遠見業務部已收到您的意願。您的專屬服務窗口將於 24 小時內與您聯繫。
+                </p>
+                <button onclick="closeUpsellModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors">
+                    返回儀表板
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- ↓ push detail modal and scripts follow — </body></html> moved to end of file -->
+
+    <!-- Modal: 推播詳情彈窗 -->
+    <div id="modal-push-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+            <!-- Header with Image Context -->
+            <div class="relative h-32 bg-indigo-600 flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <div class="relative z-10 text-white text-center">
+                    <div id="push-detail-icon" class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2 backdrop-blur-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                </div>
+                <button onclick="closePushDetail()" class="absolute top-4 right-4 text-white/70 hover:text-white p-1 hover:bg-white/10 rounded-full transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <h3 id="push-detail-title" class="text-xl font-bold text-slate-900 mb-4 leading-tight">訊息載入中...</h3>
+                <div id="push-detail-content" class="text-slate-600 text-sm leading-relaxed prose prose-sm max-w-none">
+                    <!-- HTML Content from Editor -->
+                </div>
+                
+                <div id="push-cta-container" class="mt-8">
+                    <a id="push-detail-cta" href="#" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2">
+                        立即查看詳情
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-center">
+                <button onclick="closePushDetail()" class="text-xs font-medium text-slate-400 hover:text-slate-600 transition">關閉視窗</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Push Detail Logic ──────────────────────────────────────
+        const PUSH_DATA = {
+            'earlyBird': {
+                title: '🔥 2026 早鳥續約專屬方案',
+                content: `
+                    <p>感謝貴集團長期以來對《遠見線上讀》的支持。為回饋核心合作客戶，我們推出 <b>2026 年度早鳥續約計畫</b>：</p>
+                    <ul class="list-disc pl-5 mt-3 space-y-2">
+                        <li><b>名額升級：</b>月底前確認續約，現有名額免費升級 20%（例如 100 席升級為 120 席）。</li>
+                        <li><b>贈送電子書：</b>加贈年度暢銷電子書一本（任選）。</li>
+                        <li><b>優先參與：</b>獲得下半年度「領袖影響力論壇」保留席次。</li>
+                    </ul>
+                    <p class="mt-4">若有任何需求，歡迎直接點擊下方按鈕或聯繫您的專屬客戶經理。</p>
+                `,
+                cta: '立即洽詢專屬經理',
+                url: '#'
+            },
+            'event': {
+                title: '📢 HR 實體交流讀書會報名中',
+                content: `
+                    <p>在 AI 時代，HR 如何運用工具優化組織效能？</p>
+                    <div class="bg-indigo-50 p-4 rounded-lg my-4 border-l-4 border-indigo-500 text-indigo-900 text-xs">
+                        <b>主題：</b>AI 與組織人才培育實務<br>
+                        <b>日期：</b>2026 / 05 / 20 (二)<br>
+                        <b>地點：</b>遠見天下文化書院 (台北市南京東路二段)
+                    </div>
+                    <p>現場將由《遠見》資深編輯與技術專家共同交流，名額有限，請盡速報名。</p>
+                `,
+                cta: '立即線上報名',
+                url: '#'
+            },
+            'maintenance': {
+                title: '系統維護公告',
+                content: `
+                    <p>為了提供更穩定的推播服務，系統將於以下時段進行升級：</p>
+                    <p class="font-bold text-red-600 mt-2">2026/04/20 (日) 02:00 - 04:00</p>
+                    <p class="mt-2">期間後台各項管理功能可能暫時無法使用，造成不便敬請見諒。</p>
+                `,
+                cta: null,
+                url: null
+            }
+        };
+
+        // ── [聯動] SA 推播直接觸發 Modal ──────────────────────────
+        function triggerSAPush(data) {
+            const titleEl   = document.getElementById('push-detail-title');
+            const contentEl = document.getElementById('push-detail-content');
+            const ctaBtn    = document.getElementById('push-detail-cta');
+            const ctaCont   = document.getElementById('push-cta-container');
+
+            titleEl.innerText = data.title || '來自遠見的最新推播';
+            // 若 content 為純文字則換行顯示，若含 HTML 則直接渲染
+            contentEl.innerHTML = data.content
+                ? (/<[a-z][\s\S]*>/i.test(data.content)
+                    ? data.content
+                    : `<p>${data.content.replace(/\n/g, '<br>')}</p>`)
+                : '<p>（此推播無附帶內文）</p>';
+
+            if (data.url) {
+                ctaBtn.textContent = '查看完整資訊';
+                ctaBtn.href = data.url;
+                ctaCont.style.display = 'block';
+            } else {
+                ctaCont.style.display = 'none';
+            }
+
+            document.getElementById('modal-push-detail').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openPushDetail(id) {
+            const data = PUSH_DATA[id];
+            if (!data) return;
+            
+            document.getElementById('push-detail-title').innerText = data.title;
+            document.getElementById('push-detail-content').innerHTML = data.content;
+            
+            const ctaBtn = document.getElementById('push-detail-cta');
+            const ctaContainer = document.getElementById('push-cta-container');
+            
+            if (data.cta) {
+                ctaBtn.innerText = data.cta;
+                ctaBtn.href = data.url;
+                ctaContainer.style.display = 'block';
+            } else {
+                ctaContainer.style.display = 'none';
+            }
+            
+            document.getElementById('modal-push-detail').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function toggleBell(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('bell-dropdown');
+            dd.classList.toggle('hidden');
+        }
+        function closeBell() {
+            document.getElementById('bell-dropdown').classList.add('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('bell-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) closeBell();
+        });
+
+        function closePushDetail() {
+            document.getElementById('modal-push-detail').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function submitUpsellRequest(type) {
+            const msg = type === 'seats' ? '已收到您的名額擴充需求，業務團隊將於 24 小時內與您聯繫。' : '已收到您的續約諮詢需求，我們將優先為您處理早鳥優惠。';
+            alert(msg);
+        }
+
+        // ── PV Chart ───────────────────────────────────────────────
+    </script>
+    <!-- Floating Shortcut to SA -->
+    <a href="遠見內部後台%20Prototype.html" class="floating-shortcut" title="切換回 SA 內部後台">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        <span>SA 後台</span>
+    </a>
+
+</body>
+</html>
