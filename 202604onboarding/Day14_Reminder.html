@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>您這週的免費閱讀額度使用了嗎？</title>
+<style>
+  body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f6f9; color: #333; }
+  .container { max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 8px; overflow: hidden; }
+  .header { background-color: #0b1c3c; color: #fff; padding: 20px; text-align: center; }
+  .content { padding: 30px; }
+  .alert-box { background-color: #fef5d9; border-left: 4px solid #d4af37; padding: 15px; margin-bottom: 25px; border-radius: 4px; }
+  .article-card { border: 1px solid #eee; border-radius: 8px; overflow: hidden; margin-bottom: 20px; display: flex; }
+  .article-card img { width: 150px; height: 100px; object-fit: cover; }
+  .article-content { padding: 15px; flex: 1; }
+  .article-content h4 { margin: 0 0 10px 0; font-size: 16px; color: #0b1c3c; line-height: 1.4; }
+  .article-content p { font-size: 13px; color: #666; margin: 0 0 10px 0; }
+  .badge { background-color: #d4af37; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 12px; }
+  .btn { display: inline-block; padding: 10px 20px; background-color: #0b1c3c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px; text-align: center; width: 100%; box-sizing: border-box;}
+  @media (max-width: 480px) { .article-card { flex-direction: column; } .article-card img { width: 100%; height: 180px; } }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>專屬推薦：本週必讀趨勢</h2>
+    </div>
+    <div class="content">
+      <div class="alert-box">
+        <strong>💡 溫馨提醒：</strong> 您的會員帳號本月還有 <strong>4 篇免費鎖文額度</strong> 尚未用完！快來看看大家都在討論什麼！
+      </div>
+      
+      <p>以下是本週全站討論度最高的精選文章，千萬別錯過：</p>
+      
+      <!-- 動態帶入區塊 (由 API 提供資料) -->
+      <div class="article-card">
+        <img src="https://via.placeholder.com/150x100?text=Top+1" alt="Article 1">
+        <div class="article-content">
+          <span class="badge">鎖文專屬</span>
+          <h4>AI 時代的企業轉型陷阱：為何砸大錢卻看不見成效？</h4>
+          <p>獨家專訪微軟專家，帶您破解導入 AI 的三大迷思...</p>
+          <a href="#" style="color: #0b1c3c; font-weight: bold; font-size: 14px; text-decoration: none;">立即閱讀 &rarr;</a>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <img src="https://via.placeholder.com/150x100?text=Top+2" alt="Article 2">
+        <div class="article-content">
+          <span class="badge">鎖文專屬</span>
+          <h4>降息循環來臨？圖解 2026 全球資金流向與投資機會</h4>
+          <p>華爾街最新分析報告指出，下半年的佈局關鍵在於...</p>
+          <a href="#" style="color: #0b1c3c; font-weight: bold; font-size: 14px; text-decoration: none;">立即閱讀 &rarr;</a>
+        </div>
+      </div>
+      <!-- 動態帶入區塊結束 -->
+
+      <a href="https://www.gvm.com.tw/digital?utm_source=onboarding&utm_medium=email&utm_campaign=day14_reminder" class="btn">探索更多好文 (使用我的免費額度)</a>
+    </div>
+  </div>
+</body>
+</html>

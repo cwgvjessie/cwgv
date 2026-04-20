@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>專案規格書：遠見會員 30 天 Onboarding 信件旅程規劃</title>
+<style>
+  :root {
+    --primary-color: #0b1c3c;
+    --accent-color: #d4af37;
+    --text-color: #333333;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e9ecef;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', '微軟正黑體', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .header {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 40px 50px;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+  .header p {
+    margin: 10px 0 0 0;
+    color: #a0aabf;
+    font-size: 14px;
+  }
+  .content {
+    padding: 40px 50px;
+  }
+  h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 10px;
+    margin-top: 40px;
+  }
+  h3 {
+    color: #2c3e50;
+    margin-top: 30px;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+  .alert-important {
+    background-color: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 15px 20px;
+    border-radius: 0 4px 4px 0;
+    margin: 20px 0;
+  }
+  .alert-important strong {
+    color: #856404;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .alert-info {
+    background-color: #e2e3e5;
+    border-left: 5px solid #383d41;
+    padding: 15px 20px;
+    border-radius: 0 4px 4px 0;
+    margin: 20px 0;
+  }
+  .journey-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fafbfc;
+  }
+  .journey-card h4 {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .code-block {
+    background-color: #2d2d2d;
+    color: #cccccc;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>專案規格書：遠見會員 30 天 Onboarding 信件規劃</h1>
+      <p>Target: gvm.com.tw | Version: 1.0</p>
+    </div>
+    
+    <div class="content">
+      
+      <h2>1. 專案概述</h2>
+      <ul>
+        <li><strong>專案名稱</strong>：遠見會員 Onboarding 信件 (30天旅程)</li>
+        <li><strong>核心目標</strong>：提高活躍度與黏著度，引導新註冊用戶從單一目的轉換為持續回訪，並確保他們體驗到平台的進階價值。</li>
+        <li><strong>發送節奏</strong>：「細水長流型」，維持每週一次的無壓力接觸，共計 4 封信件。</li>
+      </ul>
+
+      <h2>2. 目標受眾與情境</h2>
+      <ul>
+        <li><strong>受眾對象</strong>：剛完成註冊的 <code>gvm.com.tw</code> 新進會員。</li>
+        <li><strong>註冊初衷假定</strong>：主要為了「解鎖閱讀某篇特定的付費/專屬文章」或「報名參加遠見主辦的活動」。</li>
+        <li><strong>溝通策略</strong>：由於最初目的明確，信件必須在達成承諾後，快速展示額外的會員權益（如免費額度、職場雷達），延續他們的注意力。</li>
+      </ul>
+
+      <div class="alert-important">
+        <strong>⚡ 專案階段性指標 (Short-term KPI)：促動回訪率</strong>
+        衡量 Onboarding 期間的立即成效：追蹤新會員在註冊後 30 天內，<strong>實際使用「每月 4 篇免費文章額度」的比例</strong>（至少閱讀 1 篇以上即算轉換）。這也是整體發信計畫是否成功帶動初始活躍度的驗證點。
+      </div>
+
+      <div class="alert-important" style="background-color: #d1ecf1; border-left-color: #0c5460; color: #0c5460;">
+        <strong style="color: #0c5460; margin-bottom: 8px;">🌟 專案北極星指標 (North Star Metrics)：長期商業價值</strong>
+        衡量完成 30 天 Onboarding 旅程後，對遠見產生的長期效益。我們將雙管齊下追蹤以下兩大維度：
+        <ul style="margin-top: 5px;">
+          <li><strong>次月自然回訪率 (Retention)</strong>：在沒有系統強制發信推播的「第 2 個月」，有多少比例的會員會自發性回到網站閱讀，以此驗證「閱讀習慣」是否被成功建立。</li>
+          <li><strong>付費升級轉換率 (Monetization)</strong>：追蹤經歷過上述完整 Onboarding 流程的會員，未來 3~6 個月內升級成為「遠見付費訂戶（無限暢讀）」的比例，以此證明完整的權益認知能有效帶動商業變現。</li>
+        </ul>
+      </div>
+
+      <h2>3. Onboarding 旅程架構 (The 4-Email Journey)</h2>
+      <p>以下為 30 天內的 4 封信件內容藍圖與行為呼籲 (CTA) 規劃：</p>
+
+      <div class="journey-card">
+        <h4>📧 Email 1: 註冊當日 (Day 0) - 歡迎與雙重驚喜</h4>
+        <ul>
+          <li><strong>核心任務</strong>：達成承諾、建立好感的第一印象。</li>
+          <li><strong>主要內容</strong>：
+            <ul>
+              <li><strong>簡短歡迎</strong>：感謝加入遠見會員。</li>
+              <li><strong>雙重見面禮 (Surprise)</strong>：
+                <br>1. <strong>生日禮預告</strong>：引導前往設定生日，告知生日當月可領取 100 元購物金。
+                <br>2. <strong>專屬知識包下載</strong>：直接附上下載入口連結，無須額外門檻。
+              </li>
+            </ul>
+          </li>
+          <li><strong style="color: #d4af37;">📍 專屬成功指標 (Micro-KPI)</strong>：生日數據補全率。追蹤點擊設定生日按鈕後的「實際資料儲存成功」比例，而不僅是開信率。</li>
+          <li style="list-style: none; margin-top: 15px;"><a href="Day0_Welcome.html" target="_blank" style="color: #0066cc; text-decoration: underline;">👉 預覽信件內容 (Day0_Welcome.html)</a></li>
+        </ul>
+      </div>
+
+      <div class="journey-card">
+        <h4>📧 Email 2: 註冊後第 7 天 (Day 7) - 意圖建立 (確保提早收集第一方數據)</h4>
+        <ul>
+          <li><strong>核心任務</strong>：趁整體開信率最高的黃金期，提早收集隱私興趣標籤，應對 Cookieless 取代方案。</li>
+          <li><strong>主要內容</strong>：
+            <ul>
+              <li><strong>預告/介紹</strong>：告訴用戶設定「職場雷達」的好處（專屬職涯文章、精準推播）。</li>
+              <li><strong>操作引導</strong>：簡單的設定步驟預覽片段。</li>
+            </ul>
+          </li>
+          <li><strong>CTA</strong>：一鍵前往設定我的職場雷達。</li>
+          <li><strong style="color: #d4af37;">📍 專屬成功指標 (Micro-KPI)</strong>：功能啟用率。撈取信件發出後的名單進行比對，確認有多少會員「實際於後端完成並儲存了職場雷達設定」。</li>
+          <li style="list-style: none; margin-top: 15px;"><a href="Day7_Radar.html" target="_blank" style="color: #0066cc; text-decoration: underline;">👉 預覽信件內容 (Day7_Radar.html)</a></li>
+        </ul>
+      </div>
+
+      <div class="journey-card">
+        <h4>📧 Email 3: 註冊後第 14 天 (Day 14) - 喚醒閱讀 (免費額度提醒)</h4>
+        <ul>
+          <li><strong>核心任務</strong>：推動短線 KPI（使用免費文章額度），喚回初步可能流失的會員注意力。</li>
+          <li><strong>主要內容</strong>：
+            <ul>
+              <li><strong>溫馨提醒</strong>：「您的本月 4 篇免費閱讀額度還沒用完喔！」</li>
+              <li><strong>動態內容區塊清單</strong>：系統自動帶入本週必讀亮點（詳見下方技術需求）。</li>
+            </ul>
+          </li>
+          <li><strong>CTA</strong>：點擊閱讀完整文章。</li>
+          <li><strong style="color: #d4af37;">📍 專屬成功指標 (Micro-KPI)</strong>：額度消耗達成率。該批收件者在收到信的 48 小時內，於網站真正「扣除至少 1 篇免費扣打」的人數比例。</li>
+          <li style="list-style: none; margin-top: 15px;"><a href="Day14_Reminder.html" target="_blank" style="color: #0066cc; text-decoration: underline;">👉 預覽信件內容 (Day14_Reminder.html)</a></li>
+        </ul>
+      </div>
+
+      <div class="journey-card">
+        <h4>📧 Email 4: 註冊後第 21 天 (Day 21) - 深度探索 (知識包大補帖)</h4>
+        <ul>
+          <li><strong>核心任務</strong>：利用長青資源展示平台深度整理的功力，零額外編輯負擔。</li>
+          <li><strong>主要內容</strong>：
+            <ul>
+              <li><strong>資源導覽</strong>：介紹遠見知識包圖書館（採用既有Evergreen專題，編輯部無需為此特別出刊）。</li>
+              <li><strong>精選推薦</strong>：列出最受歡迎的 2-3 個經典知識包主題。</li>
+            </ul>
+          </li>
+          <li><strong>CTA</strong>：前往知識包專區瀏覽。</li>
+          <li><strong style="color: #d4af37;">📍 專屬成功指標 (Micro-KPI)</strong>：深度下載轉換率。前往網站後，追蹤使用者是否「確實按下下載 PDF」按鈕。</li>
+          <li style="list-style: none; margin-top: 15px;"><a href="Day21_Knowledge.html" target="_blank" style="color: #0066cc; text-decoration: underline;">👉 預覽信件內容 (Day21_Knowledge.html)</a></li>
+        </ul>
+      </div>
+
+      <h2>4. 系統與技術開發需求</h2>
+      <div class="alert-info">
+        技術團隊需針對 <strong>Day 14 信件</strong> 實作自動化撈取機制，以降低行銷營運成本。
+      </div>
+
+      <h3>模組名稱：動態推薦文章自動化 (Email 3 應用)</h3>
+      <ul>
+        <li><strong>觸發點</strong>：發送 Day 14 Onboarding 郵件時，即時由 Backend 運算帶入。</li>
+        <li><strong>資料來源運輯</strong>（系統自動撈取，無需手動）：
+          <ul>
+            <li><strong>條件 A</strong>：撈取系統「最近一週全站 Top 3 最熱門的鎖文（付費文章）」。</li>
+            <li><strong>條件 B（若 A 資料不足的退避機制）</strong>：撈取後台編輯設定的「鎖文推薦值主題」。</li>
+          </ul>
+        </li>
+        <li><strong>輸出格式要求</strong>：提供文章標題、主視覺圖片、摘要，以及帶有該用戶追蹤碼 (UTM) 的連結。</li>
+      </ul>
+
+      <p style="margin-top:40px; text-align:center; color:#999; font-size: 13px;">-- 規格書結束 --</p>
+    </div>
+  </div>
+</body>
+</html>
