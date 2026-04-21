@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推薦視窗特效測試 - 優雅抖動版</title>
+    <style>
+        /* 1. 定義左右平移動畫 (Translate Shake) */
+        @keyframes elegant-shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .recommend-popup {
+            /* 恢復預設軸心 */
+            transform-origin: initial;
+        }
+
+        /* 頁面基礎設定 (僅供 Demo 顯示) */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            height: 2000px; /* 模擬長頁面 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+        }
+
+        /* 2. 視窗主體樣式 */
+        .recommend-popup {
+            position: fixed;
+            bottom: 30px;
+            left: 30px; /* 原為 right: 30px */
+            width: 380px;
+            background: #F0F4F8; /* 淺灰色底 */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid #E1E8ED;
+            
+            /* 動態觸發：延長至 3 秒抖動，持續一次 */
+            animation: elegant-shake 3s ease-in-out 0.8s 1;
+            box-sizing: border-box;
+        }
+
+        /* 3. 內部佈局 */
+        .popup-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 左側獎盃圈 */
+        .icon-circle {
+            width: 50px;
+            height: 50px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* 文字區 */
+        .content-area {
+            flex-grow: 1;
+            padding-right: 25px;
+        }
+
+        .header-text {
+            color: #888888;
+            font-size: 13px;
+            margin-bottom: 2px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .main-text {
+            color: #333333;
+            font-size: 16px;
+            line-height: 1.4;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* 右側點擊按鈕 */
+        .action-link {
+            color: #0055AA; /* 遠見標誌藍 */
+            font-size: 16px;
+            text-decoration: none;
+            font-weight: 700;
+            white-space: nowrap;
+            margin-left: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .action-link:hover {
+            opacity: 0.8;
+        }
+
+        /* 關閉按鈕 (X) */
+        .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            color: #999;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 10px;
+            line-height:1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* 4. 底部進度條 */
+        .progress-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #0055AA;
+            width: 66.6%; /* 代表 2/3 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 這是用於展示的背景說明 -->
+    <div style="padding: 50px; color: #666;">
+        <h1>推薦視窗特效測試 Demo</h1>
+        <p>視窗將在頁面載入 0.8 秒後自動「優雅抖動」兩次。</p>
+        <p>這是一個純 CSS 的實作版本。</p>
+    </div>
+
+    <!-- 浮動視窗主體 -->
+    <div class="recommend-popup" id="recommendPopup">
+        <div class="popup-container">
+            <!-- 關閉按鈕 -->
+            <span class="close-btn" onclick="document.getElementById('recommendPopup').style.display='none'">&times;</span>
+            
+            <!-- 獎盃圖示 -->
+            <div class="icon-circle">
+                🏆
+            </div>
+            
+            <!-- 文字內容 -->
+            <div class="content-area">
+                <div class="header-text">最後衝刺：已閱讀 2/3 篇文章</div>
+                <h3 class="main-text">讀完編輯部推薦文章，立即解鎖抽獎！</h3>
+            </div>
+
+            <!-- 動作連結 -->
+            <a href="#" class="action-link">說明 &gt;</a>
+        </div>
+        
+        <!-- 底部進度條 -->
+        <div class="progress-indicator"></div>
+    </div>
+
+</body>
+</html>
