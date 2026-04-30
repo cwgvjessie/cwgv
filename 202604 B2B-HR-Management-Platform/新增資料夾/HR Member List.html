@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B2B 企業學員名單 Prototype</title>
+    <title>遠見線上讀 B2B - 學員名單管理</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -22,18 +22,6 @@
         .sticky-col-0 { left:0; }
         .sticky-col-1 { left:40px; }
         #toast { transition: opacity 0.3s, transform 0.3s; }
-        
-        /* Table Layout Standard */
-        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-block: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 1100px; }
-        th { background: #f8fafc; padding: 12px 16px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 12px; position:sticky; top:0; z-index:10; }
-        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        
-        /* Sticky Column Enhancements */
-        .sticky-col { position:sticky; background:white; z-index:5 !important; }
-        th.sticky-col { z-index:15 !important; }
-        .sticky-col-shadow { box-shadow: 4px 0 8px -2px rgba(0,0,0,0.05); }
-
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
@@ -42,102 +30,36 @@
 <nav class="bg-slate-900 text-white h-14 flex items-center px-4 md:px-8 shrink-0 sticky top-0 z-30 shadow-lg">
     <div class="flex items-center gap-3 mr-8">
         <div class="w-7 h-7 bg-red-600 rounded flex items-center justify-center font-bold text-base shrink-0">V</div>
-        <span class="font-bold tracking-wider text-sm whitespace-nowrap">B2B 企業後台</span>
+        <span class="font-bold tracking-wider text-sm whitespace-nowrap">線上讀 B2B</span>
     </div>
     <div class="hidden md:flex items-center gap-1 flex-1">
-        <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+        <a href="HR Dashboard Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
             總覽儀表板
         </a>
         <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/15 text-red-400 border border-red-500/30 text-sm font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            人員管理
-        </a>
-        <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            操作紀錄
+            學員名單管理
         </a>
     </div>
     <div class="ml-auto flex items-center gap-3">
         <span class="hidden sm:block text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full truncate max-w-[180px]">天下文化集團 2026</span>
-        
-        <!-- Notification Bell -->
-        <div class="relative group mt-1">
-            <button class="relative p-1.5 text-slate-400 hover:text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-slate-900"></span>
-            </button>
-            <div class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                <div class="px-4 py-2 border-b border-slate-100 font-semibold text-sm text-slate-800 flex justify-between items-center">
-                    最新推播
-                    <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">未讀 1</span>
-                </div>
-                <div class="divide-y divide-slate-50">
-                    <a href="#" class="block p-3 hover:bg-slate-50 transition bg-red-50/30">
-                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">🔥 2026 早鳥續約專屬方案</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2">感謝貴公司支持，即日起至月底前完成續約，享名額升級不加價！</p>
-                        <span class="text-[10px] text-slate-400 mt-1 block">剛剛</span>
-                    </a>
-                    <a href="#" class="block p-3 hover:bg-slate-50 transition">
-                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">📢 HR 實體交流讀書會報名</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2">探討如何運用 AI 提升選育用留效率，限額 30 名免費報名。</p>
-                        <span class="text-[10px] text-slate-400 mt-1 block">昨天</span>
-                    </a>
-                    <a href="#" class="block p-3 hover:bg-slate-50 transition opacity-60">
-                        <h4 class="text-xs font-bold text-slate-800 mb-0.5">遠見線上讀：系統維護公告</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2">系統將於本週日凌晨 02:00-04:00 進行升級，期間將暫停服務。</p>
-                        <span class="text-[10px] text-slate-400 mt-1 block">3 天前</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Dropdown (Hover) -->
-        <div class="relative group mt-1 ml-1 cursor-pointer">
-            <div class="w-8 h-8 rounded-full bg-red-900/60 text-red-300 flex items-center justify-center font-bold text-[10px] border border-red-700 shrink-0 hover:bg-red-800 transition">管理員</div>
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
-                <div class="px-4 py-3 border-b border-slate-50">
-                    <p class="text-sm font-bold text-slate-800 truncate">主要管理者</p>
-                    <p class="text-xs text-slate-400 truncate mt-0.5">hr.admin@cw.com.tw</p>
-                </div>
-                <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition">修改密碼</a>
-                <a href="#" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center justify-between">
-                    協同管理者設定
-                    <span class="bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded text-[10px]">2</span>
-                </a>
-                <div class="border-t border-slate-50"></div>
-                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">登出</a>
-            </div>
-        </div>
+        <div class="w-8 h-8 rounded-full bg-red-900/60 text-red-300 flex items-center justify-center font-bold text-xs border border-red-700 shrink-0">人資</div>
         <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-1.5 rounded hover:bg-slate-700 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </div>
 </nav>
 
-    <!-- Marketing Banner -->
-    <div id="marketing-banner" class="bg-indigo-600 text-white text-xs font-medium px-4 py-2 flex items-center justify-center relative shadow-inner z-20">
-        <span class="bg-indigo-800 text-[10px] px-2 py-0.5 rounded-full mr-3 shrink-0 hidden sm:inline-block">行銷公告</span>
-        <span class="mr-1">🔥 2026 早鳥續約方案！月底前完成續約享「名額免費升級 20%」</span>
-        <a href="#" class="underline hover:text-indigo-200 shrink-0 whitespace-nowrap">查看詳情 →</a>
-        <button onclick="document.getElementById('marketing-banner').style.display='none'" class="absolute right-2 sm:right-4 p-1 rounded-full hover:bg-indigo-700 transition">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-    </div>
-
 <!-- Mobile Menu -->
 <div id="mobile-menu" class="md:hidden bg-slate-800 text-white px-4 py-3 space-y-1 sticky top-14 z-20 shadow-md">
-    <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+    <a href="HR Dashboard Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
         總覽儀表板
     </a>
     <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-400 text-sm font-medium">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        人員管理
-    </a>
-    <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        操作紀錄
+        學員名單管理
     </a>
     <div class="pt-2 border-t border-slate-700 text-xs text-slate-500 px-3 pb-1">天下文化集團 2026</div>
 </div>
@@ -148,15 +70,9 @@
 
         <!-- Page Title -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div class="flex items-center gap-3">
-                <div>
-                    <h1 class="text-xl font-bold text-slate-800">人員管理</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">行政狀態即時同步｜名額變動立即生效</p>
-                </div>
-                <button class="flex items-center gap-1 text-[11px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 px-2 py-1 rounded transition self-start mt-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    頁面手冊
-                </button>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">學員名單管理</h1>
+                <p class="text-xs text-slate-400 mt-0.5">行政狀態即時同步｜名額變動立即生效</p>
             </div>
         </div>
 
@@ -170,19 +86,19 @@
                 </div>
                 <span id="kpi-pct" class="text-[10px] text-slate-400">71% 使用中</span>
             </div>
-            <div class="glass-card p-4 flex flex-col cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all group" onclick="toggleFilter('active')">
+            <div class="glass-card p-4 flex flex-col">
                 <span class="text-xs text-slate-500 mb-1">已開通</span>
-                <span id="kpi-active" class="text-2xl font-black text-emerald-600 underline decoration-emerald-600/30 group-hover:decoration-emerald-600 underline-offset-4 transition-colors">—</span>
+                <span id="kpi-active" class="text-2xl font-black text-emerald-600">—</span>
                 <span class="text-[10px] text-slate-400 mt-auto pt-2">含接替排程席位</span>
             </div>
-            <div class="glass-card p-4 flex flex-col cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all group" onclick="toggleFilter('pending')">
+            <div class="glass-card p-4 flex flex-col">
                 <span class="text-xs text-slate-500 mb-1">未開通（佔用名額）</span>
-                <span id="kpi-pending" class="text-2xl font-black text-amber-500 underline decoration-amber-500/30 group-hover:decoration-amber-500 underline-offset-4 transition-colors">—</span>
+                <span id="kpi-pending" class="text-2xl font-black text-amber-500">—</span>
                 <span class="text-[10px] text-amber-600 mt-auto pt-2 font-medium">⚠ 名額已佔用</span>
             </div>
-            <div class="glass-card p-4 flex flex-col cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all group" onclick="toggleFilter('suspended')">
+            <div class="glass-card p-4 flex flex-col">
                 <span class="text-xs text-slate-500 mb-1">停用</span>
-                <span id="kpi-suspended" class="text-2xl font-black text-red-500 underline decoration-red-500/30 group-hover:decoration-red-500 underline-offset-4 transition-colors">—</span>
+                <span id="kpi-suspended" class="text-2xl font-black text-red-500">—</span>
                 <span class="text-[10px] text-slate-400 mt-auto pt-2">名額已釋出</span>
             </div>
         </div>
@@ -209,7 +125,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     批次匯入
                 </button>
-                <button onclick="openAdd()" class="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition font-medium">
+                <button onclick="openModal('modal-add')" class="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     新增學員
                 </button>
@@ -226,14 +142,16 @@
             <div class="flex gap-2 flex-wrap">
                 <button onclick="batchAction('resend')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-amber-50 hover:border-amber-300 text-slate-700 hover:text-amber-700 transition">重新發送開通信</button>
                 <button onclick="batchAction('suspend')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-red-50 hover:border-red-300 text-slate-700 hover:text-red-600 transition">停用</button>
+                <button onclick="batchAction('remove')" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition">移除（釋出名額）</button>
             </div>
             <button onclick="clearSelection()" class="ml-auto text-xs text-slate-400 hover:text-slate-600 shrink-0">取消選取</button>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-
+        <!-- Table -->
+        <div class="glass-card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[960px] text-sm border-collapse">
+                    <thead>
                         <tr class="border-b border-slate-100 bg-slate-50">
                             <th class="w-10 px-3 py-3 sticky-col sticky-col-0 bg-slate-50 border-r border-slate-100">
                                 <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded accent-indigo-600 cursor-pointer">
@@ -252,7 +170,6 @@
                     <tbody id="member-tbody"></tbody>
                 </table>
             </div>
-
             <div class="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span id="table-count">共 0 筆</span>
                 <div class="flex gap-1">
@@ -273,7 +190,7 @@
 <div id="modal-add" class="modal-bg" onclick="if(event.target===this)closeModal('modal-add')">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-5">
-            <h3 id="modal-add-title" class="font-bold text-base text-slate-800">新增學員</h3>
+            <h3 class="font-bold text-base text-slate-800">新增學員</h3>
             <button onclick="closeModal('modal-add')" class="text-slate-400 hover:text-slate-600 p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -299,7 +216,7 @@
                 <input type="text" id="add-title" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="業務主任">
             </div>
             <!-- Succession Toggle -->
-            <div id="add-suc-container" class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <label class="flex items-center gap-3 cursor-pointer select-none">
                     <input type="checkbox" id="add-suc-toggle" onchange="toggleAddSuccession()" class="w-4 h-4 rounded accent-indigo-600">
                     <div>
@@ -326,7 +243,7 @@
             </div>
             <div class="flex gap-3 pt-1">
                 <button type="button" onclick="closeModal('modal-add')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
-                <button type="submit" id="add-submit-btn" data-mode="add" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">確認新增</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">確認新增</button>
             </div>
         </form>
     </div>
@@ -439,7 +356,25 @@
     </div>
 </div>
 
-
+<!-- 確認移除 -->
+<div id="modal-remove" class="modal-bg" onclick="if(event.target===this)closeModal('modal-remove')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </div>
+        <h3 class="font-bold text-base text-center text-slate-800 mb-2">確認移除</h3>
+        <p id="remove-names" class="text-sm text-center text-slate-700 font-medium mb-3"></p>
+        <div class="text-xs text-center text-slate-500 space-y-1 mb-2">
+            <p>移除後名額<strong>立即釋出</strong></p>
+            <p>歷史閱讀數據保留於企業報表</p>
+        </div>
+        <p class="text-xs text-center text-red-500 font-semibold mb-6">此操作不可撤銷</p>
+        <div class="flex gap-3">
+            <button onclick="closeModal('modal-remove')" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">取消</button>
+            <button onclick="confirmRemove()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">確認移除</button>
+        </div>
+    </div>
+</div>
 
 <!-- Toast -->
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-none opacity-0 translate-y-2">
@@ -465,15 +400,6 @@ let MEMBERS = [
     { id:14, name:'賴俊賢', email:'lai@tw.com',    dept:'研發部', title:'工程師',     status:'suspended',  activatedAt:'2026-01-15', lastLogin:'2026-02-20', reads:5   },
     { id:15, name:'洪雅琪', email:'hung@tw.com',   dept:'人資部', title:'人資助理',   status:'pending',    activatedAt:null,         lastLogin:null,         reads:0   },
 ];
-
-// 補足假資料，使「已使用名額 (Active + Pending)」能夠對齊 Dashboard 的 142 人
-// 目前預設資料中：Active 有 8 人, Pending 有 4 人，共 12 人。還欠缺 130 人。
-for(let i=16; i<=145; i++) {
-    MEMBERS.push({ 
-        id: i, name: `技術專員_${i}`, email: `tech${i}@tw.com`, dept: '資訊部', title: '工程師', 
-        status: 'active', activatedAt: '2026-03-05', lastLogin: '2026-04-18', reads: Math.floor(Math.random() * 50) + 1 
-    });
-}
 
 const TOTAL_SEATS = 200;
 const STATUS_LABEL = { active:'已開通', pending:'未開通', suspended:'停用中', scheduled_suspend:'排程停用', succession:'待接替' };
@@ -517,16 +443,6 @@ function getFiltered() {
 }
 
 function applyFilters() { renderTable(); }
-
-function toggleFilter(status) {
-    const sel = document.getElementById('status-filter');
-    if (sel.value === status) {
-        sel.value = ''; // Toggle off
-    } else {
-        sel.value = status; // Toggle on
-    }
-    applyFilters();
-}
 
 function initDeptFilter() {
     const depts = [...new Set(MEMBERS.map(m => m.dept))].sort();
@@ -590,20 +506,20 @@ function buildRowActions(m) {
     if (m.status === 'pending') {
         btns.push(`<button onclick="resendEmail(${m.id})" class="text-[11px] text-amber-600 hover:text-amber-700 hover:underline">重發信</button>`);
     }
-    if (m.status === 'pending' || m.status === 'active') {
-        btns.push(`<button onclick="openEdit(${m.id})" class="text-[11px] text-indigo-600 hover:text-indigo-700 hover:underline">編輯</button>`);
-    }
     if ((m.status === 'active' || m.status === 'suspended') && !m.successionDate) {
         btns.push(`<button onclick="openSuccession(${m.id})" class="text-[11px] text-violet-600 hover:text-violet-700 hover:underline">設定接替</button>`);
     }
     if (m.status === 'suspended') {
         btns.push(`<button onclick="restoreMember(${m.id})" class="text-[11px] text-emerald-600 hover:text-emerald-700 hover:underline">重新開通</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
     } else if (m.status === 'scheduled_suspend') {
         btns.push(`<button onclick="cancelScheduledSuspend(${m.id})" class="text-[11px] text-orange-600 hover:text-orange-700 hover:underline">取消排程</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
     } else if (m.status === 'succession') {
         btns.push(`<button onclick="cancelSuccession(${m.id})" class="text-[11px] text-slate-400 hover:text-slate-600 hover:underline">取消接替</button>`);
     } else {
         btns.push(`<button onclick="openSuspend(${m.id})" class="text-[11px] text-red-400 hover:text-red-600 hover:underline">停用</button>`);
+        btns.push(`<button onclick="openRemove(${m.id})" class="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium">移除</button>`);
     }
     return `<div class="flex items-center justify-end gap-3 whitespace-nowrap">${btns.join('')}</div>`;
 }
@@ -640,7 +556,6 @@ function batchAction(type) {
     const names = MEMBERS.filter(m => selectedIds.has(m.id)).map(m => m.name).join('、');
     if (type === 'resend') {
         showToast(`已重新發送開通信給：${names}`);
-        window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
         clearSelection();
         return;
     }
@@ -649,13 +564,17 @@ function batchAction(type) {
         openModal('modal-suspend');
         return;
     }
+    if (type === 'remove') {
+        document.getElementById('remove-names').textContent = names;
+        openModal('modal-remove');
+        return;
+    }
 }
 
 // ── Row actions ──────────────────────────────────────
 function resendEmail(id) {
     const m = MEMBERS.find(m => m.id === id);
     showToast(`已重新發送開通信給 ${m.name}`);
-    window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
 }
 
 function restoreMember(id) {
@@ -710,76 +629,44 @@ function openSuspend(id) {
     openModal('modal-suspend');
 }
 
-function openAdd() {
-    document.getElementById('modal-add-title').textContent = '新增學員';
-    document.getElementById('add-submit-btn').textContent = '確認新增';
-    document.getElementById('add-submit-btn').dataset.mode = 'add';
-    document.getElementById('add-suc-container').classList.remove('hidden');
-    ['add-name','add-email','add-dept','add-title','add-suc-date'].forEach(i => document.getElementById(i).value = '');
-    document.getElementById('add-suc-toggle').checked = false;
-    document.getElementById('add-email-err').classList.add('hidden');
-    toggleAddSuccession();
-    openModal('modal-add');
-}
-
-function openEdit(id) {
+function openRemove(id) {
     currentTargetId = id;
-    const m = MEMBERS.find(x => x.id === id);
-    document.getElementById('modal-add-title').textContent = '編輯學員資料';
-    document.getElementById('add-submit-btn').textContent = '儲存修改';
-    document.getElementById('add-submit-btn').dataset.mode = 'edit';
-    
-    document.getElementById('add-name').value = m.name;
-    document.getElementById('add-email').value = m.email;
-    document.getElementById('add-dept').value = m.dept;
-    document.getElementById('add-title').value = m.title;
-    
-    document.getElementById('add-suc-container').classList.add('hidden');
-    document.getElementById('add-email-err').classList.add('hidden');
-    openModal('modal-add');
+    selectedIds.clear();
+    const m = MEMBERS.find(m => m.id === id);
+    document.getElementById('remove-names').textContent = m.name;
+    openModal('modal-remove');
 }
 
 // ── Modal form submissions ────────────────────────────
 function submitAdd(e) {
     e.preventDefault();
-    const btn = document.getElementById('add-submit-btn');
-    const isEdit = btn.dataset.mode === 'edit';
-
     const name  = document.getElementById('add-name').value.trim();
     const email = document.getElementById('add-email').value.trim();
     const dept  = document.getElementById('add-dept').value.trim();
     const title = document.getElementById('add-title').value.trim();
     const errEl = document.getElementById('add-email-err');
 
-    const existing = MEMBERS.find(m => m.email === email);
-    if (existing && (!isEdit || existing.id !== currentTargetId)) {
+    if (MEMBERS.find(m => m.email === email)) {
         errEl.classList.remove('hidden');
         return;
     }
     errEl.classList.add('hidden');
 
-    if (isEdit) {
-        const m = MEMBERS.find(x => x.id === currentTargetId);
-        m.name = name; m.email = email; m.dept = dept; m.title = title;
-        showToast('學員資料已更新');
-    } else {
-        const isSuc = document.getElementById('add-suc-toggle').checked;
-        const id    = nextId++;
+    const isSuc = document.getElementById('add-suc-toggle').checked;
+    const id    = nextId++;
 
-        if (isSuc) {
-            const replacingId  = parseInt(document.getElementById('add-replacing').value);
-            const date         = document.getElementById('add-suc-date').value;
-            const replacing    = MEMBERS.find(m => m.id === replacingId);
-            if (!replacingId || !date) return;
-            MEMBERS.push({ id, name, email, dept, title, status:'succession', activatedAt:null, lastLogin:null, reads:0,
-                successionDate:date, replacingName:replacing?.name, replacingId });
-            if (replacing) { replacing.successionDate = date; replacing.successionTo = name; }
-            showToast(`接替排程已設定：${replacing?.name} → ${name}（${date} 生效）`);
-        } else {
-            MEMBERS.push({ id, name, email, dept, title, status:'pending', activatedAt:null, lastLogin:null, reads:0 });
-            showToast(`${name} 已新增，開通信已發送`);
-            window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
-        }
+    if (isSuc) {
+        const replacingId  = parseInt(document.getElementById('add-replacing').value);
+        const date         = document.getElementById('add-suc-date').value;
+        const replacing    = MEMBERS.find(m => m.id === replacingId);
+        if (!replacingId || !date) return;
+        MEMBERS.push({ id, name, email, dept, title, status:'succession', activatedAt:null, lastLogin:null, reads:0,
+            successionDate:date, replacingName:replacing?.name, replacingId });
+        if (replacing) { replacing.successionDate = date; replacing.successionTo = name; }
+        showToast(`接替排程已設定：${replacing?.name} → ${name}（${date} 生效）`);
+    } else {
+        MEMBERS.push({ id, name, email, dept, title, status:'pending', activatedAt:null, lastLogin:null, reads:0 });
+        showToast(`${name} 已新增，開通信已發送`);
     }
 
     closeModal('modal-add');
@@ -841,14 +728,21 @@ function confirmSuspend() {
     showToast(isImmediate ? '已停用，名額立即釋出' : `已排程停用（${dateVal} 生效），名額於停用日釋出`);
 }
 
-
+function confirmRemove() {
+    const ids = selectedIds.size > 0 ? [...selectedIds] : [currentTargetId];
+    ids.forEach(id => { MEMBERS = MEMBERS.filter(m => m.id !== id); });
+    closeModal('modal-remove');
+    clearSelection();
+    renderTable();
+    updateKPI();
+    showToast('已移除，名額已釋出');
+}
 
 function submitImport() {
     closeModal('modal-import');
     document.getElementById('csv-preview').classList.add('hidden');
     document.getElementById('csv-file').value = '';
-    showToast('批次匯入完成，開通信已自動發送（模擬）');
-    window.open('【重要通知】遠見已為您開通線上讀權限.pdf', '_blank');
+    showToast('批次匯入完成（模擬）');
 }
 
 function exportCSV() {
@@ -900,15 +794,6 @@ function showToast(msg) {
 // ── Init ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initDeptFilter();
-    
-    // Check URL parameters for status filter
-    const urlParams = new URLSearchParams(window.location.search);
-    const statusParam = urlParams.get('status');
-    if (statusParam) {
-        const sel = document.getElementById('status-filter');
-        if (sel) sel.value = statusParam;
-    }
-
     renderTable();
     updateKPI();
 

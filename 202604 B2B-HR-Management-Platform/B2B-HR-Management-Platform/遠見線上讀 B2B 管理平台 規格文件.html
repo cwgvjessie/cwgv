@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遠見線上讀 B2B 管理平台 - 功能規格書</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f1f5f9; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; line-height: 1.7; color: #334155;}
+        
+        /* Typography */
+        h1 { font-size: 1.875rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 2rem;}
+        h2.chapter-title { font-size: 1.5rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; margin-top: 3rem; margin-bottom: 1.5rem; }
+        h2.chapter-title::before { content: ""; display: inline-block; width: 6px; height: 1.5rem; background-color: #ef4444; margin-right: 0.75rem; border-radius: 4px; }
+        h3 { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
+        p { margin-bottom: 1rem; }
+        
+        /* Layout & Components */
+        .page-container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .main-content { background: white; padding: 3rem 4rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
+        .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .highlight-box { background: #fee2e2; border-left: 4px solid #ef4444; padding: 1rem 1.5rem; margin-bottom: 1.5rem; border-radius: 0 8px 8px 0; }
+        
+        /* Table Styles */
+        .table-container { width: 100%; overflow-x: auto; margin-block: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; table-layout: fixed; }
+        th { background: #f8fafc; padding: 0.875rem 1rem; text-align: left; border: 1px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.025em; }
+        td { padding: 1rem; border: 1px solid #e2e8f0; vertical-align: top; word-break: break-word; }
+        
+        /* Column Width Presets */
+        .col-code { width: 100px; }
+        .col-status { width: 100px; }
+        .col-time { width: 100px; }
+        .col-label { width: 150px; }
+
+        
+        /* Mermaid overrides */
+        .mermaid { display: flex; justify-content: center; overflow-x: auto; background: white; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 1rem; }
+        .mermaid .edgeLabel, .mermaid .edgeTerminals, .mermaid .edgeThickness { background-color: white !important; color: #0f172a !important; fill: #0f172a !important; font-weight: 500;}
+        .mermaid .node text { fill: #0f172a !important; font-weight: bold !important; }
+        
+        /* Tags */
+        .tag { background: #e0e7ff; color: #4338ca; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-right: 0.5rem; }
+        
+        @media (max-width: 1024px) {
+            .page-container { padding: 1rem; }
+            .main-content { padding: 1.5rem 2rem; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+
+
+
+    <!-- 右側主要內容區 -->
+    <main class="main-content">
+        
+        <header class="text-center">
+            <div class="mb-3">
+                <span class="tag">純標準化 SaaS 架構</span>
+                <span class="tag">合約時效對齊 (Pro-Rata)</span>
+                <span class="tag">隱藏封存 (Soft Delete)</span>
+            </div>
+            <h1>遠見線上讀 B2B 管理平台 <br><span class="text-2xl text-slate-500 font-normal mt-2 block">系統功能規格書 (PRD)</span></h1>
+            
+            <div class="text-left highlight-box">
+                <strong class="text-red-700 block mb-1">📌 專案概述</strong>
+                <p class="text-red-900 m-0 text-sm">本平台旨在提供企業客戶（HR）一站式的主管平台，以利執行學員開通授權、數據追蹤與成效評估，具體展示數位閱讀學習之 ROI 價值。</p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-8 text-left shadow-sm">
+                <h3 class="!mt-0 text-blue-800 text-base font-bold flex items-center mb-2">🔗 介面原型 (Prototypes) 快速連結</h3>
+                <p class="text-slate-600 text-sm mb-3">以下為本專案高保真 HTML 原型，前端開發請以此版面與互動設計為基準：</p>
+                <div class="flex flex-col space-y-2">
+                    <a href="B2B%20%E4%BC%81%E6%A5%AD%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0%20Prototype.html" target="_blank" class="text-blue-700 hover:text-blue-900 font-medium no-underline hover:underline transition-all">👉 1. B2B 企業管理平台 (首頁儀表板)</a>
+                    <a href="B2B%20%E4%BC%81%E6%A5%AD%E5%AD%B8%E5%93%A1%E5%90%8D%E5%96%AE%20Prototype.html" target="_blank" class="text-blue-700 hover:text-blue-900 font-medium no-underline hover:underline transition-all">👉 2. B2B 企業學員名單 (人員管理)</a>
+                    <a href="Email%20Templates.html" target="_blank" class="text-blue-700 hover:text-blue-900 font-medium no-underline hover:underline transition-all">👉 3. Email 通知信模板 (Email Templates)</a>
+                    <a href="B2B%20%E4%BC%81%E6%A5%AD%E6%93%8D%E4%BD%9C%E7%B4%80%E9%8C%84%20Prototype.html" target="_blank" class="text-blue-700 hover:text-blue-900 font-medium no-underline hover:underline transition-all">👉 4. B2B 企業操作紀錄 (Action Log)</a>
+                    <a href="%E9%81%A0%E8%A6%8B%E5%85%A7%E9%83%A8%E5%BE%8C%E5%8F%B0%20Prototype.html" target="_blank" class="text-blue-700 hover:text-blue-900 font-medium no-underline hover:underline transition-all">👉 5. 遠見內部後台 (營運管理台)</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 零、系統角色與名詞定義 -->
+        <section id="part0">
+            <h2 class="chapter-title">零、系統角色與名詞定義</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-indigo-500">
+                    <strong class="text-indigo-800 block mb-1">企業</strong>
+                    <p class="text-slate-600 text-sm m-0">購買線上讀產品權益的公司主體。</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-emerald-500">
+                    <strong class="text-emerald-800 block mb-1">企業管理員 (主/協同)</strong>
+                    <p class="text-slate-600 text-sm m-0">企業端管理者，分為「主要管理者 (遠見指定，不可刪)」與「協同管理者 (平行共管)」。皆可管理學員。</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-amber-500">
+                    <strong class="text-amber-800 block mb-1">學員</strong>
+                    <p class="text-slate-600 text-sm m-0">獲得企業配發閱讀權益的員工（終端使用者）。</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-rose-500">
+                    <strong class="text-rose-800 block mb-1">遠見管理員</strong>
+                    <p class="text-slate-600 text-sm m-0">遠見內部後台管理員，擁有營運最高管理權限。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 壹、商業目標與營運定位 -->
+        <section id="part1">
+            <h2 class="chapter-title">壹、商業目標與營運定位</h2>
+            
+            <div class="card bg-white shadow-sm">
+                <h3>1. 開發排程與成功指標</h3>
+                <ul class="list-disc pl-5">
+                    <li class="mb-2"><strong>預計上線時間：</strong> 2026年 6~7 月。</li>
+                    <li class="mb-2"><strong>短期指標 (2026年底前)：</strong> 以每家購買 50 個帳號、6 萬元計算，預估銷售 15 家企業、業績 90 萬（待 UI/UX 完成後，將依情況微調定價）。</li>
+                    <li><strong>中期指標 (2027~2028年)：</strong> 系統持續優化，累計銷售 25 家企業、創造業績 200 萬。</li>
+                </ul>
+            </div>
+
+            <div class="card bg-white shadow-sm">
+                <h3>2. 核心產品策略</h3>
+                <ul class="list-disc pl-5">
+                    <li class="mb-2"><strong>堅持標準化 SaaS：</strong> 專注於「線上讀」產品，不接受深度客製化，確保能高速複製並達成上述業務指標。</li>
+                    <li class="mb-2"><strong>合約期限對齊 (Pro-rata)：</strong> 若企業期中加購名額，系統主動將新增名額的到期日與「主合約」對齊，降低使用計算的混亂。</li>
+                    <li><strong>護城河與生命週期閉環 (The Moat)：</strong> 合約到期後，HR Dashboard 將強制切換為<strong>「永久唯讀模式」</strong>。HR 仍可無限期登入查閱歷史學習數據，但無法新增或異動名單，且介面頂部將長駐「專屬續約廣告橫幅」，將原有的履約管理工具，轉化為無形的 B2B 持續再行銷通路。</li>
+                    <li class="mb-2"><strong>前台整合至既有平台：</strong> 遠見線上讀前台（學員閱讀介面）<strong>非獨立全新前端</strong>，整合至既有 gvm.com.tw 體系；學員入口位於遠見會員中心（<code>member.gvm.com.tw</code>），B2B 閱讀功能以模組形式嵌入會員中心，學員以現有遠見帳號登入即可存取。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 貳、系統核心作業流程 -->
+        <section id="part2">
+            <h2 class="chapter-title">貳、系統核心作業流程</h2>
+            <p class="text-slate-500 mb-6">本節定義 HR 在 B2B 管理平台上對學員帳號操作的三大核心流。</p>
+
+            <h3>1. 初始建置與學員開通 (Onboarding)</h3>
+            <div class="text-sm text-slate-600 bg-slate-100 p-3 rounded mb-4">
+                <strong class="text-slate-800 block mb-1">💡 核心業務邏輯：</strong>
+                <ul class="list-disc pl-5 m-0 space-y-1">
+                    <li><strong>匯入方式：</strong>支援單筆新增與 CSV/Excel 批次上傳。</li>
+                    <li><strong>名額控管 (Seat Quota)：</strong>採取「整批阻擋」防呆機制。若上傳名單大於剩餘名額，系統將整批拒絕匯入。「未開通」狀態之學員亦會佔用名額。</li>
+                    <li><strong>現有會員判定：</strong>若信箱已存在於遠見會員庫（含社群第三方登入），匯入後直接發配權益，狀態為「已開通」。</li>
+                    <li><strong>權益重疊處理：</strong>允許同帳號在兩個專案走期中重疊，時間採聯集（不累加），重疊期數據同時歸屬至兩個專案。系統匯入時僅做「軟提示」，不阻擋。</li>
+                </ul>
+            </div>
+            <div class="mermaid">
+            graph TD
+                subgraph Admin ["遠見內部後台"]
+                    A[後台維運管理] -->|1. 新增企業| B(建立企業資料)
+                    A -->|2. 設定企業管理員| C(授權管理)
+                end
+
+                subgraph HR_Zone ["B2B 企業管理平台"]
+                    D[企業管理員登入] --> E{具備權限?}
+                    E -->|Yes| F[批次匯入學員信箱]
+                    F --> H[系統自動發送權益開通通知信]
+                end
+
+                subgraph Auto_Resend ["未開通防呆機制"]
+                    H --> O{經過 7 天未開通?}
+                    O -->|是| P[自動補發一次提醒信]
+                    O -->|否| Q[企業管理員可手動補發]
+                end
+
+                subgraph Employee_Zone ["學員使用者端"]
+                    H --> I[學員點擊郵件專屬連結]
+                    P --> I
+                    Q --> I
+                    I --> J{已有遠見帳號?}
+                    J -->|否| K[引導註冊新帳號]
+                    J -->|是| L[登入既有帳號]
+                    K --> M[綁定為企業用戶，開啟無限暢讀]
+                    L --> M
+                end
+            </div>
+
+            <h3 class="mt-12">2. 權限異動與帳號回收 (Offboarding)</h3>
+            <div class="text-sm text-slate-600 bg-slate-100 p-3 rounded mb-4">
+                <strong class="text-slate-800 block mb-1">💡 核心業務邏輯：</strong>
+                <ul class="list-disc pl-5 m-0 space-y-1">
+                    <li><strong>移除學員：</strong>人資執行「移除」後，學員 B2B 閱讀權益立即終止，名額同步釋出，可立即派發給其他員工；歷史閱讀數據永久保留於企業報表。</li>
+                    <li><strong>停用學員：</strong>人資執行「停用」後，學員無法登入閱讀，名額立即釋出；可設定未來生效日（排程停用）；已停用學員可由人資「重新開通」（需有剩餘名額）。</li>
+                    <li><strong>數位資產保留：</strong>無論移除或停用，學員個人收藏的文章書籤均予以保留。</li>
+                </ul>
+            </div>
+            <div class="mermaid">
+            graph TD
+                A[企業管理員進入名單管理] --> B{操作類型}
+
+                B -->|移除| C[解除企業綁定]
+                C --> C1[名額立即釋出，可重新派發]
+                C --> C2[歷史閱讀數據保留於企業報表]
+                C --> C3[學員降級為一般免費會員，書籤保留]
+
+                B -->|停用| D[暫停學員登入權限]
+                D --> D1[名額繼續佔用，不釋出]
+                D --> D2[可隨時恢復，無需重發開通信]
+            </div>
+
+            <h3 class="mt-12">3. 合約變更與資料到期邏輯 (Lifecycle)</h3>
+            <div class="mermaid">
+            sequenceDiagram
+                participant S as 遠見內部後台
+                participant H as B2B 企業管理後台
+                participant E as 遠見官網
+                
+                Note over S: 營運階段
+                H->>S: 提出期中加購需求
+                S->>S: 所有新增授權數量，強制對齊原到期日
+                
+                Note over S: 到期倒數 30/14/7 天
+                S->>H: 發送預警信件與版頭橫幅警告
+                
+                Note over S: 到期日 D-Day 23:59
+                S->>E: 學員端：立即停止閱讀權限
+
+                Note over S: 到期後 (護城河策略)
+                S->>H: 企業後台介面強制切換為「永久唯讀模式」
+                S->>H: 頂部置入固定式「續約廣告橫幅 (Upsell Banner)」
+                
+                alt 後續無限期
+                    H->>S: 管理員隨時可登入檢視歷史閱讀報表 (無法派發名額)
+                    alt 企業回流續約
+                        S->>H: 解除唯讀模式，延續原資料庫無縫營運
+                    end
+                end
+            </div>
+        </section>
+
+        <!-- 參、數據指標與資安規範 -->
+        <section id="part3">
+            <h2 class="chapter-title">參、數據指標與資安規範</h2>
+            <p class="text-slate-500 mb-6">為證明產品 ROI，儀表板的數據運算規則必須嚴格且具備說服力。</p>
+
+            <div class="card border-blue-200">
+                <h3 class="text-blue-800 !mt-0">1. 數據邊界與雙軌制更新邏輯</h3>
+                <ul class="list-disc pl-5">
+                    <li class="mb-2"><strong>數據蒐集邊界：</strong>採寬鬆定義，只要確認為企業員工，其在專案期間內的所有站內閱讀行為（含自購付費內容），皆計入企業報表績效。</li>
+                    <li class="mb-2"><strong>雙軌制更新頻率 (Dual-Track) 加上 按需運算 (On-Demand Compute)：</strong>
+                        <ul class="list-[circle] pl-5 mt-1 text-slate-700 text-sm">
+                            <li class="mb-1"><strong>行政狀態（即時 Real-time）：</strong>「啟用帳號/開通率」等相關數字為即時更新，方便 HR 匯入後立即確認狀態。</li>
+                            <li class="mb-1"><strong>行為數據（隔日 T+1）：</strong>大用量的運算指標（活躍時間熱度圖、員工興趣文字雲等），皆嚴格鎖定於隔日午夜 Batch 排程結算，節省系統核心算力。</li>
+                            <li><strong>手動局部輕量刷新（按需運算）：</strong>賦予 HR 主動更新控制權，支援手動刷新「總閱讀次數、平均閱讀時長」等輕量加總數值。另為保護伺服器免受突發請求(Burst)衝擊，系統加掛 <strong class="text-red-500">【每 4 小時僅限點擊 1 次】</strong> 之冷卻(Cooldown)防呆限制。</li>
+                        </ul>
+                    </li>
+                    <li><strong>資安稽核與介面 (Action Log)：</strong>系統允許所有 HR 匯出資料，因此必須留存嚴格的「高風險操作軌跡」。軌跡資料無保留期限（跟隨合約效期），並於 Dashboard 提供專屬「操作紀錄」頁面供 HR 隨時稽核查閱。</li>
+                </ul>
+            </div>
+
+            <h3>2. 關鍵成效指標與儀表板模塊 (Dashboard UI)</h3>
+            <div class="table-container">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>模塊 / 指標名稱</th>
+                            <th>系統定義與呈現細節</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr>
+                        <td><strong class="text-slate-800">專案帳號總覽卡片</strong></td>
+                        <td>呈現「啟用帳號數 / 購買總數」、「累計系統開通率」以及「專案權限到期日」。此數據採<strong>即時 (立即見效)</strong>，行政異動（如：開通人員）後數據立刻更新。</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-slate-800">平均閱讀時間</strong></td>
+                        <td>以「每人每週 / 每月的平均累計時長」呈現，衡量整間公司投入閱讀的長期黏著度。</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-slate-800">熱門文章與分類</strong></td>
+                        <td>列出站內「Top 10 瀏覽文章」列表，並搭配「文章分類 / 總覽」的視覺化圖表。</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-slate-800">活躍時間熱度圖 (Heatmap)</strong></td>
+                        <td>以時間區間呈現活躍週期（例如：用深淺色塊呈現「週五下午 16 點」為全公司閱讀高峰），幫助 HR 掌握後續內部推廣時機。</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-slate-800">透明勤學榜 Top 10</strong></td>
+                        <td>針對近 30 天內累計閱讀量最高的學員，採實名制清單呈現。<strong class="text-red-600 background-red-100 px-1 rounded">※ 僅限 HR 後台觀看</strong>，作為內部獎勵依據，不顯示於學員端。</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-slate-400">有效閱讀門檻 (底層邏輯)</strong></td>
+                        <td class="text-slate-500">深藏於系統底層的卡控邏輯：學員必須同時滿足以下兩個條件，才算一次有效的「閱讀次數」。
+                            <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-sm">
+                                <li><strong class="text-slate-700">滑動深度 ＞ 75%</strong>：頁面需滑動超過文章總長度的 75%。</li>
+                                <li><strong class="text-slate-700">停留時間依字數比例計算</strong>：前端即時讀取文章字數，套用公式「停留秒數 ≥ 文章字數 ÷ 800 × 30」。例如 800 字文章需停留 30 秒、1200 字需 45 秒、2000 字需 75 秒。字數計算由前端 JavaScript 即時執行，不需後端額外儲存，確保每篇文章長短不同時門檻也跟著調整，報表上的閱讀紀錄才能真實反映員工的投入程度。</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 肆、後續驗證與評估 -->
+        <section id="part4">
+            <h2 class="chapter-title">肆、後續驗證與評估</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card !mb-0 border-slate-300">
+                    <h3 class="!mt-0 text-slate-700">UI/UX 設計對齊需求</h3>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li>產出極簡標準 SaaS 後台介面。</li>
+                        <li>儀表板需呈現：活躍卡片、Tag Cloud 視覺、實名制表格。</li>
+                        <li>設計 Action Log 查詢專屬介面。</li>
+                    </ul>
+                </div>
+                <div class="card !mb-0 border-slate-300">
+                    <h3 class="!mt-0 text-slate-700">工程開發可行性檢核</h3>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li>App 端：[75%滑動+字數秒數] 的前端埋點 Tracker 傳輸機制。</li>
+                        <li>後端：T+1 Batch Job 每日例行排程的伺服器負載承受度。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 伍、系統功能規格（角色 × 平台 × 功能） -->
+        <section id="part5">
+            <h2 class="chapter-title">伍、系統功能規格（角色 × 平台 × 功能）</h2>
+            <p class="text-slate-500 mb-6">本節以角色為軸心，逐一定義每個角色在各平台可執行的功能項目，作為開發實作與 B2B 營運確認的依據。</p>
+
+            <!-- 角色代號說明 -->
+            <div class="flex flex-wrap gap-3 mb-6">
+                <span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" class="px-3 py-1 rounded-full text-sm font-bold">遠見｜後台管理員</span>
+                <span style="background:#e0e7ff;color:#3730a3;border:1px solid #a5b4fc;" class="px-3 py-1 rounded-full text-sm font-bold">人資｜HR Admin</span>
+                <span style="background:#dcfce7;color:#166534;border:1px solid #86efac;" class="px-3 py-1 rounded-full text-sm font-bold">學員｜企業員工</span>
+            </div>
+
+            <!-- 5-1 權限總覽矩陣 -->
+            <h3>1. 平台 × 角色 權限總覽</h3>
+            <div class="table-container">
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>平台</th>
+                            <th>遠見</th>
+                            <th>人資</th>
+                            <th>學員</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>遠見內部後台</strong><br><span class="text-slate-400 text-xs">企業帳號與合約管理</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 完整管理權</span></td>
+                        <td><span class="text-red-500">❌ 無法進入</span></td>
+                        <td><span class="text-red-500">❌ 無法進入</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>B2B 企業管理平台</strong><br><span class="text-slate-400 text-xs">企業管理平台（主體開發）</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 完整管理權</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 完整管理權（限本企業）</span></td>
+                        <td><span class="text-red-500">❌ 無法進入</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>遠見線上讀前台</strong><br><span class="text-slate-400 text-xs">員工閱讀平台</span></td>
+                        <td><span class="text-red-500">❌ 不使用</span></td>
+                        <td><span class="text-red-500">❌ 不使用</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 完整閱讀權</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email 通知系統</strong><br><span class="text-slate-400 text-xs">自動觸發式通知信</span></td>
+                        <td><span class="text-amber-600 font-semibold">✅ 收系統異常預警信</span></td>
+                        <td><span class="text-amber-600 font-semibold">✅ 收合約預警／操作確認信</span></td>
+                        <td><span class="text-amber-600 font-semibold">✅ 收開通信／重發信</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>統一登入入口</strong><br><span class="text-slate-400 text-xs">member.gvm.com.tw</span></td>
+                        <td><span class="text-red-500">❌ 不使用</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 自動導向 (Auto-Direct)</span></td>
+                        <td><span class="text-green-700 font-semibold">✅ 自動導向 (Auto-Direct)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 5-2 遠見內部後台 -->
+            <h3 class="mt-10">2. 遠見內部後台功能明細　<span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" class="px-2 py-0.5 rounded text-xs font-bold">僅限遠見</span></h3>
+            <div class="table-container">
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>功能模組</th>
+                            <th>功能項目</th>
+                            <th>說明／商業規則</th>
+                            <th>呈現時效 (Latency)</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4" class="font-semibold text-amber-800 align-top">企業帳號管理</td>
+                        <td>新增企業服務專案</td>
+                        <td>
+                            <strong>帳號唯一性：</strong>以「企業統編 (Tax ID)」作為主鍵。<br>
+                            <strong>多專案支援：</strong>若同一統編有不同採購需求，支援使用「專案後綴 (Suffix)」區分（例如：23725000-2026主管專案、23725000-業務部專案）。內容權益一律為全站開放。
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>設定合約期間</td>
+                        <td>設定合約起始日、到期日；到期後 HR Dashboard 自動鎖定</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>設定名額上限</td>
+                        <td>設定該企業最多可開通的員工人數上限</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>停用／啟用企業帳號</td>
+                        <td>停用後該企業所有 HR Admin 及學員帳號同步失效</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3" class="font-semibold text-amber-800 align-top">HR 帳號管理</td>
+                        <td>開通主要 HR 帳號</td>
+                        <td>設定該企業唯一的主要 HR 登入帳號（信箱）並發送開通信。<br>主要管理者不可由前端刪除。若遇離職轉換，需由 SA 變更綁定信箱。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>重設主要 HR 密碼</td>
+                        <td>觸發重設密碼信至主要 HR 信箱</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>停用 HR Admin 帳號</td>
+                        <td>停用後 HR Admin 無法登入 Dashboard，但員工數據保留（包含協同 HR 一併失效）</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="font-semibold text-amber-800 align-top">監看總覽</td>
+                        <td>查看所有企業使用概況</td>
+                        <td>名額使用率、活躍學員數、合約到期狀態（跨企業彙總視圖）</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td>代入指定企業 HR Dashboard</td>
+                        <td>SA 可代入任一企業身份，進行完整管理操作（等同 HR Admin 完整權限）；<strong>不記錄 Action Log</strong></td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4" class="font-semibold text-amber-800 align-top">行銷推播管理</td>
+                        <td>建立活動與詳情內容</td>
+                        <td>
+                            <strong>功能：</strong>SA 可建立推播活動，並使用 <strong>HTML 輕量編輯器</strong> 撰寫詳情彈窗內容。<br>
+                            <strong>派發維度：</strong>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><strong>全站廣播 (All)</strong>：所有 B2B 企業管理員。<strong>選擇此項時，系統自動隱藏「統編輸入框」。</strong></li>
+                                <li><strong>指定企業</strong>：輸入統編（Tax ID），僅特定企業可見。</li>
+                                <li><strong>合約狀態</strong>：如「到期前 60 天以上」、「已過期」等條件過濾。</li>
+                            </ul>
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>視覺樣式與詳情編輯</td>
+                        <td>
+                            <strong>樣式控制：</strong>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><strong>版位類型</strong>：SA 設定「<strong>Topbar 橫幅</strong>」或「<strong>強制 Popup</strong>」二擇一。<br><span style="color:#0f766e; font-size:11px;">📌 所有推播無論版位類型，<strong>一律自動出現在右上角小鈴鐺通知（新到舊排序）</strong>，無需另行設定。</span></li>
+                                <li><strong>輕量編輯器規格</strong>：支援粗體、連結、項目符號、字體顏色。內容將於用戶點擊訊息後以 <strong>Modal 彈窗</strong> 呈現。</li>
+                                <li><strong>行動呼籲 (CTA) 按鈕</strong>：可於 Modal 內置入一組專用按鈕連結 (URL)。若 URL 欄位留空，則彈窗底部自動隱藏該按鈕。</li>
+                            </ul>
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>發布與下架管理</td>
+                        <td>
+                            <strong>週期邏輯：</strong>無結束時間限制，發布後即刻生效。需由管理員<strong>手動執行下架</strong>。<br>
+                            <strong>狀態：</strong>草稿 (Draft)、發布中 (Published)、已下架 (Archived)。
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>二開發布與複製</td>
+                        <td>對於已下架之推播，支援「一鍵複製為草稿」或「直接重新上架」，以便快速重用過往行銷素材。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 5-3 B2B 企業管理平台 -->
+            <h3 class="mt-10">3. B2B 企業管理平台功能明細　<span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" class="px-2 py-0.5 rounded text-xs font-bold mr-1">遠見</span><span style="background:#e0e7ff;color:#3730a3;border:1px solid #a5b4fc;" class="px-2 py-0.5 rounded text-xs font-bold">人資</span></h3>
+            
+            <div class="text-sm text-slate-600 bg-slate-100 border-l-4 border-slate-500 p-3 rounded mb-4">
+                <strong class="text-slate-800">🛡️ 護城河發動：合約過期後之「永久唯讀模式 (Read-Only Mode)」特例</strong>
+                <p class="mt-1 mb-1">下列所有功能，在此企業合約到期後，系統會在底層啟動全域權限切換：</p>
+                <ul class="list-disc pl-5 mt-1 space-y-1">
+                    <li><strong class="text-red-600">禁止寫入：</strong>名單模組所有與「新增、匯入、移除、停用、接替、重發信」相關的操作按鈕將全面隱藏或鎖死。</li>
+                    <li><strong class="text-emerald-700">保留讀取：</strong>所有數據摘要、報表圖表、名單瀏覽、名單匯出與「操作紀錄(Action Log)」依然<strong>無限期完全開放查閱</strong>。</li>
+                    <li><strong class="text-indigo-600">廣告長駐：</strong>平台介面上方恆常釘選「合約續約再行銷廣告」，成功將功能介面轉換為廣告版位。</li>
+                </ul>
+            </div>
+
+            <div class="table-container">
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>功能模組</th>
+                            <th>功能項目</th>
+                            <th>說明／商業規則</th>
+                            <th>呈現時效 (Latency)</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="6" class="font-semibold text-indigo-800 align-top">首頁儀表板</td>
+                        <td>名額使用概況</td>
+                        <td>顯示「已開通人數 / 總名額上限」；未開通者仍佔用名額</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>整體閱讀數據摘要</td>
+                        <td>總閱讀次數、本月新增閱讀、平均閱讀時間</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td>活躍時間熱度圖</td>
+                        <td>週一～週日 × 00:00～23:00 矩陣；數字寫於方塊內，顏色依數量漸層（灰→綠→黃→紅）</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td>熱門文章 Top 5</td>
+                        <td>依閱讀次數排序；含分類 Tag、篇名，點擊帶出外部連結（target="_blank"）</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td>員工興趣文字雲</td>
+                        <td>依閱讀文章分類統計，串接 wordcloud2.js，依權重動態排版</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td>透明勤學榜 Top 10</td>
+                        <td>依有效閱讀量排序之員工實名制排行榜；<strong class="text-red-600">僅 HR Admin / SA 可見，不對員工公開</strong>；<strong class="text-red-600">HR Admin 不可匯出此名單</strong>（隱私保護）</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="8" class="font-semibold text-indigo-800 align-top">人員管理</td>
+                        <td>查看人員名單列表</td>
+                        <td>
+                            <strong>欄位：</strong>姓名、信箱、部門、職稱、狀態、開通日期、最後登入、有效閱讀篇數<br>
+                            <strong>狀態類型：</strong>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><span class="text-emerald-700 font-semibold">已開通</span>：學員可正常登入閱讀，佔用一個名額</li>
+                                <li><span class="text-amber-600 font-semibold">未開通</span>：已匯入但學員尚未點擊開通信，仍佔用名額</li>
+                                <li><span class="text-red-600 font-semibold">停用中</span>：學員無法登入，名額已釋出</li>
+                                <li><span class="text-orange-600 font-semibold">排程停用</span>：已設定未來停用日，屆時自動停用並釋出名額</li>
+                                <li><span class="text-violet-700 font-semibold">待接替</span>：已設定權益接替排程，接替日前不佔用名額</li>
+                            </ul>
+                        </td>
+                        <td class="text-sm"><span class="text-green-700 font-semibold">行政即時</span><br><span class="text-amber-600 font-semibold">行為 T+1</span></td>
+                    </tr>
+                    <tr>
+                        <td>單筆新增學員</td>
+                        <td>輸入姓名 + 信箱；新增後立即佔用一個名額，系統自動發送開通信</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>批次匯入學員（CSV）</td>
+                        <td>上傳 CSV；系統執行防呆驗證（格式錯誤、重複信箱、超過名額上限）；驗證通過後批次寫入並批次發信</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>搜尋／篩選人員</td>
+                        <td>可依姓名、信箱、部門、帳號狀態篩選；支援關鍵字即時搜尋</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>移除學員</td>
+                        <td>移除後立即釋出名額；歷史閱讀行為數據永久保留於企業報表，不受影響</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>停用學員</td>
+                        <td>
+                            暫停學員存取遠見線上讀；<strong>名額立即釋出</strong>；歷史閱讀數據保留於企業報表<br>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><strong>立即停用：</strong>留空生效日或選擇今日（含）以前，停用立即生效，名額當下釋出</li>
+                                <li><strong>排程停用：</strong>指定未來日期，學員於該日自動停用並釋出名額；停用日前狀態顯示「排程停用（橙色）」</li>
+                                <li><strong>重新開通：</strong>已停用學員可由企業管理員重新開通，需有剩餘名額</li>
+                                <li>停用中學員仍可設定「權益接替排程」</li>
+                            </ul>
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>重新發送開通信</td>
+                        <td>針對「未開通」狀態學員手動觸發重發；已開通者不可操作此按鈕</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>權益接替排程</td>
+                        <td>
+                            為「已開通」或「停用中」學員指定接替人與生效日，於生效日自動切換權益<br>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><strong>名額計算：</strong>接替日前共佔用 1 個名額（被接替者持有）；接替人以「待接替」狀態列入名單，不額外佔用名額</li>
+                                <li><strong>生效日當天：</strong>系統自動將被接替者移除、接替人切換為「已開通」，名額不增減</li>
+                                <li><strong>取消接替：</strong>生效日前可由企業管理員取消排程，接替人從名單移除，被接替者恢復原狀</li>
+                                <li><strong>接替企業管理員料：</strong>可於設定接替時同步填入（無需預先建立帳號）；信箱重複則提示錯誤</li>
+                            </ul>
+                        <td rowspan="2" class="font-semibold text-indigo-800 align-top">資安稽核</td>
+                        <td>查看操作紀錄 (Action Log)</td>
+                        <td>
+                            提供 HR 查詢企業內所有管理者的重要軌跡，資料無查詢期限限制（隨合約保留）。<br>
+                            <strong>專注記錄高風險操作範圍：</strong><br>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li>HR 登入（成功/失敗）</li>
+                                <li>學員單筆新增、批次匯入</li>
+                                <li>學員停用、重新開通、移除</li>
+                                <li>學員權益接替與排程設定/取消</li>
+                                <li>資料匯出行為（全名單與報表下載）</li>
+                            </ul>
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>篩選與匯出紀錄</td>
+                        <td>支援依操作者 (HR)、時間區間、動作類型進行篩選，並開放將軌跡以 CSV 格式匯出。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="font-semibold text-indigo-800 align-top">報表匯出</td>
+                        <td>匯出所有學員名單</td>
+                        <td>匯出該企業全部學員為 CSV（不限篩選條件）；欄位含姓名、信箱、帳號狀態、開通日期、最後活躍日、累積有效閱讀數；<strong class="text-red-600">不含勤學榜排名資料</strong></td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>匯出閱讀報表</td>
+                        <td>匯出指定時間區間之有效閱讀數據（依員工彙整）</td>
+                        <td class="text-amber-600 font-semibold text-sm">T+1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3" class="font-semibold text-indigo-800 align-top">帳號設定</td>
+                        <td>管理協同 HR 團隊</td>
+                        <td><strong>平行共管：</strong>任意 HR 登入後皆可新增/刪除其他「協同 HR 管理者」。<br><strong>分離歸公：</strong>被刪除之協同人資僅無法登入，過往所有匯入名單與 Action Log 皆保留於企業帳號下。<br><strong>防呆限制：</strong>前端介面絕對不允許刪除「主要 HR 管理者」。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>查看合約資訊</td>
+                        <td>顯示合約起訖日、名額上限、方案內容（唯讀，由 SA 於內部後台設定）</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>修改登入密碼</td>
+                        <td>HR (皆含主要與協同) 可自行修改自身登入密碼</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <!-- ──────────────────────────────────────────────────────
+                         自動化行銷與增購引導 (Smart Upsell)
+                    ────────────────────────────────────────────────────── -->
+                    <tr class="bg-amber-50">
+                        <td rowspan="2" class="font-semibold text-amber-900 align-top">增購引導</td>
+                        <td>名額擴充提醒</td>
+                        <td><strong>自動觸發：</strong>當名額使用率（已開通 + 待開通）達 <strong>90%</strong> 時，儀表板首頁「名額使用率」卡片自動顯示 [立即擴充] 按鈕。<br><strong>行為：</strong>點擊後自動發送增購需求信給遠見業務部。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr class="bg-amber-50">
+                        <td>合約續約預警</td>
+                        <td><strong>自動觸發：</strong>當合約到期日 <strong>< 60 天</strong> 時，儀表板首頁「專案到期日」卡片自動顯示 [立即續約] 按鈕與「預覽提醒信」連結。<br><strong>行為：</strong>點擊後引發增購通報機制。</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="font-semibold text-indigo-800 align-top">系統推播與輔助</td>
+                        <td>行銷佈告欄 (詳情彈窗詳情)</td>
+                        <td>
+                            由遠見管理員推送之動態消息（例如活動邀約、續約早鳥）。<br>
+                            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-xs">
+                                <li><strong>互動行為：</strong>點擊 Topbar 或小鈴鐺通知後，<strong>一律開啟詳情彈窗 (Modal)</strong> 展示完整圖文內容。</li>
+                                <li><strong>多則未讀邏輯：</strong>登入時若有多則未讀推播，<strong>僅自動彈出第一則</strong>。其餘則數以「小鈴鐺紅點」提示，避免過度干擾用戶。</li>
+                                <li><strong>按鈕顯示：</strong>若該推播設有 URL 連結，彈窗底部顯示 CTA 按鈕；若無連結則自動關閉按鈕，僅留關閉選項。</li>
+                                <li><strong>顯示邏輯：</strong>無結束日期，直到用戶手動關閉或管理員下架該推播活動。</li>
+                            </ul>
+                        </td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>各頁面使用手冊</td>
+                        <td>於各模組標題旁提供「說明」或「手冊」按鈕，點開即可查閱對應該頁面之操作指引與名詞定義（例如：有效閱讀的標準、狀態的意義）。</td>
+                        <td class="text-slate-400 font-semibold text-sm">靜態</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="mt-8">4. 自動化行銷觸發規約 (Smart Upsell)</h3>
+            <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg mb-4 text-sm">
+                <strong class="text-indigo-800 italic">💡 商業價值：</strong>
+                <p class="text-slate-600 m-0">將管理後台轉化為再行銷通路。HR 通常是企業採購決策者，在「需求最渴求」或「合約快中斷」時直接提供行動呼籲 (CTA)，可有效提升增購率與續約率。</p>
+            </div>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>觸發情境</th>
+                        <th>判定閾值 (Threshold)</th>
+                        <th>介面呈現與互動行為</th>
+                        <th>後續業務邏輯</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-bold text-orange-700">名額快滿了<br>(Expansion)</td>
+                        <td>使用率 > 90%</td>
+                        <td>
+                            1. 儀表板卡片轉為橙色警示態。<br>
+                            2. 出現「立即洽詢額度擴充」按鈕。<br>
+                            3. 點擊後顯示「已提交需求」提示。
+                        </td>
+                        <td>後端發送「擴充需求通知」至遠見 CRM/業務窗口，名單標註企業與申請人資訊。</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-indigo-700">合約快到期<br>(Renewal)</td>
+                        <td>到期日 < 60 天</td>
+                        <td>
+                            1. 到期卡片轉為深色行銷主題態。<br>
+                            2. 顯示「立即啟動續約洽詢」與信件預覽連結。<br>
+                            3. 點擊後彈出成功視窗。
+                        </td>
+                        <td>後端發送「續約意願通知」至遠見業務，並記錄 HR 點擊行為作為業務洽談依據。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 5-4 遠見線上讀前台 -->
+            <h3 class="mt-10">4. 遠見線上讀前台功能明細　<span style="background:#dcfce7;color:#166534;border:1px solid #86efac;" class="px-2 py-0.5 rounded text-xs font-bold">僅限學員</span></h3>
+            <div class="text-sm text-slate-600 bg-amber-50 border border-amber-200 p-3 rounded mb-4">
+                ⚠️ <strong>架構前提與體驗設計：</strong>
+                <ul class="list-disc pl-5 mt-1 space-y-1 text-slate-700">
+                    <li><strong>隱形整合（零摩擦體驗）：</strong>遠見線上讀前台非獨立模組。學員只要具備企業權限，登入 <code>member.gvm.com.tw</code> 後，全站既有付費文章將自動「隱形解鎖」，系統不另行建構額外的 B2B 企業專區入口。</li>
+                    <li><strong>標準註冊流程：</strong>新學員收到開通信後，直接沿用現有會員中心的「標準註冊與登入流程」，完成註冊後企業權限即自動綁定。個人帳號管理（如密碼修改）由既有平台統一處理，不在本案開發範疇。</li>
+                </ul>
+            </div>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>功能模組</th>
+                        <th>功能項目</th>
+                        <th>說明／商業規則</th>
+                        <th>呈現時效 (Latency)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3" class="font-semibold text-emerald-800 align-top">帳號啟用</td>
+                        <td>首次開通帳號</td>
+                        <td>點擊開通信中的連結，設定個人密碼後完成開通；開通後帳號狀態由「未開通」變為「已開通」</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>登入</td>
+                        <td>以信箱 + 密碼登入；帳號被停用時顯示提示訊息，無法登入</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>忘記密碼</td>
+                        <td>輸入信箱觸發重設密碼信</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3" class="font-semibold text-emerald-800 align-top">內容閱讀</td>
+                        <td>瀏覽文章列表</td>
+                        <td>依方案權益顯示可存取之內容範圍</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                    <tr>
+                        <td>閱讀文章（有效閱讀）</td>
+                        <td><strong>有效閱讀條件（兩者須同時滿足）：</strong>① 頁面滑動超過 75%；② 停留時間達「文章字數 ÷ 800 × 30 秒」（前端即時計算，800字需30秒、2000字需75秒）；同時滿足才計入一次有效閱讀，回報至企業報表（T+1）</td>
+                        <td class="text-amber-600 font-semibold text-sm">行為 T+1</td>
+                    </tr>
+                    <tr>
+                        <td>收藏文章</td>
+                        <td>個人書籤功能，不計入有效閱讀數；移除企業綁定後書籤仍保留</td>
+                        <td class="text-green-700 font-semibold text-sm">即時</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 5-5 Email 通知系統 -->
+            <h3 class="mt-10">5. Email 通知系統規格</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%">信件類型</th>
+                            <th style="width:14%">收件人</th>
+                            <th style="width:26%">觸發時機</th>
+                            <th style="width:14%">發送方式</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold">權益開通通知信</td>
+                            <td><span style="background:#dcfce7;color:#166534;" class="px-2 py-0.5 rounded text-xs font-bold">學員</span></td>
+                            <td>① HR 新增學員（單筆或批次）後直接觸發<br>② 當「權益接替排程」到達生效日，自動發送給接替人</td>
+                            <td class="text-green-700 text-sm font-semibold">系統自動</td>
+                            <td class="text-slate-500 text-sm">信中含開通連結（限時有效）；點擊後引導註冊與設定密碼</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">未開通重發信</td>
+                            <td><span style="background:#dcfce7;color:#166534;" class="px-2 py-0.5 rounded text-xs font-bold">學員</span></td>
+                            <td>① 系統自動：新增後超過 7 天仍未開通<br>② HR 手動：點擊「重新發送開通信」按鈕</td>
+                            <td class="text-amber-600 text-sm font-semibold">自動 + 手動</td>
+                            <td class="text-slate-500 text-sm">已確認 7 天；已開通者不可觸發</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">合約到期預警信（HR）</td>
+                            <td><span style="background:#e0e7ff;color:#3730a3;" class="px-2 py-0.5 rounded text-xs font-bold">人資</span></td>
+                            <td>合約到期前 30 天、14 天、7 天各發一封（共三封）</td>
+                            <td class="text-green-700 text-sm font-semibold">系統自動</td>
+                            <td class="text-slate-500 text-sm">信中顯示到期日與名額使用狀況，提醒聯繫遠見續約</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">合約到期預警信（SA）</td>
+                            <td><span style="background:#fef3c7;color:#92400e;" class="px-2 py-0.5 rounded text-xs font-bold">遠見</span></td>
+                            <td>同上，同步副本通知遠見內部營運人員</td>
+                            <td class="text-green-700 text-sm font-semibold">系統自動</td>
+                            <td class="text-slate-500 text-sm">讓遠見業務提前跟進續約商機</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">HR 帳號開通信</td>
+                            <td><span style="background:#e0e7ff;color:#3730a3;" class="px-2 py-0.5 rounded text-xs font-bold">人資</span></td>
+                            <td>SA 在遠見內部後台開通 HR Admin 帳號後</td>
+                            <td class="text-green-700 text-sm font-semibold">系統自動</td>
+                            <td class="text-slate-500 text-sm">含初次登入連結與操作說明</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">名額擴充需求通知</td>
+                            <td><span style="background:#fef3c7;color:#92400e;" class="px-2 py-0.5 rounded text-xs font-bold">遠見</span></td>
+                            <td>HR 點擊 Dashbaord 上的「立即洽詢額度擴充」按鈕</td>
+                        <td class="text-amber-600 text-sm font-semibold">HR 手動觸發</td>
+                            <td class="text-slate-500 text-sm">發送 Lead 至業務團隊，含企業使用率數據</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold">續約意願洽詢通知</td>
+                            <td><span style="background:#fef3c7;color:#92400e;" class="px-2 py-0.5 rounded text-xs font-bold">遠見</span></td>
+                            <td>HR 點擊 Dashbaord 上的「立即啟動續約洽詢」按鈕</td>
+                            <td class="text-amber-600 text-sm font-semibold">HR 手動觸發</td>
+                            <td class="text-slate-500 text-sm">發送 Lead 至業務團隊，含合約到期日數據</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-sm text-slate-600 bg-slate-50 border border-slate-200 p-3 rounded mt-4">
+                💡 <strong class="text-slate-800">靜默處理（終止權益不發信）：</strong>
+                <p class="m-0 mt-1">針對「排程停用」以及「權益接替（被接替之原學員）」，當學員的閱讀權限被終止時，系統 <strong>一律不主動發送</strong> 任何停權通知信，交由企業內部行政流程自行溝通，以避免不必要的客訴與誤會。</p>
+            </div>
+
+        </section>
+
+        <!-- 陸、開發時間評估 -->
+        <section id="part6">
+            <h2 class="chapter-title">陸、開發時間評估</h2>
+            <p class="text-slate-500 mb-6">以 <strong>1 位全端工程師 + Claude AI 協作</strong> 為前提進行估算。AI 協作預計可縮短 30–40% 開發時間（程式碼生成、除錯、文件撰寫）。原型 UI（HR Dashboard、學員名單）已完成，可直接作為前端開發藍圖。</p>
+
+            <div class="card bg-white shadow-sm">
+                <h3 class="!mt-0">1. 開發假設</h3>
+                <ul class="list-disc pl-5 space-y-1 text-sm">
+                    <li><strong>人力：</strong>1 位全端工程師，每週 5 天、每天 8 小時</li>
+                    <li><strong>AI 協作：</strong>Claude AI 負責程式碼生成、重構建議、測試案例撰寫；工程師負責架構決策、整合驗證、上線</li>
+                    <li><strong>前台架構：</strong>整合至既有 member.gvm.com.tw，非全新獨立前端，節省基礎建設時間</li>
+                    <li><strong>原型已完成：</strong>HR Dashboard UI、學員名單 UI 已有高保真原型，前端開發以原型為準，無需重新設計</li>
+                    <li><strong>時程計算基準：</strong>2026 年 4 月下旬開始，目標 6–7 月上線</li>
+                </ul>
+            </div>
+
+            <div class="card bg-white shadow-sm">
+                <h3 class="!mt-0">2. 各模組時間估算</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:20%">模組</th>
+                                <th>主要工項</th>
+                                <th class="col-time">預估週數</th>
+                                <th style="width:25%">備註</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold text-slate-700">基礎建設</td>
+                            <td>資料庫 Schema 設計、API 架構規劃、開發環境建置</td>
+                            <td class="text-center font-bold text-indigo-700">1 週</td>
+                            <td class="text-sm text-slate-500">Soft Delete 設計、多租戶資料隔離</td>
+                        </tr>
+                        <tr>
+                        <td class="font-semibold text-slate-700">認證 & 權限</td>
+                            <td>HR / SA 登入、Token 管理、角色權限控制、整合既有遠見帳號系統</td>
+                            <td class="text-center font-bold text-indigo-700">1 週</td>
+                            <td class="text-sm text-slate-500">依 member.gvm.com.tw 既有 OAuth / SSO 方案整合</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">後端：學員管理</td>
+                            <td>名單 CRUD、批次匯入（CSV 防呆）、停用 / 排程停用 / 重新開通、權益接替排程、名額計算邏輯</td>
+                            <td class="text-center font-bold text-indigo-700">2 週</td>
+                            <td class="text-sm text-slate-500">商業邏輯最複雜的模組；接替 / 停用規則需仔細測試</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">後端：數據統計</td>
+                            <td>有效閱讀判定邏輯（T+1 Batch）、PV 統計、勤學榜、熱門文章、分類統計、報表 API</td>
+                            <td class="text-center font-bold text-indigo-700">2 週</td>
+                            <td class="text-sm text-slate-500">Batch Job 排程設計（每日凌晨）、資料聚合效能</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">後端：Email 系統</td>
+                            <td>5 種通知信觸發邏輯、Email 模板、排程觸發（到期預警）</td>
+                            <td class="text-center font-bold text-indigo-700">1 週</td>
+                            <td class="text-sm text-slate-500">開通信、重發信、到期 30/14/7 天預警、HR 帳號開通信</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">HR Dashboard 前端</td>
+                            <td>儀表板圖表串接（PV 趨勢、熱度圖、勤學榜、文字雲）、學員名單管理頁所有互動</td>
+                            <td class="text-center font-bold text-indigo-700">2 週</td>
+                            <td class="text-sm text-slate-500">原型已完成，以 Prototype HTML 為藍圖直接實作</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">前台整合</td>
+                            <td>B2B 閱讀模組嵌入 member.gvm.com.tw、有效閱讀行為追蹤埋碼（75% + 秒數判定）、B2B 入口識別</td>
+                            <td class="text-center font-bold text-indigo-700">1.5 週</td>
+                            <td class="text-sm text-slate-500">實際工時依現有前端架構複雜度而定，為最大不確定項</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">QA & 整合測試</td>
+                            <td>功能測試、邊界條件（名額滿、重複信箱、接替衝突）、跨模組整合驗證</td>
+                            <td class="text-center font-bold text-indigo-700">1.5 週</td>
+                            <td class="text-sm text-slate-500">AI 協助生成測試案例；人工執行驗收</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">部署 & UAT</td>
+                            <td>正式環境部署、HR 使用者驗收測試、上線前緩衝</td>
+                            <td class="text-center font-bold text-indigo-700">1 週</td>
+                            <td class="text-sm text-slate-500">含遠見內部人員試用回饋修正</td>
+                        </tr>
+                        <tr style="background:#eef2ff;">
+                            <td class="font-bold text-indigo-800">合計</td>
+                            <td class="text-indigo-700">—</td>
+                            <td class="text-center font-black text-indigo-800 text-base">13 週</td>
+                            <td class="font-semibold text-indigo-700">約 3 個月（含 AI 加速後）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-white shadow-sm">
+                <h3 class="!mt-0">3. 預計時程（2026）</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:20%">模組</th>
+                                <th class="col-time">4月下旬</th>
+                                <th class="col-time">5月</th>
+                                <th class="col-time">6月</th>
+                                <th class="col-time">7月上旬</th>
+                                <th>里程碑</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>基礎建設 + 認證</td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td></td><td></td><td></td>
+                                <td class="text-xs text-slate-500">DB Schema 定案</td>
+                            </tr>
+                            <tr>
+                                <td>後端：學員管理</td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">██</span></td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td></td><td></td>
+                                <td class="text-xs text-slate-500">學員管理 API 完成</td>
+                            </tr>
+                            <tr>
+                                <td>後端：數據統計 + Email</td>
+                                <td></td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">██</span></td>
+                                <td></td>
+                                <td class="text-xs text-slate-500">後端 API 全數完成</td>
+                            </tr>
+                            <tr>
+                                <td>HR Dashboard 前端</td>
+                                <td></td>
+                                <td class="text-center"><span style="background:#10b981;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td class="text-center"><span style="background:#10b981;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td></td>
+                                <td class="text-xs text-slate-500">HR 介面完整串接</td>
+                            </tr>
+                            <tr>
+                                <td>後端：行銷推播模組</td>
+                                <td></td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td class="text-center"><span style="background:#6366f1;color:white;" class="px-2 py-0.5 rounded text-xs">██</span></td>
+                                <td></td>
+                                <td class="text-xs text-slate-500">推播 API + HR 端分發完成</td>
+                            </tr>
+                            <tr>
+                                <td>前台整合</td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-center"><span style="background:#f59e0b;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td></td>
+                                <td class="text-xs text-slate-500">學員前台可用</td>
+                            </tr>
+                            <tr>
+                                <td>QA + 部署 + UAT</td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-center"><span style="background:#ef4444;color:white;" class="px-2 py-0.5 rounded text-xs">██</span></td>
+                                <td class="text-center"><span style="background:#ef4444;color:white;" class="px-2 py-0.5 rounded text-xs">████</span></td>
+                                <td class="text-xs font-semibold text-red-600">🚀 7月上線</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card bg-white shadow-sm">
+                <h3 class="!mt-0">4. 風險與緩衝說明</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:25%">風險項目</th>
+                                <th style="width:15%">影響程度</th>
+                                <th>說明 / 因應</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold">前台整合複雜度未知</td>
+                                <td class="text-center"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-semibold">高</span></td>
+                                <td class="text-sm text-slate-600">member.gvm.com.tw 既有架構若無完整文件，整合工時可能 +1～2 週；建議開發前先進行 2 天 spike</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">T+1 Batch Job 效能</td>
+                                <td class="text-center"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-semibold">中</span></td>
+                                <td class="text-sm text-slate-600">學員數量大時，每日閱讀聚合可能影響效能；建議使用 AWS Lambda + EventBridge 排程</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">遠見帳號系統整合</td>
+                                <td class="text-center"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-semibold">中</span></td>
+                                <td class="text-sm text-slate-600">若 gvm.com.tw 帳號系統無現成 API，需額外 1 週開發 SSO 或帳號比對機制</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">UAT 回饋修正</td>
+                                <td class="text-center"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-semibold">低</span></td>
+                                <td class="text-sm text-slate-600">已預留 1 週緩衝；若回饋較多，上線日順延至 7 月底</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- 柒、系統驗收測試案例 (UAT) -->
+        <section id="part7">
+            <h2 class="chapter-title">柒、系統驗收測試案例 (UAT)</h2>
+            <p class="text-slate-500 mb-6">本單元提供核心流程之端到端 (End-to-End) 驗收標準，涵蓋正常路徑 (Happy Path) 與重要異常防呆 (Negative Test)。工程師開發完畢後，QA 或 PM 應依此進行驗收點交。</p>
+
+            <h3 class="mt-8">1. SA 建立企業與 HR 開通 (SA to HR)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-101</span></td>
+                            <td class="font-semibold text-slate-800">建立新企業與 HR</td>
+                            <td>SA 於後台建立「測試企業 A」，設定名額 50，到期日 12/31。輸入 HR 信箱開通。</td>
+                            <td class="text-sm">1. 系統發送開通信。<br>2. HR 連結登入 Dashboard 顯示名額 50。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold">邊界</span></td>
+                            <td><span class="tag">UA-102</span></td>
+                            <td class="font-semibold text-slate-800">統編後綴重複性</td>
+                            <td>嘗試建立兩間統編相同但後綴不同的企業（如 12345678-A, 12345678-B）。</td>
+                            <td class="text-sm">1. 系統應允許建立，且導航至不同後台路徑。<br>2. 資料應完全隔離。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-101</span></td>
+                                <td class="font-semibold text-rose-700">合約到期存取</td>
+                                <td class="text-sm italic text-slate-600">HR 登入後強制進入「唯讀模式」，無法新增學員。Topbar 顯示紅色警告。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-102</span></td>
+                                <td class="font-semibold text-rose-700">Tax ID Session 過期</td>
+                                <td class="text-sm italic text-slate-600">當管理者在 A 企業操作到一半，session 因逾時失效，點擊任何按鈕應導向登入頁而非噴 JS Error。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">2. 學員匯入與狀態防呆 (HR Admin)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-201</span></td>
+                            <td class="font-semibold text-slate-800">CSV 批次匯入</td>
+                            <td>HR 上傳內含 10 筆正確格式信箱的 CSV。</td>
+                            <td class="text-sm">1. 名單新增 10 筆。<br>2. 剩餘名額同步減少。<br>3. 寄出 10 封開通信。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-202</span></td>
+                            <td class="font-semibold text-slate-800">單筆新增學員</td>
+                            <td>輸入 1 筆信箱並點擊「新增學員」。</td>
+                            <td class="text-sm">名單出現該筆且狀態為「未開通」。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-201</span></td>
+                                <td class="font-semibold text-rose-700">超額匯入阻擋</td>
+                                <td class="text-sm italic text-slate-600">剩餘 5 名時嘗試匯入 10 名，系統彈窗顯示「名額不足」並整批 Rollback，不發半封信。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-202</span></td>
+                                <td class="font-semibold text-rose-700">重複信箱檢查</td>
+                                <td class="text-sm italic text-slate-600">CSV 中包含已存在於系統的學員，該行應標記錯誤跳過，不重複發信。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-203</span></td>
+                                <td class="font-semibold text-rose-700">壓力測試 (D)</td>
+                                <td class="text-sm italic text-slate-600">同時上傳 10,000 筆信箱，API 不應逾時 (Timeout)，應採非同步處理或背景 Batch。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">3. 停用與權益接替邏輯 (HR Admin)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-301</span></td>
+                            <td class="font-semibold text-slate-800">立即停用名額釋出</td>
+                            <td>HR 對學員執行停用。</td>
+                            <td class="text-sm">狀態變更為「停用中」，剩餘名額立即 +1。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-302</span></td>
+                            <td class="font-semibold text-slate-800">權益接替排程</td>
+                            <td>設定學員 A 於明日接替給學員 B。</td>
+                            <td class="text-sm">1. 學員 B 狀態為「待接替」。<br>2. 生效日跨夜後，A 移除 B 轉為「未開通」並發信。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-301</span></td>
+                                <td class="font-semibold text-rose-700">接替目標信箱衝突</td>
+                                <td class="text-sm italic text-slate-600">設定接替給 B 之後，手動在名單另一處又新增 B。接替功能應在生效時判斷重複並跳出異常日誌。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-302</span></td>
+                                <td class="font-semibold text-rose-700">排程中途取消</td>
+                                <td class="text-sm italic text-slate-600">生效日前一小時取消接替。學員 A 權益應不受損，學員 B 應從名單完全移除。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">4. 學員前台閱讀閉環 (User Frontend)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-401</span></td>
+                            <td class="font-semibold text-slate-800">登入與名額解鎖</td>
+                            <td>新註冊學員登入 <code>member.gvm.com.tw</code>。</td>
+                            <td class="text-sm">1. 狀態轉為「已開通」。<br>2. 網站全站付費文章可閱讀。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">核心</span></td>
+                            <td><span class="tag">UA-402</span></td>
+                            <td class="font-semibold text-slate-800">有效閱讀門檻觸發</td>
+                            <td>學員看文停留 > 60s 且滑動 > 75%。</td>
+                            <td class="text-sm">觸發 PV 事件，隔日後台顯示該人次閱讀 +1。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-401</span></td>
+                                <td class="font-semibold text-rose-700">秒關文章測試</td>
+                                <td class="text-sm italic text-slate-600">學員點進文章馬上關閉（停留 < 5s）。系統不應觸發有效閱讀事件（過濾雜訊）。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-402</span></td>
+                                <td class="font-semibold text-rose-700">被權限回收後的存取</td>
+                                <td class="text-sm italic text-slate-600">HR 移除授權後，學員前端應立即出現付費牆，不可繼續看文。書籤應可保留。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">5. 自動化行銷觸發驗收 (Smart Upsell)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">行銷</span></td>
+                            <td><span class="tag">UA-501</span></td>
+                            <td class="font-semibold text-slate-800">名額滿載觸發</td>
+                            <td>名額剩餘 < 10%。</td>
+                            <td class="text-sm">儀表板顯現「額度擴充洽詢」按鈕。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">行銷</span></td>
+                            <td><span class="tag">UA-502</span></td>
+                            <td class="font-semibold text-slate-800">續約意願提交</td>
+                            <td>點擊「啟動續約洽詢」。</td>
+                            <td class="text-sm">彈出「已收到意願」Modal，並傳送有效 Lead 至後端。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-501</span></td>
+                                <td class="font-semibold text-rose-700">CRM 同步失敗受領</td>
+                                <td class="text-sm italic text-slate-600">當後端串接失敗時，UI 應顯示「目前繁忙，請稍後再試」而非卡死在 Loading。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">6. 行銷推播完整流程驗收 (SA Push System)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">行銷</span></td>
+                            <td><span class="tag">UA-601</span></td>
+                            <td class="font-semibold text-slate-800">Topbar/Bell 聯動</td>
+                            <td>SA 發布一則 Topbar 類型推播。</td>
+                            <td class="text-sm">HR 端橫幅文字更新、小鈴鐺出現紅點。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">行銷</span></td>
+                            <td><span class="tag">UA-602</span></td>
+                            <td class="font-semibold text-slate-800">Popup 彈窗發布</td>
+                            <td>SA 發布 Popup 推播，HR 重新整理。</td>
+                            <td class="text-sm">載入後 500ms 自動跳出 Modal 詳情。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-601</span></td>
+                                <td class="font-semibold text-rose-700">HTML 資安清理 (XSS)</td>
+                                <td class="text-sm italic text-slate-600">SA 在推播內文輸入 <code>&lt;script&gt;alert(1)&lt;/script&gt;</code>。HR 端渲染時應過濾掉該標籤，僅顯示純文字，不可執行腳本。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-602</span></td>
+                                <td class="font-semibold text-rose-700">未閉合標籤容錯</td>
+                                <td class="text-sm italic text-slate-600">內文輸入 <code>&lt;b&gt;未關閉的粗體</code>。渲染引擎應自動校正，避免破壞 HR 平台整頁佈局。</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag">UE-603</span></td>
+                                <td class="font-semibold text-rose-700">推播即時下架</td>
+                                <td class="text-sm italic text-slate-600">SA 執行下架。HR 端下次頁面變動時，LocalStorage 與 UI 應同步清除該則緩存。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <h3 class="mt-8">7. 數據儀表板與報表驗證 (ROI Dashboard)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold">數據</span></td>
+                            <td><span class="tag">UA-701</span></td>
+                            <td class="font-semibold text-slate-800">T+1 聚合計數準確性</td>
+                            <td>學員昨日進行 5 次有效閱讀，今日開啟 Dashboard。</td>
+                            <td class="text-sm">總閱讀人次應準確增加 5，趨勢圖對應日期上升。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold">數據</span></td>
+                            <td><span class="tag">UA-702</span></td>
+                            <td class="font-semibold text-slate-800">熱門關鍵字雲渲染</td>
+                            <td>驗證 Dashboard 下方的關鍵字雲。</td>
+                            <td class="text-sm">應根據該企業學員閱讀文章之標記 (Tag) 出現頻率顯示大小。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card bg-rose-50 border-rose-200 mt-2">
+                <h4 class="text-rose-800 text-xs font-bold mb-2">⚠️ 異常與邊界情境 (Category C)</h4>
+                <div class="table-container !my-0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-code">代號</th>
+                                <th class="col-label">異常情境</th>
+                                <th>預期行為</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag">UE-701</span></td>
+                                <td class="font-semibold text-rose-700">全新企業零數據狀態</td>
+                                <td class="text-sm italic text-slate-600">剛開通且無閱讀紀錄時，圖表應顯示為 0 或「尚無數據」，不可發生 JS 渲染崩潰。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 class="mt-8">8. 操作紀錄與管理者權限 (Action Log & Staff Management)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-code">類別</th>
+                            <th class="col-code">代號</th>
+                            <th class="col-label">測試項目</th>
+                            <th style="width:30%">操作步驟</th>
+                            <th>預期系統行為 (Expected Result)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">權限</span></td>
+                            <td><span class="tag">UA-801</span></td>
+                            <td class="font-semibold text-slate-800">協同管理者權限隔離</td>
+                            <td>以「協同管理者」身份嘗試刪除「主要管理者」。</td>
+                            <td class="text-sm">系統應阻擋並提示「權限不足」。</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">權限</span></td>
+                            <td><span class="tag">UA-802</span></td>
+                            <td class="font-semibold text-slate-800">操作紀錄 Traceability</td>
+                            <td>HR 新增一筆學員後，查看「操作紀錄」分頁。</td>
+                            <td class="text-sm">應明確紀錄：時間、操作人、行為（新增學員）、目標對象、來源 IP。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 捌、附錄：全功能模組核對表 (Functional Matrix) -->
+        <section id="part8">
+            <h2 class="chapter-title">捌、附錄：全功能模組核對表 (Category D)</h2>
+            <div class="table-container">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-indigo-900 text-white">
+                            <th style="width:15%">大模組</th>
+                            <th style="width:20%">子功能</th>
+                            <th>功能要點 (Checklist)</th>
+                            <th style="width:10%" class="text-center">優先級</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="font-bold bg-indigo-50">SA 內部管理</td>
+                            <td>企業基礎資訊</td>
+                            <td>統編識別、後綴設定、名額與到期日管理</td>
+                            <td class="text-center font-bold text-red-600">P0</td>
+                        </tr>
+                        <tr>
+                            <td>行銷推播系統</td>
+                            <td>Topbar/Popup 設定、HTML 編輯器、即時下架、GA 追蹤碼埋碼</td>
+                            <td class="text-center font-bold text-indigo-500">P1</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3" class="font-bold bg-indigo-50">HR Dashboard</td>
+                            <td>核心數據看板</td>
+                            <td>T+1 零時結算、PV 趨勢圖、ROI 概覽、閱讀排行</td>
+                            <td class="text-center font-bold text-red-600">P0</td>
+                        </tr>
+                        <tr>
+                            <td>學員名單管理</td>
+                            <td>CSV 萬筆處理、單筆 CRUD、排程停用、權益接替邏輯</td>
+                            <td class="text-center font-bold text-red-600">P0</td>
+                        </tr>
+                        <tr>
+                            <td>成效分析圖表</td>
+                            <td>關鍵字雲、分類偏好圓餅圖、勤學榜匯出</td>
+                            <td class="text-center font-bold text-slate-500">P2</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" class="font-bold bg-indigo-50">系統基礎</td>
+                            <td>Email 通知</td>
+                            <td>5 種自動觸發信件、靜默原則處理、重發機制</td>
+                            <td class="text-center font-bold text-indigo-500">P1</td>
+                        </tr>
+                        <tr>
+                            <td>安全性與審核</td>
+                            <td>操作紀錄日誌、XSS 內容清理、Session 管理、租戶資料隔離</td>
+                            <td class="text-center font-bold text-red-600">P0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+</script>
+</body>
+</html>

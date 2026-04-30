@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遠見線上讀 B2B 管理平台 - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+    <style>
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f1f5f9; }
+        .glass-card { background: rgba(255,255,255,0.97); border: 1px solid rgba(226,232,240,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .glass-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.09); }
+        .heatmap-cell { width:100%; height:100%; min-height:28px; border-radius:4px; transition:transform 0.15s, box-shadow 0.15s; cursor:pointer; position:relative; }
+        .heatmap-cell:hover { transform:scale(1.18); box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:20; }
+        #hm-tooltip { pointer-events:none; position:fixed; z-index:999; background:#1e293b; color:#f8fafc; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:500; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); opacity:0; transition:opacity 0.15s; line-height:1.6; }
+        #hm-tooltip.show { opacity:1; }
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+        /* Mobile nav drawer */
+        #mobile-menu { display:none; }
+        #mobile-menu.open { display:block; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Heatmap Tooltip -->
+    <div id="hm-tooltip"></div>
+
+    <!-- Top Navbar -->
+    <nav class="bg-slate-900 text-white h-14 flex items-center px-4 md:px-8 shrink-0 sticky top-0 z-30 shadow-lg">
+        <!-- Brand -->
+        <div class="flex items-center gap-3 mr-8">
+            <div class="w-7 h-7 bg-red-600 rounded flex items-center justify-center font-bold text-base shrink-0">V</div>
+            <span class="font-bold tracking-wider text-sm whitespace-nowrap">線上讀 B2B</span>
+        </div>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-1 flex-1">
+            <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/15 text-red-400 border border-red-500/30 text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+                總覽儀表板
+            </a>
+            <a href="HR Member List.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                學員名單管理
+            </a>
+        </div>
+
+        <!-- Right: Company + User -->
+        <div class="ml-auto flex items-center gap-3">
+            <span class="hidden sm:block text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full truncate max-w-[180px]">天下文化集團 2026</span>
+            <div class="w-8 h-8 rounded-full bg-red-900/60 text-red-300 flex items-center justify-center font-bold text-xs border border-red-700 shrink-0">人資</div>
+            <!-- Mobile Hamburger -->
+            <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-1.5 rounded hover:bg-slate-700 transition" aria-label="選單">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="md:hidden bg-slate-800 text-white px-4 py-3 space-y-1 sticky top-14 z-20 shadow-md">
+        <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-400 text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+            總覽儀表板
+        </a>
+        <a href="HR Member List.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            學員名單管理
+        </a>
+        <div class="pt-2 border-t border-slate-700 text-xs text-slate-500 px-3 pb-1">天下文化集團 2026</div>
+    </div>
+
+    <!-- Page Content -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div class="max-w-7xl mx-auto space-y-6">
+
+            <!-- Page Title + Status -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">總覽儀表板</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">行為數據每日凌晨更新（T+1）｜行政狀態即時同步</p>
+                </div>
+                <span class="flex items-center self-start sm:self-auto text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>即時狀態更新中
+                </span>
+            </div>
+
+            <!-- KPIs Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- 名額 -->
+                <div class="glass-card p-5 flex flex-col col-span-2 sm:col-span-1">
+                    <span class="text-xs font-medium text-slate-500 mb-2">已開通 / 總名額</span>
+                    <div class="flex items-end gap-1 mb-3">
+                        <span class="text-3xl font-black text-slate-900">142</span>
+                        <span class="text-lg text-slate-400 font-medium mb-0.5">/200</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mb-2">
+                        <div class="bg-indigo-500 h-2 rounded-full" style="width:71%"></div>
+                    </div>
+                    <p class="text-xs text-amber-600 font-medium">⚠ 58 人未開通，名額仍佔用</p>
+                </div>
+
+                <!-- 開通率 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <span class="text-xs font-medium text-slate-500 mb-2">系統開通率</span>
+                    <span class="text-4xl font-black text-indigo-600 mt-1">71%</span>
+                    <span class="text-xs text-slate-400 mt-auto pt-3">142 人已完成開通</span>
+                </div>
+
+                <!-- 閱讀時長 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <span class="text-xs font-medium text-slate-500 mb-2">平均閱讀時長（人/月）</span>
+                    <div class="flex items-baseline gap-1 mt-1">
+                        <span class="text-4xl font-black text-rose-500">2.4</span>
+                        <span class="text-sm font-medium text-rose-600">小時</span>
+                    </div>
+                    <span class="text-xs text-emerald-600 mt-auto pt-3 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        較上月 +12%
+                    </span>
+                </div>
+
+                <!-- 到期日 -->
+                <div class="glass-card p-5 flex flex-col bg-gradient-to-br from-slate-800 to-slate-900 text-white">
+                    <span class="text-xs font-medium text-slate-400 mb-2">專案到期日</span>
+                    <span class="text-2xl font-bold mt-1">2026/12/31</span>
+                    <span class="text-xs text-amber-300 mt-auto pt-3 font-medium">距今約 258 天</span>
+                </div>
+            </div>
+
+            <!-- PV Line Chart -->
+            <div class="glass-card p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">每日閱讀 PV 趨勢</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">全體學員每日有效閱讀頁次</p>
+                    </div>
+                    <div class="flex gap-1" id="pv-toggle"></div>
+                </div>
+                <div class="relative h-[180px] md:h-[220px]">
+                    <canvas id="pvChart"></canvas>
+                </div>
+            </div>
+
+
+            <!-- Articles + Word Cloud -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+
+                <!-- Top Articles -->
+                <div class="glass-card p-5 border-t-4 border-indigo-500 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800">全站熱門文章 Top 10</h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="art-toggle"></div>
+                    <div id="art-list" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
+                </div>
+
+                <!-- 勤學榜 -->
+                <div class="glass-card p-5 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            透明勤學榜 Top 10
+                            <span class="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full border border-red-200 shrink-0">人資限定</span>
+                        </h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="lb-toggle"></div>
+                    <div id="lb-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
+                </div>
+            </div>
+            <!-- Heatmap + Leaderboard -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+                <!-- Heatmap -->
+                <div class="glass-card p-5 lg:col-span-2 flex flex-col min-h-[320px]">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800">活躍時間熱度圖</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">全體學員近 30 天各時段累計有效閱讀次數</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200 shrink-0">T+1</span>
+                    </div>
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <!-- X Axis -->
+                        <div class="flex w-full mb-1.5 pl-[44px] pr-1">
+                            <div class="flex-1 text-center text-[9px] text-slate-400">00</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">01</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">02</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">03</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">04</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">05</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">06</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">07</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">08</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">09</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">10</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">11</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">12</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">13</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">14</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">15</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">16</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">17</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-500 font-semibold">18</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">19</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">20</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">21</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">22</div>
+                            <div class="flex-1 text-center text-[9px] text-slate-400">23</div>
+                        </div>
+                        <!-- Rows -->
+                        <div id="heatmap-rows" class="flex flex-col gap-[3px] w-full flex-1 pr-1 pb-1"></div>
+                    </div>
+                    <!-- Legend -->
+                    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                        <span class="text-[10px] text-slate-400">低</span>
+                        <div class="flex gap-1 flex-1">
+                            <div class="flex-1 h-2 rounded" style="background:#f1f5f9"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#bfdbfe"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#60a5fa"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#3b82f6"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#6366f1"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#8b5cf6"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#ec4899"></div>
+                            <div class="flex-1 h-2 rounded" style="background:#ef4444"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">高</span>
+                    </div>
+                </div>
+
+                <!-- 文章分類 Word Cloud -->
+                <div class="glass-card p-5 border-t-4 border-rose-400 flex flex-col">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-800">員工興趣：文章分類</h2>
+                    </div>
+                    <div class="flex gap-1 mb-3" id="wc-toggle"></div>
+                    <div id="canvas-container" class="flex-1 flex justify-center items-center w-full min-h-[220px]">
+                        <canvas id="wordCloudCanvas" width="500" height="240" style="width:100%;height:100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-8"></div>
+        </div>
+    </main>
+
+    <script>
+        // ── PV Chart ───────────────────────────────────────────────
+        function genPVData(days) {
+            const labels = [], values = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                labels.push(`${d.getMonth()+1}/${d.getDate()}`);
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                const base = isWeekend ? 120 : 480;
+                values.push(Math.floor(base + Math.random() * 200 - 50 + Math.sin(i * 0.4) * 80));
+            }
+            return { labels, values };
+        }
+
+        let pvChart = null;
+        function renderPVChart(days) {
+            const { labels, values } = genPVData(days);
+            const ctx = document.getElementById('pvChart').getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, 'rgba(99,102,241,0.25)');
+            grad.addColorStop(1, 'rgba(99,102,241,0)');
+            if (pvChart) pvChart.destroy();
+            pvChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        backgroundColor: grad,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: days <= 7 ? 4 : 2,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            bodyFont: { size: 13, weight: '600' },
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                title: items => items[0].label,
+                                label: item => `PV：${item.raw.toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#94a3b8', font: { size: 11 },
+                                maxTicksLimit: days <= 7 ? 7 : days <= 14 ? 7 : 10,
+                                maxRotation: 0
+                            },
+                            border: { display: false }
+                        },
+                        y: {
+                            position: 'left',
+                            grid: { color: 'rgba(148,163,184,0.12)' },
+                            ticks: { color: '#94a3b8', font: { size: 11 }, maxTicksLimit: 5 },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ── Mock Data ──────────────────────────────────────────────
+        const LEADERBOARD = {
+            7:  [{n:'陳建明',c:'陳',v:18},{n:'李思穎',c:'李',v:15},{n:'黃志偉',c:'黃',v:14},{n:'林雅惠',c:'林',v:12},{n:'吳俊宏',c:'吳',v:11},{n:'王美玲',c:'王',v:9},{n:'張文凱',c:'張',v:8},{n:'劉怡君',c:'劉',v:7},{n:'蔡明哲',c:'蔡',v:6},{n:'許雅婷',c:'許',v:5}],
+            14: [{n:'林雅惠',c:'林',v:29},{n:'陳建明',c:'陳',v:27},{n:'吳俊宏',c:'吳',v:22},{n:'黃志偉',c:'黃',v:20},{n:'王美玲',c:'王',v:17},{n:'李思穎',c:'李',v:15},{n:'許雅婷',c:'許',v:13},{n:'張文凱',c:'張',v:11},{n:'劉怡君',c:'劉',v:10},{n:'蔡明哲',c:'蔡',v:8}],
+            30: [{n:'陳建明',c:'陳',v:45},{n:'林雅惠',c:'林',v:38},{n:'黃志偉',c:'黃',v:32},{n:'吳俊宏',c:'吳',v:28},{n:'李思穎',c:'李',v:21},{n:'王美玲',c:'王',v:19},{n:'張文凱',c:'張',v:16},{n:'劉怡君',c:'劉',v:14},{n:'許雅婷',c:'許',v:11},{n:'蔡明哲',c:'蔡',v:9}]
+        };
+        const TAG_COLORS = {
+            'AI 趨勢':'text-indigo-600 bg-indigo-50','領導管理':'text-emerald-600 bg-emerald-50',
+            'ESG 永續':'text-cyan-600 bg-cyan-50','理財投資':'text-amber-600 bg-amber-50',
+            '職涯發展':'text-slate-600 bg-slate-100','數位轉型':'text-violet-600 bg-violet-50',
+            '總體經濟':'text-blue-600 bg-blue-50','心理成長':'text-pink-600 bg-pink-50',
+            '溝通技巧':'text-teal-600 bg-teal-50','敏捷開發':'text-orange-600 bg-orange-50'
+        };
+        const ARTICLES = {
+            7:  [{tag:'AI 趨勢',title:'ChatGPT 進化論：企業導入的五大誤區',v:420},{tag:'領導管理',title:'一對一面談的藝術：如何讓部屬主動開口',v:385},{tag:'ESG 永續',title:'碳費開徵在即，中小企業盤查指南',v:310},{tag:'數位轉型',title:'低代碼平台崛起，IT 部門的新角色',v:278},{tag:'理財投資',title:'美元走勢與台股配息策略全解析',v:245},{tag:'職涯發展',title:'斜槓不是解藥：重建職涯核心競爭力',v:210},{tag:'總體經濟',title:'Fed 利率決策對亞洲市場的連鎖效應',v:195},{tag:'心理成長',title:'高效率不等於高成就：重新定義生產力',v:180},{tag:'溝通技巧',title:'跨部門協作的潛規則，你知道幾條？',v:162},{tag:'敏捷開發',title:'Scrum 失效原因大公開：台灣團隊常見問題',v:148}],
+            14: [{tag:'AI 趨勢',title:'生成式 AI 引爆企業管理革命，哪些工作會消失？',v:780},{tag:'領導管理',title:'從主管變教練，跨世代團隊溝通的 3 個破冰技巧',v:642},{tag:'ESG 永續',title:'淨零碳排倒數！台灣中小企業如何度過碳焦慮？',v:590},{tag:'數位轉型',title:'低代碼平台崛起，IT 部門的新角色',v:520},{tag:'理財投資',title:'降息循環來臨，高資產族群的資產配置新拐點',v:480},{tag:'職涯發展',title:'安靜離職後的反思：重新找回工作的內在驅動力',v:430},{tag:'溝通技巧',title:'跨部門協作的潛規則，你知道幾條？',v:395},{tag:'總體經濟',title:'Fed 利率決策對亞洲市場的連鎖效應',v:360},{tag:'心理成長',title:'高效率不等於高成就：重新定義生產力',v:320},{tag:'敏捷開發',title:'Scrum 失效原因大公開：台灣團隊常見問題',v:285}],
+            30: [{tag:'AI 趨勢',title:'生成式 AI 引爆企業管理革命，哪些工作會消失？',v:1280},{tag:'領導管理',title:'從主管變教練，跨世代團隊溝通的 3 個破冰技巧',v:942},{tag:'ESG 永續',title:'淨零碳排倒數！台灣中小企業如何度過碳焦慮？',v:820},{tag:'理財投資',title:'降息循環來臨，高資產族群的資產配置新拐點',v:651},{tag:'職涯發展',title:'安靜離職後的反思：重新找回工作的內在驅動力',v:590},{tag:'數位轉型',title:'AI 時代的數位轉型，從流程自動化開始',v:540},{tag:'溝通技巧',title:'跨部門協作的潛規則，你知道幾條？',v:495},{tag:'總體經濟',title:'2026 全球經濟展望：三大風險與機會',v:442},{tag:'心理成長',title:'高效率不等於高成就：重新定義生產力',v:410},{tag:'敏捷開發',title:'Scrum 失效原因大公開：台灣團隊常見問題',v:375}]
+        };
+        const WC_DATA = {
+            7:  [['AI 趨勢',45],['領導管理',38],['數位轉型',30],['職涯發展',25],['溝通技巧',22],['敏捷開發',18],['心理成長',15],['OKR',20],['遠距辦公',12],['時間管理',17]],
+            14: [['領導管理',48],['AI 趨勢',44],['ESG 永續',36],['跨世代溝通',32],['數位轉型',28],['職涯發展',26],['溝通技巧',23],['理財投資',20],['敏捷開發',16],['OKR',22],['心理成長',18],['總體經濟',14]],
+            30: [['領導管理',50],['AI 趨勢',45],['ESG 永續',40],['跨世代溝通',38],['企業經營',35],['數位轉型',32],['職涯發展',28],['理財投資',25],['心理成長',22],['總體經濟',20],['敏捷開發',18],['專案管理',16],['自我實現',15],['OKR',24],['綠能',14],['溝通技巧',26],['遠距辦公',12],['時間管理',21]]
+        };
+
+        // ── Toggle Helper ──────────────────────────────────────────
+        function makePeriodToggle(containerId, periods, defaultP, onChange) {
+            const el = document.getElementById(containerId);
+            let cur = defaultP;
+            periods.forEach(p => {
+                const btn = document.createElement('button');
+                btn.textContent = p + '天';
+                btn.dataset.p = p;
+                btn.className = p === defaultP
+                    ? 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white transition'
+                    : 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition';
+                btn.onclick = () => {
+                    if (cur === p) return;
+                    cur = p;
+                    el.querySelectorAll('button').forEach(b => {
+                        b.className = b.dataset.p == p
+                            ? 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white transition'
+                            : 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 transition';
+                    });
+                    onChange(p);
+                };
+                el.appendChild(btn);
+            });
+        }
+
+        // ── Render Leaderboard ─────────────────────────────────────
+        function renderLeaderboard(period) {
+            const el = document.getElementById('lb-list');
+            el.innerHTML = '';
+            LEADERBOARD[period].forEach((item, i) => {
+                const rankColor = i===0?'text-amber-500 font-bold':i===1?'text-slate-400 font-bold':i===2?'text-orange-400 font-bold':'text-slate-400';
+                const crown = i===0?'<span class="absolute -top-1 -right-1 text-[10px]">👑</span>':'';
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 text-center text-sm ${rankColor}">${i+1}</span>
+                        <div class="w-8 h-8 rounded-full ${i===0?'bg-amber-100 text-amber-700':'bg-slate-100 text-slate-500'} flex items-center justify-center text-xs font-bold relative">${item.c}${crown}</div>
+                        <span class="text-sm ${i<3?'font-semibold text-slate-700':'font-medium text-slate-600'}">${item.n}</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-800">${item.v} <span class="text-xs text-slate-400 font-normal">篇</span></span>`;
+                el.appendChild(div);
+            });
+        }
+
+        // ── Render Articles ────────────────────────────────────────
+        function renderArticles(period) {
+            const el = document.getElementById('art-list');
+            el.innerHTML = '';
+            const numColors = ['text-indigo-300','text-slate-300','text-slate-300','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200','text-slate-200'];
+            ARTICLES[period].forEach((item, i) => {
+                const tagCls = TAG_COLORS[item.tag] || 'text-slate-600 bg-slate-100';
+                const a = document.createElement('a');
+                a.href = '#'; a.target = '_blank';
+                a.className = 'flex items-start gap-3 p-2 -mx-1 rounded-lg hover:bg-slate-50 transition group border border-transparent hover:border-indigo-100';
+                a.innerHTML = `
+                    <span class="font-black text-lg italic ${numColors[i]} shrink-0 leading-none mt-0.5 w-5 text-right">${i+1}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-[10px] font-bold ${tagCls} px-2 py-0.5 rounded shrink-0">${item.tag}</span>
+                            <span class="text-xs text-slate-400 ml-auto shrink-0">${item.v.toLocaleString()}</span>
+                        </div>
+                        <p class="text-sm font-medium text-slate-800 group-hover:text-indigo-600 transition leading-snug truncate">${item.title}</p>
+                    </div>`;
+                el.appendChild(a);
+            });
+        }
+
+        // ── Render Word Cloud ──────────────────────────────────────
+        let wcPeriod = 30;
+        function renderWordCloud(period) {
+            wcPeriod = period;
+            const c = document.getElementById('canvas-container');
+            const cv = document.getElementById('wordCloudCanvas');
+            cv.width  = c.offsetWidth || 400;
+            cv.height = c.offsetHeight || 240;
+            WordCloud(cv, {
+                list: WC_DATA[period],
+                gridSize: 8,
+                weightFactor: cv.offsetWidth > 400 ? 1.1 : 0.65,
+                fontFamily: 'Inter, PingFang TC, sans-serif',
+                color: () => ['#ef4444','#f59e0b','#10b981','#3b82f6','#6366f1','#8b5cf6','#ec4899','#0f766e','#0ea5e9','#d97706'][Math.floor(Math.random()*10)],
+                rotateRatio: 0.2, rotationSteps: 2,
+                backgroundColor: 'transparent', shape: 'circle'
+            });
+        }
+
+        // ── Tooltip ────────────────────────────────────────────────
+        const tip = document.getElementById('hm-tooltip');
+        const showTip = (e, text) => {
+            tip.innerHTML = text.replace('\n', '<br>');
+            tip.classList.add('show');
+            moveTip(e);
+        };
+        const moveTip = e => {
+            const x = e.clientX + 14, y = e.clientY - 10;
+            const overRight = x + tip.offsetWidth > window.innerWidth - 8;
+            tip.style.left = (overRight ? e.clientX - tip.offsetWidth - 14 : x) + 'px';
+            tip.style.top  = y + 'px';
+        };
+        const hideTip = () => tip.classList.remove('show');
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ── Init Toggles ───────────────────────────────────────
+            makePeriodToggle('lb-toggle',  [7,14,30], 30, p => renderLeaderboard(p));
+            makePeriodToggle('art-toggle', [7,14,30], 30, p => renderArticles(p));
+            makePeriodToggle('wc-toggle',  [7,14,30], 30, p => renderWordCloud(p));
+            makePeriodToggle('pv-toggle',  [7,14,30], 30, p => renderPVChart(p));
+            renderLeaderboard(30);
+            renderArticles(30);
+            renderPVChart(30);
+            setTimeout(() => renderWordCloud(30), 120);
+
+            // Heatmap
+            const container = document.getElementById('heatmap-rows');
+            const days = ['週一','週二','週三','週四','週五','週六','週日'];
+            const data = [];
+            for (let d = 0; d < 7; d++) {
+                let row = [];
+                for (let h = 0; h < 24; h++) {
+                    let v = Math.random() * 200;
+                    if (d === 4 && h >= 14 && h <= 17) v += 8000;
+                    if (d === 2 && h >= 9  && h <= 11) v += 3000;
+                    if (h >= 9 && h <= 18) v += 800 + Math.random() * 500;
+                    if (h >= 0 && h <= 5)  v = Math.random() < 0.2 ? Math.floor(Math.random() * 20) : 0;
+                    row.push(Math.floor(v));
+                }
+                data.push(row);
+            }
+            const color = v => {
+                if (v === 0)    return '#f1f5f9';
+                if (v < 300)    return '#bfdbfe';
+                if (v < 700)    return '#60a5fa';
+                if (v < 1500)   return '#3b82f6';
+                if (v < 3500)   return '#6366f1';
+                if (v < 6000)   return '#8b5cf6';
+                if (v < 9000)   return '#ec4899';
+                return '#ef4444';
+            };
+            const label = v => v === 0 ? '—' : v < 1000 ? `${v} 次` : `${(v/1000).toFixed(1)}K 次`;
+            data.forEach((row, di) => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'flex items-center w-full flex-1 gap-[3px]';
+                const lbl = document.createElement('div');
+                lbl.className = 'w-[38px] text-right text-[10px] text-slate-500 font-semibold shrink-0 mr-1';
+                lbl.innerText = days[di];
+                rowEl.appendChild(lbl);
+                row.forEach((v, hi) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell flex-1';
+                    cell.style.backgroundColor = color(v);
+                    const tipText = `${days[di]}　${String(hi).padStart(2,'0')}:00 – ${String(hi+1).padStart(2,'0')}:00\n${label(v)}`;
+                    cell.addEventListener('mouseenter', e => showTip(e, tipText));
+                    cell.addEventListener('mousemove',  e => moveTip(e));
+                    cell.addEventListener('mouseleave', hideTip);
+                    cell.addEventListener('click',      e => showTip(e, tipText));
+                    rowEl.appendChild(cell);
+                });
+                container.appendChild(rowEl);
+            });
+
+            // Word Cloud
+            const wcData = [
+                ['領導管理',50],['AI 趨勢',45],['ESG 永續',40],['跨世代溝通',38],
+                ['企業經營',35],['數位轉型',32],['職涯發展',28],['理財投資',25],
+                ['心理成長',22],['總體經濟',20],['敏捷開發',18],['專案管理',16],
+                ['自我實現',15],['OKR',24],['綠能',14],['溝通技巧',26],
+                ['遠距辦公',12],['時間管理',21]
+            ];
+            const renderCloud = () => {
+                const c = document.getElementById('canvas-container');
+                const cv = document.getElementById('wordCloudCanvas');
+                cv.width  = c.offsetWidth;
+                cv.height = c.offsetHeight || 260;
+                WordCloud(cv, {
+                    list: wcData,
+                    gridSize: 8,
+                    weightFactor: cv.offsetWidth > 400 ? 1.0 : 0.6,
+                    fontFamily: 'Inter, PingFang TC, sans-serif',
+                    color: () => ['#ef4444','#f59e0b','#10b981','#3b82f6','#6366f1','#8b5cf6','#ec4899','#0f766e'][Math.floor(Math.random()*8)],
+                    rotateRatio: 0.2,
+                    rotationSteps: 2,
+                    backgroundColor: 'transparent',
+                    shape: 'circle'
+                });
+            };
+            setTimeout(renderCloud, 120);
+            window.addEventListener('resize', () => {
+                clearTimeout(window._wcTimer);
+                window._wcTimer = setTimeout(renderCloud, 300);
+            });
+        });
+    </script>
+</body>
+</html>

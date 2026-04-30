@@ -67,11 +67,26 @@
             </div>
             <h1>遠見線上讀 B2B 管理平台 <br><span class="text-2xl text-slate-500 font-normal mt-2 block">系統功能規格書 (PRD)</span></h1>
             
+
+
+            <!-- 規格異動紀錄 -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-8 text-left shadow-sm">
+                <h3 class="!mt-0 text-slate-800 text-base font-bold flex items-center mb-3">📝 規格異動紀錄</h3>
+                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-2">
+                    <li>
+                        <strong class="text-slate-800">2026/04/30：UI 與防呆邏輯優化</strong>
+                        <ul class="list-[circle] pl-5 mt-1 space-y-1">
+                            <li>優化「首頁儀表板」，於系統開通率卡片新增「待開通人數」捷徑連結。</li>
+                            <li>優化「人員管理頁」，將上方 KPI 卡片改為可點擊之狀態篩選器，並支援 URL 參數自動篩選。</li>
+                            <li>修正人員管理操作邏輯，為了保護歷史報表數據，<strong class="text-red-600">全面移除「刪除」功能</strong>（改以「停用」處理名額釋出），並<strong class="text-indigo-600">新增「編輯」功能</strong>以利 HR 修正建錯的資料（如信箱打錯）。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
             <div class="text-left highlight-box">
                 <strong class="text-red-700 block mb-1">📌 專案概述</strong>
                 <p class="text-red-900 m-0 text-sm">本平台旨在提供企業客戶（HR）一站式的主管平台，以利執行學員開通授權、數據追蹤與成效評估，具體展示數位閱讀學習之 ROI 價值。</p>
             </div>
-
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-8 text-left shadow-sm">
                 <h3 class="!mt-0 text-blue-800 text-base font-bold flex items-center mb-2">🔗 介面原型 (Prototypes) 快速連結</h3>
                 <p class="text-slate-600 text-sm mb-3">以下為本專案高保真 HTML 原型，前端開發請以此版面與互動設計為基準：</p>
@@ -568,8 +583,8 @@
                         <td class="text-green-700 font-semibold text-sm">即時</td>
                     </tr>
                     <tr>
-                        <td>移除學員</td>
-                        <td>移除後立即釋出名額；歷史閱讀行為數據永久保留於企業報表，不受影響</td>
+                        <td>編輯學員資料</td>
+                        <td>取代移除功能。針對建檔錯誤（如信箱拼錯），允許 HR 編輯「未開通」或「已開通」狀態學員之姓名、信箱、部門等基本資料。</td>
                         <td class="text-green-700 font-semibold text-sm">即時</td>
                     </tr>
                     <tr>

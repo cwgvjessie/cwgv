@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遠見 B2B Email 範本設計</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #f1f5f9; }
+        .tab-btn { transition: all 0.2s; }
+        .tab-btn.active { background: #1e293b; color: white; }
+        .email-frame { max-width: 600px; margin: 0 auto; background: white; border-radius: 4px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .var { background: #fef3c7; color: #92400e; border: 1px dashed #fbbf24; border-radius: 3px; padding: 0 4px; font-size: 0.85em; font-family: monospace; }
+        .var-red { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .var-blue { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .email-body { font-family: 'PingFang TC', 'Microsoft JhengHei', Arial, sans-serif; color: #1e293b; line-height: 1.8; font-size: 15px; }
+        .cta-btn { display: inline-block; background: #e8621a; color: white !important; padding: 14px 36px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
+        .cta-btn-blue { background: #1e3a8a; }
+        .cta-btn-red { background: #dc2626; }
+        .email-footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center; color: #94a3b8; font-size: 12px; line-height: 1.8; }
+        .alert-bar-amber { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .alert-bar-red { background: #fee2e2; border-left: 4px solid #dc2626; padding: 12px 16px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        
+        /* Table Layout Standard */
+        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-block: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
+        th { background: #f8fafc; padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 12px; }
+        td { padding: 10px 12px; border: 1px solid #e2e8f0; vertical-align: middle; font-size: 12px; color: #64748b; }
+        
+        .info-table th:nth-child(1) { width: 15%; }
+        .info-table th:nth-child(2) { width: 35%; }
+        .info-table th:nth-child(3) { width: 15%; }
+        .info-table th:nth-child(4) { width: 20%; }
+        .info-table th:nth-child(5) { width: 15%; }
+
+    </style>
+</head>
+<body class="p-6 md:p-10">
+
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center font-bold text-white text-sm">V</div>
+            <span class="font-bold text-slate-700">遠見線上讀 B2B — Email 範本設計稿</span>
+        </div>
+        <p class="text-sm text-slate-500">寄件者：遠見雜誌 &lt;gvm@cwgv.com.tw&gt;｜<span class="var">{{變數}}</span> 為系統動態帶入欄位</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-2 mb-6 flex-wrap">
+        <button onclick="showTab('tab1')" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-slate-800 text-white">① 合約到期預警 (HR)</button>
+        <button onclick="showTab('tab2')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-600">② 合約到期預警 (SA內部)</button>
+        <button onclick="showTab('tab3')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-600">③ HR 帳號開通信</button>
+        <button onclick="showTab('tab4')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-600">④ 名額擴充需求 (SA內部)</button>
+        <button onclick="showTab('tab5')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-600">⑤ 續約意願洽詢 (SA內部)</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         ① 合約到期預警信（HR）
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab1">
+        <!-- Dynamic config note -->
+        <div class="glass-info bg-white border border-slate-200 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-2">
+            <p class="font-semibold text-slate-800">📋 動態規則（同一套模板，依天數帶入不同用字）</p>
+            <div class="table-container">
+                <table class="info-table">
+                    <thead><tr class="bg-slate-50"><th>天數</th><th>主旨</th><th>{{TONE}}</th><th>{{URGENCY_TEXT}}</th><th>Header 色</th></tr></thead>
+                    <tbody>
+                        <tr><td>30 天</td><td>【提醒】貴公司授權將於 30 天後到期</td><td>溫馨提醒</td><td>提前安排，從容續約</td><td><span class="badge bg-emerald-100 text-emerald-700">綠色</span></td></tr>
+                        <tr><td>14 天</td><td>【注意】貴公司授權將於 14 天後到期</td><td>敬請注意</td><td>請盡速確認續約事宜</td><td><span class="badge bg-amber-100 text-amber-700">琥珀</span></td></tr>
+                        <tr><td class="font-semibold text-red-700">7 天</td><td class="font-semibold text-red-700">【緊急】貴公司授權即將於 7 天後到期</td><td>緊急提醒</td><td>請立即聯繫遠見</td><td><span class="badge bg-red-100 text-red-700">紅色</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-slate-400">以下預覽為 7 天版（最緊急樣式）</p>
+        </div>
+
+        <!-- Email Preview -->
+        <div class="email-frame">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #b91c1c 100%); padding: 40px 40px 32px; text-align: center;">
+                <div style="color:white; font-size:13px; letter-spacing:3px; margin-bottom:8px; opacity:0.85;">遠見線上讀 B2B</div>
+                <div style="color:white; font-size:28px; font-weight:900; letter-spacing:1px; line-height:1.2;">⚠ 緊急提醒</div>
+                <div style="color:#fca5a5; font-size:15px; margin-top:10px; font-weight:500;">您的企業授權即將於 <span class="var var-red" style="background:rgba(255,255,255,0.2);color:white;border-color:rgba(255,255,255,0.4);">{{DAYS_LEFT}}</span> 天後到期</div>
+            </div>
+
+            <!-- Body -->
+            <div class="email-body" style="padding: 36px 40px;">
+                <p>親愛的 <span class="var">{{HR_NAME}}</span> 您好，</p>
+
+                <p>感謝 <span class="var">{{COMPANY_NAME}}</span> 長期支持《遠見》。我們提醒您，貴公司的遠見線上讀企業授權即將到期，請盡速確認續約，以確保同仁的閱讀權益不中斷。</p>
+
+                <div class="alert-bar-red">
+                    <div style="font-weight:700; color:#991b1b; margin-bottom:6px;">⚠ 授權到期資訊</div>
+                    <div style="font-size:14px; color:#7f1d1d; line-height:2;">
+                        到期日期：<strong><span class="var">{{EXPIRE_DATE}}</span></strong><br>
+                        剩餘天數：<strong><span class="var">{{DAYS_LEFT}}</span> 天</strong><br>
+                        名額使用：<strong><span class="var">{{USED_QUOTA}}</span> / <span class="var">{{TOTAL_QUOTA}}</span></strong> 人已開通
+                    </div>
+                </div>
+
+                <p>到期後，所有學員將<strong>立即失去閱讀權益</strong>，相關閱讀數據亦將停止累計。為避免影響同仁的學習計畫，請立即聯繫遠見業務進行續約。</p>
+
+                <div style="text-align:center; margin: 32px 0;">
+                    <a href="mailto:gvm@cwgv.com.tw?subject=【續約洽詢】{{COMPANY_NAME}}" class="cta-btn cta-btn-red">立即聯繫遠見續約</a>
+                </div>
+
+                <p style="font-size:13px; color:#64748b;">若您已完成續約洽詢，請忽略此封提醒。如有任何疑問，歡迎隨時聯繫我們。</p>
+
+                <p>遠見雜誌 敬上</p>
+            </div>
+
+            <div class="email-footer">
+                Copyright © 1999-2026 遠見天下文化出版股份有限公司. All rights reserved.<br>
+                讀者服務部電話：02-2662-0012｜時間：週一至週五 9:00-12:30；13:30-17:00<br>
+                服務信箱：gvm@cwgv.com.tw
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         ② 合約到期預警信（SA 內部通報）
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab2" class="hidden">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1">
+            <p class="font-semibold text-slate-800">📋 說明</p>
+            <p>與 HR 版同步觸發（30/14/7 天），寄給遠見內部業務 / 營運人員，語氣為<strong>內部工作通報</strong>，直接列出客戶資訊與行動建議。</p>
+            <p class="text-xs text-slate-400">以下預覽為 14 天版</p>
+        </div>
+
+        <div class="email-frame">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #1d4ed8 100%); padding: 32px 40px; text-align:center;">
+                <div style="color:#bfdbfe; font-size:12px; letter-spacing:3px; margin-bottom:8px;">遠見內部通報 — 業務跟進</div>
+                <div style="color:white; font-size:24px; font-weight:900;">客戶合約即將到期</div>
+                <div style="color:#bfdbfe; font-size:14px; margin-top:8px;">請盡速安排客戶拜訪或聯繫</div>
+            </div>
+
+            <!-- Body -->
+            <div class="email-body" style="padding: 32px 40px;">
+                <p>Hi <span class="var">{{SA_NAME}}</span>，</p>
+
+                <p>以下客戶的企業授權將於 <strong><span class="var">{{DAYS_LEFT}}</span> 天後（<span class="var">{{EXPIRE_DATE}}</span>）</strong>到期，系統已同步發送提醒信給該企業 HR，請您主動跟進續約商機。</p>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin:20px 0;">
+                    <div style="font-weight:700; color:#1e3a8a; margin-bottom:12px; font-size:14px;">📋 客戶資訊</div>
+                    <div style="font-size:14px; color:#334155; line-height:2.2;">
+                        企業名稱：<strong><span class="var">{{COMPANY_NAME}}</span></strong><br>
+                        HR 聯絡人：<span class="var">{{HR_NAME}}</span>（<span class="var">{{HR_EMAIL}}</span>）<br>
+                        合約到期日：<strong><span class="var">{{EXPIRE_DATE}}</span></strong>（剩 <span class="var var-red">{{DAYS_LEFT}}</span> 天）<br>
+                        名額使用：<span class="var">{{USED_QUOTA}}</span> / <span class="var">{{TOTAL_QUOTA}}</span> 人（使用率 <span class="var">{{USAGE_PCT}}</span>%）<br>
+                        合約金額：<span class="var">{{CONTRACT_VALUE}}</span> 元
+                    </div>
+                </div>
+
+                <div class="alert-bar-amber">
+                    <div style="font-weight:700; color:#92400e; margin-bottom:4px;">💡 建議行動</div>
+                    <div style="font-size:13px; color:#78350f; line-height:1.8;">
+                        1. 主動電聯 HR，確認是否有續約意願<br>
+                        2. 若使用率偏低（&lt;50%），可提供閱讀推廣建議提升黏著度<br>
+                        3. 若已確認不續約，請至後台標記，避免重複通報
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin: 28px 0;">
+                    <a href="&#36960;&#35211;&#20839;&#37096;&#24460;&#21488;%20Prototype.html" class="cta-btn cta-btn-blue">前往遠見後台查看合約</a>
+                </div>
+
+                <p style="font-size:13px; color:#64748b;">此信由系統自動發送，HR 端已同步收到到期提醒。如有特殊情況，請至後台備註。</p>
+
+                <p>遠見線上讀 B2B 系統</p>
+            </div>
+
+            <div class="email-footer">
+                此為遠見內部系統自動通報，請勿回覆此信。<br>
+                如需修改通報設定，請聯繫遠見資訊部。
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         ③ HR 帳號開通信
+    ══════════════════════════════════════════════════════ -->
+    <!-- ══════════════════════════════════════════════════════
+         ④ 名額擴充需求通報 (SA 內部)
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab4" class="hidden">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1">
+            <p class="font-semibold text-slate-800">📋 觸發時機</p>
+            <p>當 HR Dashboard 名額使用率 > 90% 時，HR 點擊儀表板上的「立即洽詢額度擴充」按鈕觸發。寄給遠見業務部通報 Lead。</p>
+        </div>
+
+        <div class="email-frame">
+            <div style="background: linear-gradient(135deg, #ea580c 0%, #f97316 100%); padding: 32px 40px; text-align:center;">
+                <div style="color:#ffedd5; font-size:12px; letter-spacing:3px; margin-bottom:8px;">遠見內部通報 — 增購商機</div>
+                <div style="color:white; font-size:24px; font-weight:900;">客戶提出「名額擴充」需求</div>
+            </div>
+
+            <div class="email-body" style="padding: 32px 40px;">
+                <p>Hi 遠見業務團隊，</p>
+                <p>系統偵測到以下客戶的名額使用率已達臨界點，且 HR 已主動點擊<strong>「名額擴充洽詢」</strong>按鈕，請負責業務儘速跟進。</p>
+
+                <div style="background:#fff7ed; border:1px solid #ffedd5; border-radius:8px; padding:20px; margin:20px 0;">
+                    <div style="font-weight:700; color:#9a3412; margin-bottom:12px; font-size:14px;">📋 增購需求資訊</div>
+                    <div style="font-size:14px; color:#431407; line-height:2.2;">
+                        企業名稱：<strong><span class="var">{{COMPANY_NAME}}</span></strong><br>
+                        HR 聯絡人：<span class="var">{{HR_NAME}}</span>（<span class="var">{{HR_EMAIL}}</span>）<br>
+                        名額使用：<span class="var var-red">{{USED_QUOTA}}</span> / <span class="var">{{TOTAL_QUOTA}}</span>（使用率 <span class="var">{{USAGE_PCT}}</span>%）<br>
+                        申請時間：<span class="var">{{CURRENT_TIME}}</span>
+                    </div>
+                </div>
+
+                <div class="alert-bar-amber">
+                    <div style="font-weight:700; color:#92400e; margin-bottom:4px;">💡 行動建議</div>
+                    <div style="font-size:13px; color:#78350f; line-height:1.8;">
+                        客戶已多次匯入失敗或名額即將用罄，此為高熱度商機。請備妥「名額擴充 Pro-rata 報價單」直接聯繫 HR。
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin: 28px 0;">
+                    <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" class="cta-btn" style="background:#ea580c">查看該客戶之 Dashboard</a>
+                </div>
+                <p>遠見線上讀 B2B 系統</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         ⑤ 續約意願洽詢通報 (SA 內部)
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab5" class="hidden">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1">
+            <p class="font-semibold text-slate-800">📋 觸發時機</p>
+            <p>當合約到期 < 60 天時，HR 在儀表板點擊「立即啟動續約洽詢」按鈕觸發。寄給遠見業務部通報 Lead。</p>
+        </div>
+
+        <div class="email-frame">
+            <div style="background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%); padding: 32px 40px; text-align:center;">
+                <div style="color:#e0e7ff; font-size:12px; letter-spacing:3px; margin-bottom:8px;">遠見內部通報 — 續約商機</div>
+                <div style="color:white; font-size:24px; font-weight:900;">客戶提出「續約洽詢」意願</div>
+            </div>
+
+            <div class="email-body" style="padding: 32px 40px;">
+                <p>Hi 遠見業務團隊，</p>
+                <p>以下客戶合約即將到期，且 HR 已主動點擊<strong>「啟動續約洽詢」</strong>按鈕提交意願，請負責業務儘速跟進續約流程。</p>
+
+                <div style="background:#eef2ff; border:1px solid #e0e7ff; border-radius:8px; padding:20px; margin:20px 0;">
+                    <div style="font-weight:700; color:#312e81; margin-bottom:12px; font-size:14px;">📋 續約意願資訊</div>
+                    <div style="font-size:14px; color:#1e1b4b; line-height:2.2;">
+                        企業名稱：<strong><span class="var">{{COMPANY_NAME}}</span></strong><br>
+                        HR 聯絡人：<span class="var">{{HR_NAME}}</span>（<span class="var">{{HR_EMAIL}}</span>）<br>
+                        合約到期日：<strong><span class="var">{{EXPIRE_DATE}}</span></strong>（剩餘 <span class="var var-red">{{DAYS_LEFT}}</span> 天）<br>
+                        名額使用率：<span class="var">{{USAGE_PCT}}</span>%
+                    </div>
+                </div>
+
+                <div class="alert-bar-amber" style="border-left-color: #4f46e5; background: #f5f3ff;">
+                    <div style="font-weight:700; color:#4c1d95; margin-bottom:4px;">💡 行動建議</div>
+                    <div style="font-size:13px; color:#4c1d95; line-height:1.8;">
+                        客戶已主動釋出續約訊號，請聯繫確認新一年度之授權規模（是否有擴編或縮減需求）。
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin: 28px 0;">
+                    <a href="&#36960;&#35211;&#20839;&#37096;&#24460;&#21488;%20Prototype.html" class="cta-btn" style="background:#4f46e5">前往 SA 管理介面</a>
+                </div>
+                <p>遠見線上讀 B2B 系統</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab3" class="hidden">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1">
+            <p class="font-semibold text-slate-800">📋 觸發時機</p>
+            <p>遠見後台（SA）為企業開通 HR Admin 帳號後，系統自動發送。內容含：開通連結 + 平台功能簡介 + 客服聯絡窗口。</p>
+        </div>
+
+        <div class="email-frame">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%); padding: 40px 40px 32px; text-align:center;">
+                <div style="color:#bfdbfe; font-size:12px; letter-spacing:3px; margin-bottom:12px;">遠見線上讀 B2B 管理平台</div>
+                <div style="color:white; font-size:26px; font-weight:900; line-height:1.3;">歡迎加入！<br>您的管理帳號已開通</div>
+                <div style="color:#93c5fd; font-size:14px; margin-top:12px;">立即登入，開始管理您的企業閱讀計畫</div>
+            </div>
+
+            <!-- Body -->
+            <div class="email-body" style="padding: 36px 40px;">
+                <p>親愛的 <span class="var">{{HR_NAME}}</span> 您好，</p>
+
+                <p>感謝 <span class="var">{{COMPANY_NAME}}</span> 選擇《遠見》企業閱讀方案。您的 HR 管理帳號已正式開通，即刻登入即可開始管理公司學員的閱讀計畫！</p>
+
+                <!-- Account info box -->
+                <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:20px; margin:20px 0;">
+                    <div style="font-weight:700; color:#0c4a6e; margin-bottom:12px; font-size:14px;">🔐 您的帳號資訊</div>
+                    <div style="font-size:14px; color:#334155; line-height:2.2;">
+                        管理帳號：<strong><span class="var">{{HR_EMAIL}}</span></strong><br>
+                        企業名稱：<span class="var">{{COMPANY_NAME}}</span><br>
+                        授權名額：<span class="var">{{TOTAL_QUOTA}}</span> 人<br>
+                        授權期限：<span class="var">{{CONTRACT_START}}</span> 至 <span class="var">{{CONTRACT_END}}</span>
+                    </div>
+                </div>
+
+                <p>請點擊以下連結完成首次登入設定：</p>
+
+                <div style="text-align:center; margin: 28px 0;">
+                    <a href="#" class="cta-btn">前往設定登入密碼</a>
+                    <div style="margin-top:12px; font-size:12px; color:#94a3b8;">連結有效期限：<span class="var">{{LINK_EXPIRE}}</span>（72小時）｜過期請聯繫遠見客服重新發送</div>
+                </div>
+
+                <hr style="border:none; border-top:1px solid #e2e8f0; margin:28px 0;">
+
+                <!-- Feature intro -->
+                <div style="font-weight:700; color:#1e293b; margin-bottom:16px;">📊 您可以在管理平台中做什麼？</div>
+
+                <div style="display:grid; gap:12px; margin-bottom:24px;">
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div style="background:#dbeafe; color:#1e40af; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">📈</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px; color:#1e293b;">總覽儀表板</div>
+                            <div style="font-size:13px; color:#64748b; margin-top:2px;">即時掌握學員開通狀況、閱讀熱度分析、每日 PV 趨勢、勤學榜 Top 10</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div style="background:#dcfce7; color:#166534; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">👥</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px; color:#1e293b;">學員名單管理</div>
+                            <div style="font-size:13px; color:#64748b; margin-top:2px;">新增 / 批次匯入學員、停用、設定離職接替排程、匯出名單報表</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div style="background:#fef3c7; color:#92400e; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">📧</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px; color:#1e293b;">系統通知</div>
+                            <div style="font-size:13px; color:#64748b; margin-top:2px;">學員開通信自動發送，未開通者可一鍵重發，合約到期前自動預警</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border:none; border-top:1px solid #e2e8f0; margin:28px 0;">
+
+                <!-- Contact -->
+                <div style="background:#f8fafc; border-radius:8px; padding:16px 20px; font-size:13px; color:#475569; line-height:2;">
+                    <div style="font-weight:700; color:#1e293b; margin-bottom:6px;">📞 需要協助？請聯繫遠見客服</div>
+                    電話：02-2662-0012<br>
+                    時間：週一至週五 9:00–12:30；13:30–17:00<br>
+                    信箱：<a href="mailto:gvm@cwgv.com.tw" style="color:#2563eb;">gvm@cwgv.com.tw</a>
+                </div>
+
+                <p style="margin-top:24px;">遠見雜誌 敬上</p>
+            </div>
+
+            <div class="email-footer">
+                Copyright © 1999-2026 遠見天下文化出版股份有限公司. All rights reserved.<br>
+                讀者服務部電話：02-2662-0012｜時間：週一至週五 9:00-12:30；13:30-17:00<br>
+                服務信箱：gvm@cwgv.com.tw
+            </div>
+        </div>
+    </div>
+
+    <!-- Variable legend -->
+    <div class="mt-8 bg-white border border-slate-200 rounded-xl p-5 text-sm">
+        <p class="font-semibold text-slate-800 mb-3">🔖 動態變數一覽</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-xs text-slate-600">
+            <div><span class="var">{{HR_NAME}}</span> — 人資姓名</div>
+            <div><span class="var">{{SA_NAME}}</span> — 遠見業務姓名</div>
+            <div><span class="var">{{COMPANY_NAME}}</span> — 企業名稱</div>
+            <div><span class="var">{{HR_EMAIL}}</span> — 人資信箱</div>
+            <div><span class="var">{{EXPIRE_DATE}}</span> — 合約到期日</div>
+            <div><span class="var">{{DAYS_LEFT}}</span> — 距到期剩餘天數</div>
+            <div><span class="var">{{USED_QUOTA}}</span> — 已開通名額數</div>
+            <div><span class="var">{{TOTAL_QUOTA}}</span> — 總名額上限</div>
+            <div><span class="var">{{USAGE_PCT}}</span> — 名額使用率（%）</div>
+            <div><span class="var">{{CONTRACT_VALUE}}</span> — 合約金額</div>
+            <div><span class="var">{{CONTRACT_START}}</span> — 合約開始日</div>
+            <div><span class="var">{{CONTRACT_END}}</span> — 合約結束日</div>
+            <div><span class="var">{{LINK_EXPIRE}}</span> — 開通連結有效期限</div>
+            <div><span class="var">{{TONE}}</span> — 語氣詞（溫馨提醒/敬請注意/緊急提醒）</div>
+        </div>
+    </div>
+
+    <div class="h-12"></div>
+</div>
+
+<script>
+function showTab(id) {
+    ['tab1','tab2','tab3','tab4','tab5'].forEach(t => {
+        const el = document.getElementById(t);
+        if(el) el.classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.remove('active','bg-slate-800','text-white');
+        btn.classList.add('bg-white','text-slate-600');
+    });
+    const idx = parseInt(id.replace('tab','')) - 1;
+    const btns = document.querySelectorAll('.tab-btn');
+    btns[idx].classList.add('active','bg-slate-800','text-white');
+    btns[idx].classList.remove('bg-white','text-slate-600');
+}
+
+window.onload = () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['tab1','tab2','tab3','tab4','tab5'].includes(hash)) {
+        showTab(hash);
+    }
+};
+</script>
+</body>
+</html>

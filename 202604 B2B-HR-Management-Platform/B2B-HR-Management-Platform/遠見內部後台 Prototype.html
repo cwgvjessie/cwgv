@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遠見線上讀 遠見內部後台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255,255,255,0.97); border: 1px solid rgba(226,232,240,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 1rem; }
+        .modal-bg { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:50; align-items:center; justify-content:center; padding:16px; }
+        .modal-bg.open { display:flex; }
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+        tbody tr:hover td { background:#f1f5f9; }
+        
+        /* Table Layout Standard */
+        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-block: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
+        th { background: #f8fafc; padding: 12px 16px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 12px; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        @keyframes highlightFade {
+            0% { background-color: #fef08a; }
+            100% { background-color: transparent; }
+        }
+        .highlight-row { animation: highlightFade 3s ease-out forwards; }
+        
+        /* Floating Shortcut Icon */
+        .floating-shortcut { position: fixed; bottom: 2rem; right: 2rem; width: 64px; height: 64px; background: #3730a3; color: white; border-radius: 50%; display: flex; flex-direction: column; items-center; justify-content: center; box-shadow: 0 4px 15px rgba(55, 48, 163, 0.4); z-index: 100; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; text-decoration: none; border: 2px solid white; }
+        .floating-shortcut:hover { transform: scale(1.1) rotate(-5deg); box-shadow: 0 8px 25px rgba(55, 48, 163, 0.6); background: #312e81; }
+        .floating-shortcut svg { width: 24px; height: 24px; margin-bottom: 2px; }
+        .floating-shortcut span { font-size: 10px; font-weight: 800; transform: scale(0.9); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+<!-- Top Navbar (SA 專屬樣式，深藍色系) -->
+<nav class="bg-indigo-950 text-white h-14 flex items-center px-4 md:px-8 shrink-0 sticky top-0 z-30 shadow-lg">
+    <div class="flex items-center gap-3 mr-8">
+        <div class="w-7 h-7 bg-white text-indigo-950 rounded flex items-center justify-center font-bold text-base shrink-0">遠見</div>
+        <span class="font-bold tracking-wider text-sm whitespace-nowrap">遠見內部後台</span>
+    </div>
+    <div class="hidden md:flex items-center gap-1 flex-1">
+        <button onclick="switchView('company')" id="nav-company" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600/30 text-indigo-200 border border-indigo-500/30 text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            企業授權管理
+        </button>
+        <button onclick="switchView('marketing')" id="nav-marketing" class="flex items-center gap-2 px-4 py-2 rounded-lg text-indigo-300 hover:text-white hover:bg-indigo-900 text-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+            行銷推播設定
+        </button>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+        <span class="text-xs text-indigo-300">遠見營運部</span>
+        <div class="w-8 h-8 rounded-full bg-white text-indigo-950 flex items-center justify-center font-bold text-[10px] shrink-0">管理員</div>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <div class="max-w-7xl mx-auto space-y-5">
+        
+        <div id="section-company">
+            <!-- Page Title -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">企業授權管理</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">負責建立 B2B 企業、分配名額額度、設定核心 HR 帳號與合約效期</p>
+                </div>
+                <button onclick="openModal('modal-company')" class="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition font-medium shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    新增企業授權
+                </button>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="glass-card p-4 flex flex-col sm:flex-row gap-3 mb-5">
+                <div class="relative flex-1 max-w-sm">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" placeholder="搜尋企業名稱或統編..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+                </div>
+                <select class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <option value="">狀態：全部</option>
+                    <option value="active">合約生效中</option>
+                    <option value="expired">已到期 (唯讀)</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">統編</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">企業名稱</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">合約期間</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">授權名額</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">已開通數</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">主企業管理員 (Admin)</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">狀態</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">系統操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-slate-700">
+                        <tr>
+                            <td class="px-4 py-3 text-xs font-mono text-slate-500">23725000</td>
+                            <td class="px-4 py-3 font-bold text-slate-800">天下文化集團</td>
+                            <td class="px-4 py-3 text-xs">2026/01/01 ~ 2026/12/31</td>
+                            <td class="px-4 py-3 text-right font-medium text-slate-900">200</td>
+                            <td class="px-4 py-3 text-right text-xs font-semibold text-indigo-600">142</td>
+                            <td class="px-4 py-3">
+                                <div class="text-sm font-medium">admin@cw.com.tw</div>
+                                <div class="text-[10px] text-slate-400">上次登入: 2026/04/19</div>
+                            </td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">生效中</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button onclick="openModal('modal-company', true)" class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">編輯</button>
+                                    <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" target="_blank" class="text-[11px] px-2 py-1 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 hover:bg-indigo-100 font-medium flex items-center gap-1 transition" title="以該企業 HR 身份登入後台">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> 代登
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-xs font-mono text-slate-500">84210099</td>
+                            <td class="px-4 py-3 font-bold text-slate-800">台達電子工業</td>
+                            <td class="px-4 py-3 text-xs">2026/03/15 ~ 2027/03/14</td>
+                            <td class="px-4 py-3 text-right font-medium text-slate-900">500</td>
+                            <td class="px-4 py-3 text-right text-xs font-semibold text-indigo-600">450</td>
+                            <td class="px-4 py-3">
+                                <div class="text-sm font-medium">hr_training@deltaww.com</div>
+                                <div class="text-[10px] text-slate-400">上次登入: 2026/04/18</div>
+                            </td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">生效中</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">編輯</button>
+                                    <a href="B2B%20&#20225;&#26989;&#31649;&#29702;&#24179;&#21488;%20Prototype.html" target="_blank" class="text-[11px] px-2 py-1 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 hover:bg-indigo-100 font-medium flex items-center gap-1 transition">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> 代登
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- section-marketing: 行銷推播設定 -->
+        <div id="section-marketing" class="hidden">
+            <!-- Page Title -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">行銷推播設定</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">管理面向 HR 端的 Topbar 橫幅、通知鈴鐺與彈窗推播活動</p>
+                </div>
+                <button onclick="openModal('modal-push')" class="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition font-medium shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    新增推播活動
+                </button>
+            </div>
+
+            <!-- Push Campaign Table -->
+            <div class="table-container">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">推播標題</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">推播類型</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">派發對象</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">發布日期</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">狀態</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="push-tbody" class="divide-y divide-slate-100 text-slate-700">
+                        <tr>
+                            <td class="px-4 py-3 font-medium text-slate-800">🔥 2026 早鳥續約方案</td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded font-semibold">Topbar 橫幅</span></td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">[全站]</span></td>
+                            <td class="px-4 py-3 text-xs text-slate-500">2026/04/01</td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">發布中</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button onclick="simulatePublishExisting('🔥 2026 早鳥續約方案', '感謝貴公司支持，月底前完成續約，享名額升級不加價！', '')" class="text-[11px] px-2 py-1 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 hover:bg-emerald-100 font-medium transition">模擬發布</button>
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">下架</button>
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">複製</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-medium text-slate-800">📢 HR 實體交流讀書會報名</td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-violet-100 text-violet-700 rounded font-semibold">小鈴鐺通知</span></td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">[全站]</span></td>
+                            <td class="px-4 py-3 text-xs text-slate-500">2026/04/10</td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">發布中</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button onclick="simulatePublishExisting('📢 HR 實體交流讀書會', '探討如何運用 AI 提升選育用留效率，限額 30 名免費報名。', '')" class="text-[11px] px-2 py-1 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 hover:bg-emerald-100 font-medium transition">模擬發布</button>
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">下架</button>
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">複製</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="filter: grayscale(0.5); opacity: 0.7;">
+                            <td class="px-4 py-3 font-medium text-slate-500">系統維護公告 (4/20)</td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">Popup 彈窗</span></td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">[全站]</span></td>
+                            <td class="px-4 py-3 text-xs text-slate-500">2026/04/18</td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">已下架</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="text-[11px] px-2 py-1 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 hover:bg-indigo-100 font-medium transition">重新上架</button>
+                                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">複製</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Toast: 保存成功提示 -->
+<div id="save-toast" class="fixed bottom-6 right-6 z-[100] transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+            <div class="font-bold text-sm">保存成功</div>
+            <div class="text-[10px] text-slate-400">專案設定與權限已立即生效</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: 新增/編輯企業授權 -->
+<div id="modal-company" class="modal-bg" onclick="if(event.target===this)closeModal('modal-company')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-indigo-50">
+            <h3 id="modal-title" class="font-bold text-lg text-indigo-950">新增企業授權</h3>
+            <button onclick="closeModal('modal-company')" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto space-y-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-1">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">企業統編 (唯一金鑰) <span class="text-red-500">*</span></label>
+                    <input type="text" id="comp-tax" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="請輸入 8 碼統編">
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">專案後綴 (用於區分多專案) <span class="text-slate-400 font-normal">(選填)</span></label>
+                    <input type="text" id="comp-suffix" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="例如：2026員購專案">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">企業名稱 <span class="text-red-500">*</span></label>
+                    <input type="text" id="comp-name" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 md:w-full" placeholder="請輸入企業全稱">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">授權名額 (Seats) <span class="text-red-500">*</span></label>
+                    <input type="number" id="comp-quota" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="名額數量">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">起始日 <span class="text-red-500">*</span></label>
+                        <input type="date" id="comp-start" class="w-full text-sm border border-slate-300 rounded-lg px-2 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">到期日 <span class="text-red-500">*</span></label>
+                        <input type="date" id="comp-end" class="w-full text-sm border border-slate-300 rounded-lg px-2 py-2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100">
+                <h4 class="text-sm font-bold text-slate-800 mb-3">主要 HR 管理者帳號</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">管理員姓名</label>
+                        <input type="text" id="hr-name" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="姓名">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">管理員信箱 (登入帳號) <span class="text-red-500">*</span></label>
+                        <input type="email" id="hr-email" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="email@company.com">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-end items-center">
+            <button onclick="closeModal('modal-company')" class="px-5 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 hover:bg-white transition">取消</button>
+            <button onclick="saveCompany()" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition shadow-sm">確認儲存</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: 新增/編輯推播活動 -->
+<div id="modal-push" class="modal-bg" onclick="if(event.target===this)closeModal('modal-push')">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-indigo-50">
+            <h3 class="font-bold text-lg text-indigo-950">設定行銷推播活動</h3>
+            <button onclick="closeModal('modal-push')" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto space-y-6">
+            <!-- 區塊 1：基本內容 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">活動標題 <span class="text-red-500">*</span></label>
+                    <input type="text" id="push-title" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="例如：🔥 2026 早鳥續約方案">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">推播內容 (HTML 彈窗詳情) <span class="text-red-500">*</span></label>
+                    <div class="border border-slate-300 rounded-lg overflow-hidden bg-white">
+                        <!-- Mock Editor Toolbar -->
+                        <div class="bg-slate-50 border-b border-slate-200 px-3 py-1.5 flex gap-2">
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600 font-bold text-xs" title="Bold">B</button>
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600 italic text-xs" title="Italic">I</button>
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600 underline text-xs" title="Underline">U</button>
+                            <div class="w-px h-4 bg-slate-200 mx-1 self-center"></div>
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600" title="Link">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            </button>
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600" title="Image">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </button>
+                            <button type="button" class="p-1 hover:bg-slate-200 rounded text-slate-600" title="Code">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            </button>
+                        </div>
+                        <textarea id="push-content" class="w-full text-sm p-4 h-48 focus:outline-none" placeholder="在此輸入圖文內容描述...（支援富文本排版）"></textarea>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">彈窗按鈕連結 (URL) <span class="text-slate-400 font-normal">(選填)</span></label>
+                    <input type="text" id="push-url" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="若彈窗詳情中需有按鈕轉導，請輸入連結網址">
+                </div>
+            </div>
+
+            <!-- 區塊 2：派發設定 -->
+            <div class="pt-4 border-t border-slate-100">
+                <h4 class="text-sm font-bold text-slate-800 mb-3">派發對象設定</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="target" value="all" onchange="toggleTaxInput(true)" class="w-4 h-4 text-indigo-600" checked>
+                            <span class="text-xs font-medium">全站廣播 (All)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="target" value="company" onchange="toggleTaxInput(false)" class="w-4 h-4 text-indigo-600">
+                            <span class="text-xs font-medium">指定企業統編</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="target" value="status" onchange="toggleTaxInput(false)" class="w-4 h-4 text-indigo-600">
+                            <span class="text-xs font-medium">依合約狀態</span>
+                        </label>
+                    </div>
+                    <div id="tax-input-container">
+                        <input type="text" id="target-tax-id" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 opacity-50 cursor-not-allowed" placeholder="全站廣播模式下無需填寫統編" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 3：視覺效果 -->
+            <div class="pt-4 border-t border-slate-100">
+                <h4 class="text-sm font-bold text-slate-800 mb-3">視覺樣式設定</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">推播類型</label>
+                        <select id="push-type" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2">
+                            <option value="topbar">Topbar 橫幅</option>
+                            <option value="popup">強制 Popup</option>
+                        </select>
+                        <p class="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
+                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            所有推播一律同步出現在小鈴鐺（新到舊排序），無需額外設定
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">底色主題</label>
+                        <div class="flex gap-2 items-center h-9">
+                            <div class="w-6 h-6 rounded-full bg-indigo-600 cursor-pointer border-2 border-white ring-2 ring-indigo-600"></div>
+                            <div class="w-6 h-6 rounded-full bg-red-600 cursor-pointer border-2 border-white"></div>
+                            <div class="w-6 h-6 rounded-full bg-orange-600 cursor-pointer border-2 border-white"></div>
+                            <div class="w-6 h-6 rounded-full bg-slate-800 cursor-pointer border-2 border-white"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 4：排程與狀態 -->
+            <div class="pt-4 border-t border-slate-100">
+                <h4 class="text-sm font-bold text-slate-800 mb-3">排程與發布狀態</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">發布日期</label>
+                        <input type="date" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">發布狀態</label>
+                        <select class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 font-bold text-indigo-600">
+                            <option>草稿 (Draft)</option>
+                            <option>預約發布 (Scheduled)</option>
+                            <option selected>立即發布 (Published)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-end items-center">
+            <button onclick="closeModal('modal-push')" class="px-5 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 hover:bg-white transition">取消</button>
+            <button onclick="simulatePublish()" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition shadow-sm">立即發布並預覽 (模擬)</button>
+            <button onclick="savePush()" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition shadow-sm">儲存為草稿</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchView(view) {
+        if(view === 'company') {
+            document.getElementById('section-company').classList.remove('hidden');
+            document.getElementById('section-marketing').classList.add('hidden');
+            document.getElementById('nav-company').classList.add('bg-indigo-600/30', 'text-indigo-200', 'border', 'border-indigo-500/30');
+            document.getElementById('nav-marketing').classList.remove('bg-indigo-600/30', 'text-indigo-200', 'border', 'border-indigo-500/30');
+            document.getElementById('nav-marketing').classList.add('text-indigo-300');
+        } else {
+            document.getElementById('section-company').classList.add('hidden');
+            document.getElementById('section-marketing').classList.remove('hidden');
+            document.getElementById('nav-marketing').classList.add('bg-indigo-600/30', 'text-indigo-200', 'border', 'border-indigo-500/30');
+            document.getElementById('nav-company').classList.remove('bg-indigo-600/30', 'text-indigo-200', 'border', 'border-indigo-500/30');
+            document.getElementById('nav-company').classList.add('text-indigo-300');
+        }
+    }
+
+    function openModal(id, isEdit = false) {
+        document.getElementById(id).classList.add('open');
+        if(id === 'modal-company') {
+            const title = document.getElementById('modal-title');
+            if(isEdit) {
+                title.textContent = '編輯企業授權';
+                document.getElementById('comp-name').value = '天下文化集團';
+                document.getElementById('comp-tax').value = '23725000';
+                document.getElementById('comp-quota').value = '200';
+                document.getElementById('comp-start').value = '2026-01-01';
+                document.getElementById('comp-end').value = '2026-12-31';
+                document.getElementById('hr-name').value = '天下文化 HR';
+                document.getElementById('hr-email').value = 'admin@cw.com.tw';
+            } else {
+                title.textContent = '新增企業授權';
+                ['comp-name','comp-tax','comp-quota','comp-start','comp-end','hr-name','hr-email'].forEach(id => document.getElementById(id).value = '');
+            }
+        }
+    }
+    
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('open'); 
+        const saveMsg = document.getElementById('save-msg');
+        if(saveMsg) saveMsg.classList.add('hidden');
+    }
+
+    function toggleTaxInput(isAll) {
+        const input = document.getElementById('target-tax-id');
+        if(isAll) {
+            input.disabled = true;
+            input.classList.add('bg-slate-50', 'opacity-50', 'cursor-not-allowed');
+            input.placeholder = "全站廣播模式下無需填寫統編";
+            input.value = "";
+        } else {
+            input.disabled = false;
+            input.classList.remove('bg-slate-50', 'opacity-50', 'cursor-not-allowed');
+            input.placeholder = "請輸入企業統編 (多筆請用逗號隔開)...";
+        }
+    }
+
+    function saveCompany() {
+        const tax = document.getElementById('comp-tax').value || '00000000';
+        const suffix = document.getElementById('comp-suffix').value;
+        const name = document.getElementById('comp-name').value || '新企業客戶';
+        const quota = document.getElementById('comp-quota').value || '0';
+        const start = document.getElementById('comp-start').value || '2026-01-01';
+        const end = document.getElementById('comp-end').value || '2026-12-31';
+        const hrEmail = document.getElementById('hr-email').value || 'admin@company.com';
+
+        const tbody = document.querySelector('#section-company tbody');
+        const newRow = document.createElement('tr');
+        newRow.className = 'highlight-row';
+        newRow.innerHTML = `
+            <td class="px-4 py-3 text-xs font-mono text-slate-500">${tax}${suffix ? ' <span class="text-indigo-400 font-bold">-' + suffix + '</span>' : ''}</td>
+            <td class="px-4 py-3 font-bold text-slate-800">${name}</td>
+            <td class="px-4 py-3 text-xs">${start.replace(/-/g,'/')} ~ ${end.replace(/-/g,'/')}</td>
+            <td class="px-4 py-3 text-right font-medium text-slate-900">${quota}</td>
+            <td class="px-4 py-3 text-right text-xs font-semibold text-indigo-600">0</td>
+            <td class="px-4 py-3">
+                <div class="text-sm font-medium">${hrEmail}</div>
+                <div class="text-[10px] text-slate-400">尚未登入</div>
+            </td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">生效中</span></td>
+            <td class="px-4 py-3 text-right">
+                <div class="flex items-center justify-end gap-2">
+                    <button class="text-[11px] px-2 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 transition">編輯</button>
+                    <button class="text-[11px] px-2 py-1 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 opacity-50 cursor-not-allowed">代登</button>
+                </div>
+            </td>
+        `;
+        tbody.prepend(newRow);
+
+        showToast('保存成功', '企業授權與專案設定已立即生效');
+        closeModal('modal-company');
+    }
+
+    function savePush() {
+        showToast('已存為草稿', '推播活動內容已成功儲存。');
+        closeModal('modal-push');
+    }
+
+    function simulatePublish() {
+        // 使用 ID 取值，避免 selector 失效導致靜默錯誤
+        const title   = (document.getElementById('push-title')   || {}).value   || '推播通知';
+        const content = (document.getElementById('push-content') || {}).value   || '無內文';
+        const url     = (document.getElementById('push-url')     || {}).value   || '';
+        const type    = (document.getElementById('push-type')    || {}).value   || 'topbar';
+
+        // 儲存到 localStorage 供 HR 平台接收
+        localStorage.setItem('latest_push', JSON.stringify({
+            title, content, url, type,
+            timestamp: new Date().getTime()
+        }));
+
+        // Step 1：先顯示「設定成功」Toast
+        showToast('設定成功', '推播已發布！即將開啟 B2B 企業管理平台預覽...');
+        closeModal('modal-push');
+
+        // Step 2：1.2 秒後另開視窗
+        setTimeout(() => {
+            window.open('B2B%20%E4%BC%81%E6%A5%AD%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0%20Prototype.html', '_blank');
+        }, 1200);
+    }
+
+    function simulatePublishExisting(title, content, url) {
+        localStorage.setItem('latest_push', JSON.stringify({
+            title: title,
+            content: content,
+            url: url,
+            timestamp: new Date().getTime()
+        }));
+        showToast('模擬發布成功', '正在為您開啟 B2B 企業管理平台進行預覽...');
+        setTimeout(() => {
+            window.open('B2B%20%E4%BC%81%E6%A5%AD%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0%20Prototype.html', '_blank');
+        }, 1000);
+    }
+
+    function showToast(title, desc) {
+        const toast = document.getElementById('save-toast');
+        toast.querySelector('.font-bold').textContent = title;
+        toast.querySelector('.text-slate-400').textContent = desc;
+        
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 2500);
+    }
+</script>
+    <!-- Floating Shortcut to HR Dashboard -->
+    <a href="B2B%20%E4%BC%81%E6%A5%AD%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0%20Prototype.html" class="floating-shortcut" title="切換至 B2B 企業管理平台">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+        <span>B2B 平台</span>
+    </a>
+
+</body>
+</html>
