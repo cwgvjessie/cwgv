@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta name="robots" content="noindex, nofollow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>訂購表單 Prototype</title>
@@ -105,29 +104,6 @@
     margin: 2px 4px 2px 0;
     font-size: 12px;
   }
-
-  /* ── 小朋友資料區 ── */
-  #child-section { border-left: 4px solid #c00; }
-
-  .child-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .child-header h2 { border: none; padding: 0; margin: 0; }
-
-  .child-fields {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .child-field { display: flex; flex-direction: column; gap: 5px; }
-  .child-field label { font-size: 13px; color: #333; }
-  .child-field label .required { color: #c00; }
-
-  .birthday-row { display: flex; gap: 8px; }
-  .birthday-row select { height: 36px; min-width: 90px; font-size: 14px; }
 
   /* ── 公益捐贈區 ── */
   #donation-section { border-left: 4px solid #c00; }
@@ -282,23 +258,6 @@
     color: #888;
   }
 
-  /* 帶入小朋友姓名按鈕 */
-  .copy-name-btn {
-    margin-left: 10px;
-    padding: 2px 10px;
-    font-size: 12px;
-    font-family: inherit;
-    color: #c00;
-    background: #fff;
-    border: 1px solid #c00;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background .15s, color .15s;
-    vertical-align: middle;
-  }
-  .copy-name-btn:hover { background: #c00; color: #fff; }
-  .copy-name-btn:disabled { opacity: .35; cursor: not-allowed; }
-
   /* 名條註記 */
   .name-tag-row {
     display: flex;
@@ -403,35 +362,6 @@
     <div id="cart-summary"><span class="empty">尚未選擇任何商品</span></div>
   </div>
 
-  <!-- ══════════════════ 小朋友資料（選任一方案即顯示） ══════════════════ -->
-  <div class="card" id="child-section" style="display:none">
-    <div class="child-header">
-      <div class="info-icon">i</div>
-      <h2>小朋友資料</h2>
-    </div>
-    <div class="child-fields">
-      <div class="child-field">
-        <label for="child-name"><span class="required">*</span>小朋友姓名</label>
-        <input type="text" class="text-input" id="child-name" style="max-width:200px">
-      </div>
-      <div class="child-field">
-        <label><span class="required">*</span>小朋友生日</label>
-        <div class="birthday-row">
-          <select id="birth-year">
-            <option value="">西元年</option>
-          </select>
-          <select id="birth-month">
-            <option value="">月份</option>
-            <option>1月</option><option>2月</option><option>3月</option>
-            <option>4月</option><option>5月</option><option>6月</option>
-            <option>7月</option><option>8月</option><option>9月</option>
-            <option>10月</option><option>11月</option><option>12月</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ══════════════════ 公益捐贈計劃（條件顯示） ══════════════════ -->
   <div class="card" id="donation-section" style="display:none">
 
@@ -483,7 +413,6 @@
       <div class="form-group">
         <div class="form-label">
           名條註記：<span style="font-weight:400;color:#888;font-size:12px;">（選填）</span>
-          <button type="button" id="copy-child-name-btn" class="copy-name-btn" title="帶入小朋友姓名">＋ 帶入小朋友姓名</button>
         </div>
         <div class="name-tag-row">
           <span class="share-suffix">由</span>
@@ -4252,8 +4181,6 @@ recipientInput.addEventListener('input', () => {
 
 const nameTagInput = document.getElementById('name-tag-input');
 const charCount = document.getElementById('char-count');
-const copyNameBtn = document.getElementById('copy-child-name-btn');
-const childNameInput = document.getElementById('child-name');
 
 function updateCharCount() {
   const len = nameTagInput.value.length;
@@ -4263,38 +4190,12 @@ function updateCharCount() {
 
 nameTagInput.addEventListener('input', updateCharCount);
 
-copyNameBtn.addEventListener('click', () => {
-  const name = childNameInput.value.trim();
-  if (!name) {
-    childNameInput.focus();
-    childNameInput.style.outline = '2px solid #c00';
-    setTimeout(() => childNameInput.style.outline = '', 1500);
-    return;
-  }
-  nameTagInput.value = name.slice(0, 15);
-  updateCharCount();
-  nameTagInput.focus();
-});
-
-// ──────────────────────────────────────────────
-// 西元年下拉初始化
-// ──────────────────────────────────────────────
-const birthYearSelect = document.getElementById('birth-year');
-const currentYear = new Date().getFullYear();
-for (let y = currentYear; y >= currentYear - 18; y--) {
-  const opt = document.createElement('option');
-  opt.value = y;
-  opt.textContent = y;
-  birthYearSelect.appendChild(opt);
-}
-
 // ──────────────────────────────────────────────
 // 商品選擇邏輯
 // ──────────────────────────────────────────────
 const DONATION_PLANS = new Set(["方案33333含贈閱方案", "方案44444含贈閱方案"]);
 
 const cartSummary = document.getElementById('cart-summary');
-const childSection = document.getElementById('child-section');
 const donationSection = document.getElementById('donation-section');
 const allLabels = document.querySelectorAll('.item-row');
 
@@ -4331,13 +4232,6 @@ function updateCart() {
     cartSummary.innerHTML = '<span class="empty">尚未選擇任何商品</span>';
   } else {
     cartSummary.innerHTML = all.map(v => `<span class="tag">${v}</span>`).join('');
-  }
-
-  // 小朋友資料：選任一方案即顯示
-  if (plan) {
-    showSection(childSection);
-  } else {
-    childSection.style.display = 'none';
   }
 
   // 公益捐贈：僅含贈閱方案才顯示
