@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>遠見 Welcome Letter — 預覽（四款風格）</title>
+<style>
+  :root {
+    --navy: #1a2a4a;
+    --red: #c8172e;
+    --cream: #eceae5;
+    --ink: #1a1a1a;
+    --paper: #f7f5ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    font-family: "Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+    color: var(--ink);
+  }
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 28px 40px;
+    border-bottom: 4px solid var(--red);
+  }
+  .brand {
+    font-size: 14px;
+    letter-spacing: 0.32em;
+    color: #9aa6c0;
+    font-family: 'Helvetica Neue',Arial,sans-serif;
+    font-weight: 700;
+  }
+  h1 {
+    margin: 8px 0 4px;
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+  }
+  .sub {
+    color: #9aa6c0;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 16px 40px 0;
+    background: var(--navy);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab {
+    background: transparent;
+    border: 0;
+    color: #9aa6c0;
+    font-family: 'Helvetica Neue',Arial,sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    text-transform: uppercase;
+  }
+  .tab.active {
+    color: #fff;
+    border-bottom-color: var(--red);
+  }
+  .tab:hover { color: #fff; }
+
+  main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e3e0d8;
+  }
+  .card-head {
+    padding: 22px 28px;
+    border-bottom: 1px solid #e3e0d8;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .card-head .num {
+    font-family: 'Helvetica Neue',Arial,sans-serif;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.32em;
+    font-weight: 700;
+  }
+  .card-head .title {
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-top: 6px;
+  }
+  .card-head .meta {
+    font-family: 'Helvetica Neue',Arial,sans-serif;
+    font-size: 11px;
+    color: #8a8a8a;
+    letter-spacing: 0.18em;
+    margin-top: 6px;
+  }
+  .card-head a.open {
+    font-family: 'Noto Sans TC',sans-serif;
+    font-size: 12px;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    padding: 8px 14px;
+    letter-spacing: 0.16em;
+    transition: 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .card-head a.open:hover { background: var(--navy); color: #fff; }
+  .iframe-wrap {
+    background: var(--cream);
+    padding: 16px;
+    overflow: hidden;
+  }
+  .iframe-wrap.nyt { background: #e9e6df; }
+  iframe {
+    width: 100%;
+    height: 1500px;
+    border: 0;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(26,42,74,0.08);
+  }
+  .pane { display: none; }
+  .pane.active { display: grid; }
+  .pane-intro {
+    grid-column: 1 / -1;
+    padding: 0 4px 12px;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+  .pane-intro b { color: var(--ink); font-weight: 700; letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">GLOBAL&nbsp;VIEWS&nbsp;·&nbsp;WELCOME&nbsp;LETTER&nbsp;PREVIEW</div>
+  <h1>遠見 Welcome Letter</h1>
+  <div class="sub">2026.05.19　·　HTML Email　·　600px　·　五款風格並陳</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-pane="brand">A｜品牌深藍風</button>
+  <button class="tab" data-pane="nyt">B｜NYT 報紙風</button>
+  <button class="tab" data-pane="gvm">C｜GVM 線上讀風</button>
+  <button class="tab" data-pane="time">D｜雜誌風（遠見深藍版）</button>
+  <button class="tab" data-pane="archive">E｜典藏質感風（墨綠 × 金）</button>
+</nav>
+
+<main>
+  <!-- 品牌風 -->
+  <div class="pane active" data-pane="brand" style="display:grid; grid-template-columns:1fr 1fr; gap:36px;">
+    <div class="pane-intro">
+      <b>品牌風</b>　深藍 #1A2A4A + 遠見紅 #C8172E，延續官網深色專業感。Sans / Serif 並用，封面圖與卡片以塊面色彩處理。
+    </div>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;01</div>
+          <div class="title">社長楊瑪利的話</div>
+          <div class="meta">＋ 遠見精選知識包 PDF</div>
+        </div>
+        <a class="open" href="letter1-yang.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="letter1-yang.html" title="Letter 1 — Brand"></iframe>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;02</div>
+          <div class="title">總編輯林讓均的話</div>
+          <div class="meta">＋ 編輯選讀 ＋ NT$2 優惠券</div>
+        </div>
+        <a class="open" href="letter1-lin.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="letter1-lin.html" title="Letter 2 — Brand"></iframe>
+      </div>
+    </section>
+  </div>
+
+  <!-- NYT 風 -->
+  <div class="pane" data-pane="nyt" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+    <div class="pane-intro">
+      <b>NYT 報紙風</b>　黑白為主、Playfair Display 報頭、Source Serif 內文、雙線分隔、首字 drop cap、小字 ALL CAPS 標籤。把 Welcome Letter 當成一份私人寄送的編輯部報紙。
+    </div>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;01　·　NYT</div>
+          <div class="title">A Letter from the Publisher</div>
+          <div class="meta">楊瑪利 · 知識包</div>
+        </div>
+        <a class="open" href="letter2-yang.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap nyt">
+        <iframe src="letter2-yang.html" title="Letter 1 — NYT"></iframe>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;02　·　NYT</div>
+          <div class="title">A Letter from the Editor-in-Chief</div>
+          <div class="meta">林讓均 · 編輯選讀 · NT$2</div>
+        </div>
+        <a class="open" href="letter2-lin.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap nyt">
+        <iframe src="letter2-lin.html" title="Letter 2 — NYT"></iframe>
+      </div>
+    </section>
+  </div>
+
+  <!-- GVM 線上讀風 -->
+  <div class="pane" data-pane="gvm" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+    <div class="pane-intro">
+      <b>GVM 線上讀風</b>　取自 gvm.com.tw/digital 視覺語彙：白底＋Noto Sans TC 無襯線中文、紅色 pill 分類標籤、「左側紅色粗條」section header、編輯推薦頭像＋推薦語版型、文章列表卡片（左圖右文）。整封信看起來像為您個人化製作的「線上讀首頁」。
+    </div>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;01　·　GVM</div>
+          <div class="title">社長楊瑪利的話</div>
+          <div class="meta">線上讀風 · 知識包卡片</div>
+        </div>
+        <a class="open" href="letter3-yang.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#f4f4f4;">
+        <iframe src="letter3-yang.html" title="Letter 1 — GVM"></iframe>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;02　·　GVM</div>
+          <div class="title">總編輯林讓均的話</div>
+          <div class="meta">編輯推薦版型 · 文章列表 · NT$2</div>
+        </div>
+        <a class="open" href="letter3-lin.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#f4f4f4;">
+        <iframe src="letter3-lin.html" title="Letter 2 — GVM"></iframe>
+      </div>
+    </section>
+  </div>
+
+  <!-- D 雜誌風 -->
+  <div class="pane" data-pane="time" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+    <div class="pane-intro">
+      <b>雜誌風（遠見深藍版）</b>　以國際版雜誌視覺為原型，主色採遠見深藍 `#002F87`。14px 藍色厚邊框、遠見官方 SVG logo（毛筆書法）、Roboto Condensed 巨大粗體 sans 主標、藍色 kicker banner、首字 drop cap、明信片票券風優惠碼。視覺對比最強、最具雜誌感。
+    </div>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;01　·　雜誌風</div>
+          <div class="title">社長楊瑪利的話</div>
+          <div class="meta">雜誌風 · 知識包封面票券</div>
+        </div>
+        <a class="open" href="letter4-yang.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#f5f1e6;">
+        <iframe src="letter4-yang.html" title="Letter 1 — 雜誌風"></iframe>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;02　·　雜誌風</div>
+          <div class="title">總編輯林讓均的話</div>
+          <div class="meta">雜誌風 · 線上讀 + 首月 NT$2</div>
+        </div>
+        <a class="open" href="letter4-lin.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#f5f1e6;">
+        <iframe src="letter4-lin.html" title="Letter 2 — 雜誌風"></iframe>
+      </div>
+    </section>
+  </div>
+
+  <!-- E 典藏質感風 -->
+  <div class="pane" data-pane="archive" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+    <div class="pane-intro">
+      <b>典藏質感風（墨綠 × 金）</b>　米白底 `#FBF8F1` + 墨綠 `#2F4A3A` + 細金線 `#B8A878`，完全捨棄遠見紅。中軸對稱排版、細雙金線分隔、巨型 drop cap、ALL CAPS 拉丁小字標籤、優惠碼以細邊框票券形式呈現。風格接近 Monocle / Kinfolk 等國際編輯刊物的「典藏號」質感，最內斂、最有書感，視覺對比與前四版完全不同。
+    </div>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;01　·　典藏</div>
+          <div class="title">社長楊瑪利的話</div>
+          <div class="meta">典藏質感 · 中軸 drop cap · 知識包</div>
+        </div>
+        <a class="open" href="letter5-yang.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#efeae0;">
+        <iframe src="letter5-yang.html" title="Letter 1 — 典藏"></iframe>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <div class="num">LETTER&nbsp;／&nbsp;02　·　典藏</div>
+          <div class="title">總編輯林讓均的話</div>
+          <div class="meta">典藏質感 · 編輯選讀 · 票券優惠</div>
+        </div>
+        <a class="open" href="letter5-lin.html" target="_blank">獨立開啟&nbsp;›</a>
+      </div>
+      <div class="iframe-wrap" style="background:#efeae0;">
+        <iframe src="letter5-lin.html" title="Letter 2 — 典藏"></iframe>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panes = document.querySelectorAll('.pane');
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      const key = t.dataset.pane;
+      tabs.forEach(x => x.classList.toggle('active', x === t));
+      panes.forEach(p => {
+        const on = p.dataset.pane === key;
+        p.classList.toggle('active', on);
+        p.style.display = on ? 'grid' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
