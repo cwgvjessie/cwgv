@@ -71,11 +71,14 @@
     max-width: 1440px;
     margin: 0 auto;
     padding: 40px 32px 80px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  }
+
+  .pane { display: none; }
+  .pane.active {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
     gap: 36px;
   }
-  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
 
   .card {
     background: #fff;
@@ -126,16 +129,18 @@
     background: var(--cream);
     padding: 16px;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
   }
   .iframe-wrap.nyt { background: #e9e6df; }
   iframe {
-    width: 100%;
+    width: 600px;
+    max-width: 100%;
     height: 1500px;
     border: 0;
     background: #fff;
     box-shadow: 0 8px 24px rgba(26,42,74,0.08);
   }
-  .pane { display: none; }
   .pane.active { display: grid; }
   .pane-intro {
     grid-column: 1 / -1;
@@ -165,7 +170,7 @@
 
 <main>
   <!-- 品牌風 -->
-  <div class="pane active" data-pane="brand" style="display:grid; grid-template-columns:1fr 1fr; gap:36px;">
+  <div class="pane active" data-pane="brand" >
     <div class="pane-intro">
       <b>品牌風</b>　深藍 #1A2A4A + 遠見紅 #C8172E，延續官網深色專業感。Sans / Serif 並用，封面圖與卡片以塊面色彩處理。
     </div>
@@ -199,7 +204,7 @@
   </div>
 
   <!-- NYT 風 -->
-  <div class="pane" data-pane="nyt" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+  <div class="pane" data-pane="nyt" >
     <div class="pane-intro">
       <b>NYT 報紙風</b>　黑白為主、Playfair Display 報頭、Source Serif 內文、雙線分隔、首字 drop cap、小字 ALL CAPS 標籤。把 Welcome Letter 當成一份私人寄送的編輯部報紙。
     </div>
@@ -233,7 +238,7 @@
   </div>
 
   <!-- GVM 線上讀風 -->
-  <div class="pane" data-pane="gvm" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+  <div class="pane" data-pane="gvm" >
     <div class="pane-intro">
       <b>GVM 線上讀風</b>　取自 gvm.com.tw/digital 視覺語彙：白底＋Noto Sans TC 無襯線中文、紅色 pill 分類標籤、「左側紅色粗條」section header、編輯推薦頭像＋推薦語版型、文章列表卡片（左圖右文）。整封信看起來像為您個人化製作的「線上讀首頁」。
     </div>
@@ -267,7 +272,7 @@
   </div>
 
   <!-- D 雜誌風 -->
-  <div class="pane" data-pane="time" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+  <div class="pane" data-pane="time" >
     <div class="pane-intro">
       <b>雜誌風（遠見深藍版）</b>　以國際版雜誌視覺為原型，主色採遠見深藍 `#002F87`。14px 藍色厚邊框、遠見官方 SVG logo（毛筆書法）、Roboto Condensed 巨大粗體 sans 主標、藍色 kicker banner、首字 drop cap、明信片票券風優惠碼。視覺對比最強、最具雜誌感。
     </div>
@@ -301,7 +306,7 @@
   </div>
 
   <!-- E 典藏質感風 -->
-  <div class="pane" data-pane="archive" style="display:none; grid-template-columns:1fr 1fr; gap:36px;">
+  <div class="pane" data-pane="archive" >
     <div class="pane-intro">
       <b>典藏質感風（墨綠 × 金）</b>　米白底 `#FBF8F1` + 墨綠 `#2F4A3A` + 細金線 `#B8A878`，完全捨棄遠見紅。中軸對稱排版、細雙金線分隔、巨型 drop cap、ALL CAPS 拉丁小字標籤、優惠碼以細邊框票券形式呈現。風格接近 Monocle / Kinfolk 等國際編輯刊物的「典藏號」質感，最內斂、最有書感，視覺對比與前四版完全不同。
     </div>
@@ -345,7 +350,6 @@
       panes.forEach(p => {
         const on = p.dataset.pane === key;
         p.classList.toggle('active', on);
-        p.style.display = on ? 'grid' : 'none';
       });
     });
   });
