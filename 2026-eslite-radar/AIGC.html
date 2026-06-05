@@ -887,6 +887,35 @@ hr {
     text-align:center;
   }
 
+}
+
+/* =========================
+   AIGC disclaimer
+   ========================= */
+.aigc-disclaimer {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  padding: 16px 20px;
+  background: #fdf8ec;
+  border: 1px solid #e8d9a0;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #7a6a3a;
+}
+.aigc-disclaimer p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #7a6a3a;
+}
+.aigc-disclaimer p:last-child {
+  margin-bottom: 0;
+}
+.aigc-disclaimer__title {
+  font-weight: 700;
+  font-size: 13px !important;
+  color: #5c4a1e !important;
+  margin-bottom: 6px !important;
 }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+TC:wght@400;500;600&display=swap" rel="stylesheet">
@@ -927,6 +956,12 @@ footer.site-footer {
   color: #AFA9A0;
   letter-spacing: 0.06em;
 }
+footer.site-footer a {
+  color: #AFA9A0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+footer.site-footer a:hover { color: #1A1710; }
 </style>
     <link rel="stylesheet" href="./css/gvm.css">
     <style>
@@ -1119,7 +1154,7 @@ footer.site-footer {
 </script>
 <nav class="navbar">
   <div class="navbar-left">
-    <span class="navbar-brand">Eslite Online</span>
+    <a class="navbar-sub" href="https://www.eslite.com/">  <span class="navbar-brand"> 誠品線上 </span></a>  
     <span class="navbar-divider"></span>
     <a class="navbar-sub" href="eslite-radar.html">職場雷達</a>
   </div>
@@ -1227,12 +1262,17 @@ Google、Amazon、阿里巴巴、蘋果、特斯拉、GE……無論是新創、
   </div>
 
 
-
+<div style="max-width:800px;margin:0 auto 40px;padding:14px 32px 14px;background:;font-size:13px">
+  <p style="font-weight:700;font-size:13px;color:#5c4a1e;margin:0 0 6px;">警語</p>
+  <p style="font-size:13px;color:#7a6a3a;margin:0 0 6px;">本頁面由AI生成，可能會發生錯誤。請查核重要資訊。</p>
+  <p style="font-size:13px;color:#7a6a3a;margin:0;">使用本AI生成內容服務即表示您同意此內容僅供個人參考非商業用途，任何轉載分享皆不得違反法律或侵犯智慧財產權，且您了解輸出內容可能不準確，所有爭議遠見天下文化出版股份有限公司保有最終解釋權。</p>
+</div>
 
 <footer class="site-footer">
-  <span>© 2026 誠品線上 eslite.com</span>
-  <span>內容合作：遠見雜誌</span>
+  <span>© 2026 <a href="https://www.eslite.com/" target="_blank">誠品線上 eslite.com</a></span>
+  <a href="eslite-radar.html">職場雷達</a>
 </footer>
+
 <script>
 /* 移除逐字動畫 span，還原成純文字 */
 (function () {

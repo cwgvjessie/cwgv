@@ -6,10 +6,12 @@
 <meta name="robots" content="noindex, nofollow">
 <title>AI競賽白熱化！台積電美國擴廠背後盤算曝光 — 職場雷達</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Noto+Sans+TC:ital,wght@0,300;0,400;0,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
+/* 強制防止瀏覽器合成斜體 */
+* { font-style: normal; font-synthesis: none; }
 
 :root {
   --white: #FFFFFF;
@@ -81,12 +83,19 @@ body {
 }
 .detail-cover {
   width: 100%;
-  aspect-ratio: 16/7;
+  aspect-ratio: 756/592;
   overflow: hidden;
   border-radius: 3px;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-cover-caption {
+  font-size: 13px;
+  color: var(--text-hint);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
 .detail-title {
   font-family: 'Noto Serif TC', serif;
   font-size: 32px;
@@ -233,6 +242,12 @@ body {
   color: var(--text-hint);
   letter-spacing: 0.06em;
 }
+.site-footer a {
+  color: var(--text-hint);
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+.site-footer a:hover { color: var(--text-head); }
 
 @media (max-width: 600px) {
   .container { padding: 0 20px 60px; }
@@ -377,7 +392,7 @@ body {
 
   <nav class="navbar">
     <div class="navbar-left">
-      <span class="navbar-brand">Eslite Online</span>
+      <a class="navbar-sub" href="https://www.eslite.com/">  <span class="navbar-brand"> 誠品線上 </span></a>        
       <span class="navbar-divider"></span>
       <a class="navbar-sub" href="eslite-radar.html">職場雷達</a>
     </div>
@@ -388,19 +403,22 @@ body {
     <div class="detail-eyebrow">
       <span class="detail-cat-pill">高階決策</span>
     </div>
+        <h1 class="detail-title">AI競賽白熱化！台積電美國擴廠背後盤算曝光</h1>
+
     <div class="detail-cover">
       <img src="images/cover-1.jpg" alt="AI競賽白熱化！台積電美國擴廠背後盤算曝光">
     </div>
-    <h1 class="detail-title">AI競賽白熱化！台積電美國擴廠背後盤算曝光</h1>
-    <div class="detail-meta">
+    <p class="detail-cover-caption">台積電加碼美國投資，亞利桑那廠成全球半導體供應鏈重組的重要據點。張智傑攝</p>
+  </div>
+      <div class="detail-meta">
       <span>作者</span>
       <span class="meta-dot"></span>
       <span>劉佩真 廖綉玉 賴昀 </span>
     </div>
-  </div>
 
   <!-- Full Article -->
   <div class="gvm-article">
+
     <p class="gvm-lede">編按：台積電加速擴大美國投資，亞利桑那的第三座晶圓廠提前封頂，顯示在AI浪潮下，全球供應鏈布局正式升級。畢竟，在面對地緣政治與客戶需求變化，美國布局已成關鍵戰略核心。</p>
     <p>台積電指出，2026年5月5日，是亞利桑那工廠的重要里程碑，當天舉行位於鳳凰城的第三座晶圓廠（P3）封頂儀式，代表大樓主體結構的完成。亞利桑那P3廠進度的顯著提前，象徵台積電在美國布局先進製程，已從試水溫進入全面深耕階段。</p>
     <p>事實上，在當前全球地緣政治與AI科技浪潮交織的關鍵時刻，台積電持續上修對美投資規模，已不再僅是單純的商業產能擴張，而是一場深謀遠慮的戰略轉骨，隨著矽盾的概念，從防禦性屏障演變為全球供應鏈的韌性基石，台積電必須在追求技術領先的同時，精準對接全球頂尖客戶對於供應鏈地理靈活性的剛性需求。</p>
@@ -522,8 +540,8 @@ Google、Amazon、阿里巴巴、蘋果、特斯拉、GE……無論是新創、
 
 
   <footer class="site-footer">
-    <span>© 2026 誠品線上 eslite.com</span>
-    <span>內容合作：遠見雜誌</span>
+    <span>© 2026 <a href="https://www.eslite.com/" target="_blank">誠品線上 eslite.com</a></span>
+    <a href="eslite-radar.html">職場雷達</a>
   </footer>
 
 </div>

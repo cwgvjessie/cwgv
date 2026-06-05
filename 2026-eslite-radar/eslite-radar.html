@@ -6,10 +6,12 @@
 <meta name="robots" content="noindex, nofollow">
 <title>職場雷達 — 誠品線上</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Noto+Sans+TC:ital,wght@0,300;0,400;0,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
+/* 強制防止瀏覽器合成斜體 */
+* { font-style: normal; font-synthesis: none; }
 
 :root {
   --white: #FFFFFF;
@@ -120,7 +122,7 @@ body {
 
 .article-thumb {
   width: 130px;
-  aspect-ratio: 3/2;
+  aspect-ratio: 756/592;
   object-fit: cover;
   display: block;
   border-radius: 2px;
@@ -227,12 +229,6 @@ body {
   color: var(--text-head);
   letter-spacing: 0.05em;
 }
-.modal-subtitle {
-  font-size: 14px;
-  color: var(--text-hint);
-  letter-spacing: 0.08em;
-  margin-top: 4px;
-}
 .modal-close {
   background: none;
   border: none;
@@ -250,9 +246,9 @@ body {
 /* ── Modal date section ── */
 .date-section {}
 .date-heading {
-  font-family: 'EB Garamond', serif;
-  font-size: 14px;
-  letter-spacing: 0.18em;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.16em;
   color: var(--text-muted);
   padding: 12px 24px 9px;
   background: var(--off-white);
@@ -268,6 +264,9 @@ body {
   padding: 11px 24px;
   border-bottom: 0.5px solid var(--rule-light);
   transition: background var(--transition);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 .article-row:last-child { border-bottom: none; }
 .article-row:hover { background: var(--off-white); }
@@ -300,6 +299,12 @@ body {
   color: var(--text-hint);
   letter-spacing: 0.06em;
 }
+.site-footer a {
+  color: var(--text-hint);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.site-footer a:hover { color: var(--text-head); }
 @media (max-width: 600px) {
   .container { padding: 0 20px 60px; }
   .hero-title { font-size: 30px; }
@@ -315,7 +320,7 @@ body {
 
   <nav class="navbar">
     <div class="navbar-left">
-      <span class="navbar-brand">Eslite Online</span>
+     <a class="navbar-sub" href="https://www.eslite.com/">  <span class="navbar-brand"> 誠品線上 </span></a>
       <span class="navbar-divider"></span>
            <a class="navbar-sub" href="eslite-radar.html">職場雷達</a>
     </div>
@@ -325,7 +330,7 @@ body {
   <div class="hero">
     <div>
       <div class="hero-eyebrow">遠見雜誌</div>
-      <a href="eslite-radar.html" style="text-decoration:none;color:inherit;"><div class="hero-title"><em>職場</em>雷達</div></a>
+      <a href="eslite-radar.html" style="text-decoration:none;color:inherit;"><div class="hero-title"><em>職場雷達</div></a>
     </div>
     <div class="hero-date-block">
       <button class="recent-btn" id="recentBtn">近期熱門文章</button>
@@ -371,8 +376,8 @@ body {
   </div>
 
   <footer class="site-footer">
-    <span>© 2026 誠品線上 eslite.com</span>
-    <span>內容合作：遠見雜誌</span>
+    <span>© 2026 <a href="https://www.eslite.com/" target="_blank">誠品線上 eslite.com</a></span>
+    <a href="eslite-radar.html">職場雷達</a>
   </footer>
 
 </div>
@@ -383,7 +388,6 @@ body {
     <div class="modal-header">
       <div class="modal-header-left">
         <div class="modal-title">近期熱門文章</div>
-        <div class="modal-subtitle" id="modalSubtitle"></div>
       </div>
       <button class="modal-close" id="modalClose" aria-label="關閉">×</button>
     </div>
@@ -475,7 +479,6 @@ const ARTICLES = [
   const overlay  = document.getElementById('recentModal');
   const card     = document.getElementById('recentModalCard');
   const body     = document.getElementById('modalBody');
-  const subtitle = document.getElementById('modalSubtitle');
   const btn      = document.getElementById('recentBtn');
   const closeBtn = document.getElementById('modalClose');
 
@@ -502,18 +505,14 @@ const ARTICLES = [
       return;
     }
 
-    const oldest = filtered[filtered.length - 1].date;
-    const newest = filtered[0].date;
-    subtitle.textContent = `${oldest} — ${newest}`;
-
     body.innerHTML = filtered.map(group => `
       <div class="date-section">
         <div class="date-heading">${group.date}</div>
         ${group.items.map(item => `
-          <div class="article-row ${item.cat}">
+          <a class="article-row ${item.cat}" href="eslite-article.html">
             <span class="cat-pill">${item.label}</span>
             <span class="article-row-title">${item.title}</span>
-          </div>
+          </a>
         `).join('')}
       </div>
     `).join('');
@@ -523,11 +522,17 @@ const ARTICLES = [
     buildModal();
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
+    if (location.hash !== '#modal') {
+      history.pushState({ modal: true }, '', '#modal');
+    }
   }
 
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
+    if (location.hash === '#modal') {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
   }
 
   btn.addEventListener('click', openModal);
@@ -537,6 +542,25 @@ const ARTICLES = [
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeModal();
+  });
+
+  window.addEventListener('popstate', function () {
+    if (location.hash === '#modal') {
+      buildModal();
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  window.addEventListener('pageshow', function () {
+    if (location.hash === '#modal') {
+      buildModal();
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
   });
 })();
 </script>
