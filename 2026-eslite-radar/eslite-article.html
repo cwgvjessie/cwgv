@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>AI競賽白熱化！台積電美國擴廠背後盤算曝光 — 職場雷達</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Noto+Sans+TC:ital,wght@0,300;0,400;0,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+/* 強制防止瀏覽器合成斜體 */
+* { font-style: normal; font-synthesis: none; }
+
+:root {
+  --white: #FFFFFF;
+  --off-white: #F9F7F4;
+  --rule-light: #E8E4DC;
+  --rule: #D4CEC4;
+  --text-hint: #AFA9A0;
+  --text-muted: #847E76;
+  --text-body: #3D3830;
+  --text-head: #1A1710;
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--white);
+  color: var(--text-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+}
+
+/* navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  border-bottom: 1px solid var(--text-head);
+}
+.navbar-left { display: flex; align-items: center; gap: 20px; }
+.navbar-brand {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  color: var(--text-head);
+  text-transform: uppercase;
+}
+.navbar-divider { width: 1px; height: 12px; background: var(--rule); }
+.navbar-sub { font-size: 14px; letter-spacing: 0.08em; color: var(--text-muted); text-decoration: none; }
+.navbar-sub:hover { color: var(--text-head); }
+.navbar-right { font-size: 14px; letter-spacing: 0.1em; color: var(--text-hint); }
+
+/* detail hero */
+.detail-hero {
+  padding: 40px 0 36px;
+  margin-bottom: 0;
+}
+.detail-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.detail-cat-pill {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 1px;
+  background: #F0EEF8;
+  color: #2B1F5C;
+}
+.detail-cover {
+  width: 100%;
+  aspect-ratio: 756/592;
+  overflow: hidden;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-cover-caption {
+  font-size: 13px;
+  color: var(--text-hint);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+.detail-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--text-head);
+  margin-bottom: 24px;
+}
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.04em;
+}
+.meta-dot { width: 2px; height: 2px; border-radius: 50%; background: var(--rule); display: inline-block; }
+
+/* full article */
+.gvm-article {
+  font-size: 16px;
+  line-height: 2;
+  color: var(--text-body);
+  margin-bottom: 48px;
+  border-top: 2px solid var(--text-head);
+  padding-top: 28px;
+}
+.gvm-article p { margin-bottom: 1.6em; }
+.gvm-article h2 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-head);
+  margin: 2em 0 0.8em;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--rule-light);
+  letter-spacing: 0.02em;
+}
+.gvm-lede {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.9;
+  padding: 16px 20px;
+  border-left: 3px solid var(--rule);
+  background: var(--off-white);
+  margin-bottom: 2em;
+}
+
+/* article read-more */
+.article-inner {
+  overflow: hidden;
+  transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.article-fade {
+  height: 96px;
+  margin-top: -96px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 100%);
+  position: relative;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.article-more-btn {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+  padding: 8px 32px;
+  background: transparent;
+  border: 0.5px solid var(--text-head);
+  color: #1A1710;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: opacity var(--transition);
+}
+.article-more-btn:hover { opacity: 0.5; }
+
+/* original link */
+.original-link {
+  display: flex;
+  width: fit-content;
+  margin-left: auto;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-head);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--text-head);
+  padding-bottom: 2px;
+  margin-bottom: 60px;
+  transition: opacity var(--transition);
+}
+.original-link:hover { opacity: 0.5; }
+.original-link svg { width: 10px; height: 10px; }
+
+/* section heading */
+.d-section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.d-section-head-line { flex: 1; height: 0.5px; background: var(--rule-light); }
+.d-section-title {
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-hint);
+  white-space: nowrap;
+}
+
+/* books */
+.books-section { margin-bottom: 60px; }
+
+/* questions */
+.questions-section { margin-bottom: 60px; }
+.question-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 16px;
+  padding: 18px 0;
+  border-bottom: 0.5px solid var(--rule-light);
+  align-items: start;
+}
+.q-num { font-family: 'EB Garamond', serif; font-size: 16px; color: var(--text-hint); padding-top: 1px; }
+.q-text { font-size: 16px; line-height: 1.75; color: var(--text-body); }
+.article-link { text-decoration: none; color: inherit; }
+
+/* footer */
+.site-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--rule-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.06em;
+}
+.site-footer a {
+  color: var(--text-hint);
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+.site-footer a:hover { color: var(--text-head); }
+
+@media (max-width: 600px) {
+  .container { padding: 0 20px 60px; }
+  .detail-title { font-size: 24px; }
+}
+
+/* ── connect-item 書籍列表（不只讀新聞風格）── */
+.connect-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.connect-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  width: 50%;
+  padding: 20px 0;
+  border-bottom: 0.5px solid var(--rule-light);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--transition);
+  position: relative;
+}
+.connect-item:nth-of-type(odd) {
+  padding-right: 24px;
+  border-right: 0.5px solid var(--rule-light);
+}
+.connect-item:nth-of-type(even) { padding-left: 24px; }
+.connect-item:last-child,
+.connect-item:nth-last-child(2) { border-bottom: none !important; }
+.connect-item:hover .item-info p { color: var(--text-head); }
+.connect-item:hover .connect-img img { transform: translateY(-3px); }
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.item-info p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  transition: color var(--transition);
+}
+.item-info p strong {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-head);
+  display: block;
+  margin-bottom: 3px;
+}
+.item-info p em {
+  font-style: normal;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.connect-img {
+  flex-shrink: 0;
+  width: 108px;
+  height: 144px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--off-white);
+}
+.connect-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.book-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.book-price-now {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-head);
+}
+
+.go-buy {
+  margin-top: 12px;
+  display: inline-block;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-head);
+  border: 1px solid var(--text-head);
+  padding: 7px 16px;
+  width: fit-content;
+  transition: background var(--transition), color var(--transition);
+}
+.go-buy:hover {
+  background: var(--text-head);
+  color: var(--white);
+}
+
+/* 只有第一本（指數型組織）全寬，其餘修正左右欄對應 */
+.connect-item:nth-of-type(1) { width: 100%; padding-right: 0 !important; padding-left: 0 !important; border-right: none !important; padding-bottom: 32px !important; }
+.connect-item:nth-of-type(1) .connect-img { width: 141px !important; height: 188px !important; }
+.connect-item:nth-of-type(2), .connect-item:nth-of-type(4), .connect-item:nth-of-type(6) { padding-right: 24px; padding-left: 0; border-right: 0.5px solid var(--rule-light); }
+.connect-item:nth-of-type(3), .connect-item:nth-of-type(5) { padding-left: 24px; padding-right: 12px; border-right: none; }
+.connect-item:nth-of-type(5) { border-bottom: 0.5px solid var(--rule-light); }
+/* line-clamp — 只套用在描述文字 .book-desc */
+.book-desc { display: block; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.connect-item:nth-of-type(1) .book-desc { -webkit-line-clamp: 5; }
+.connect-item:not(:nth-of-type(1)) .book-desc { -webkit-line-clamp: 3; }
+@media (max-width: 600px) {
+  .connect-item:nth-of-type(1) .book-desc { -webkit-line-clamp: 10; }
+  .connect-item:not(:nth-of-type(1)) .book-desc { -webkit-line-clamp: 4; }
+}
+@media (max-width: 600px) {
+  .connect-item {
+    width: 100%;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    border-right: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="navbar-sub" href="https://www.eslite.com/">  <span class="navbar-brand"> 誠品線上 </span></a>        
+      <span class="navbar-divider"></span>
+      <a class="navbar-sub" href="eslite-radar.html">職場雷達</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="detail-hero">
+    <div class="detail-eyebrow">
+      <span class="detail-cat-pill">高階決策</span>
+    </div>
+        <h1 class="detail-title">AI競賽白熱化！台積電美國擴廠背後盤算曝光</h1>
+
+    <div class="detail-cover">
+      <img src="images/cover-1.jpg" alt="AI競賽白熱化！台積電美國擴廠背後盤算曝光">
+    </div>
+    <p class="detail-cover-caption">台積電加碼美國投資，亞利桑那廠成全球半導體供應鏈重組的重要據點。張智傑攝</p>
+  </div>
+      <div class="detail-meta">
+      <span>作者</span>
+      <span class="meta-dot"></span>
+      <span>劉佩真 廖綉玉 賴昀 </span>
+    </div>
+
+  <!-- Full Article -->
+  <div class="gvm-article">
+
+    <p class="gvm-lede">編按：台積電加速擴大美國投資，亞利桑那的第三座晶圓廠提前封頂，顯示在AI浪潮下，全球供應鏈布局正式升級。畢竟，在面對地緣政治與客戶需求變化，美國布局已成關鍵戰略核心。</p>
+    <p>台積電指出，2026年5月5日，是亞利桑那工廠的重要里程碑，當天舉行位於鳳凰城的第三座晶圓廠（P3）封頂儀式，代表大樓主體結構的完成。亞利桑那P3廠進度的顯著提前，象徵台積電在美國布局先進製程，已從試水溫進入全面深耕階段。</p>
+    <p>事實上，在當前全球地緣政治與AI科技浪潮交織的關鍵時刻，台積電持續上修對美投資規模，已不再僅是單純的商業產能擴張，而是一場深謀遠慮的戰略轉骨，隨著矽盾的概念，從防禦性屏障演變為全球供應鏈的韌性基石，台積電必須在追求技術領先的同時，精準對接全球頂尖客戶對於供應鏈地理靈活性的剛性需求。</p>
+    <h2>台積電美國布局進入深水區</h2>
+    <p>這場橫跨太平洋的布局，不僅象徵半導體製造，從集中化效率轉向分散化安全的典範轉移，更反映企業在維持台灣核心研發動能，與滿足大國地緣利益之間的精妙平衡，進而確保其在未來AI霸權爭奪戰中，立於不可撼動的制高點。</p>
+    <p>從近期侯永清副共同營運長的表態來看，台積電可能再加碼美國的核心動力，早已超越單純的補助誘因，而是深度綁定於客戶韌性與AI市場需求。隨著全球大型雲端服務商，如微軟（Microsoft）、Google、Meta（臉書母公司）等，將AI視為軍備競賽，這些頂尖客戶對供應鏈的安全性與地理靈活性要求極高。將最尖端的2奈米、甚至更先進的製程移往美國，能讓台積電在第一時間貼近矽谷的創新核心，並消除客戶對台海情勢可能導致供應中斷的疑慮，從而鞏固其在晶圓代工市場的絕對統治力。</p>
+    <p>就影響面而言，台積電在亞利桑那州打造的獨立超大晶圓廠聚落，將從單純的代工中心轉型為集研發、製造、封裝於一體的全功能生態系。這種規模的投資案，將帶動大量台灣供應鏈業者跟進赴美；雖然初期會面臨高昂的建置成本與文化磨合，但長期來看，此則有助於台積電掌握全球關鍵人才與研發資源，將其企業影響力從台灣延伸至全球經濟的心臟地帶。</p>
+    <h2>台灣研發、全球生產成新模式</h2>
+    <p>至於外界最擔心的，排擠台灣投資或去台化問題，現階段雖然看來更多是資源的共榮與延伸，然而，其後續對台灣本土半導體業的群聚效益、上中下游的協作效率及其他負面後座力的影響，仍不容忽視。特別是當半導體產業投資往美國的方向確立、投資規模不斷擴大，台灣本土對半導體產業的政策主導性與彈性調整空間，相對將遭對壓縮。</p>
+    <p>所幸台積電一向堅持根留台灣，最前瞻的技術研發與首波量產基地依然穩坐台灣。而透過將部分產能外移，台灣總部能騰出空間專注於下一個世代的技術突破，如埃米，甚至更先進的製程。期望台灣作為大腦的核心地位依舊穩固，美國廠則扮演全球戰略側翼的角色，協助台積電在分散風險的同時，獲取最大化的股東利益與市場份額。</p>
+    <p>整體來說，加碼美國是台積電在複雜政經環境下的出擊，這不僅是為了回應美國政府的期待，更是為確保在未來的AI競賽中，台積電依然是全球科技巨人唯一且不可替代的盟友，而這種台灣研發、全球生產的模式，正是台積電邁向世界級企業新高峰的關鍵轉型。</p>
+  </div>
+
+  <a href="https://www.gvm.com.tw/article/130163" target="_blank" class="original-link">
+    至遠見雜誌閱讀原文
+    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 10L10 2M6.5 2H10v3.5"/>
+    </svg>
+  </a>
+
+  <!-- Books -->
+  <div class="books-section">
+    <div class="d-section-head">
+      <div class="d-section-title">誠品選書推薦</div>
+      <div class="d-section-head-line"></div>
+    </div>
+    <div class="connect-link-list">
+
+      <a class="connect-item" href="https://www.eslite.com/product/1001118562627515" target="_blank">
+        <div class="item-info">
+          <p><strong>指數型組織</strong><em>Salim Ismail</em><span class="book-desc">亞馬遜讀者超過200人5星推薦
+1. 論述完整清晰，以明確的流程步驟，說明指數型組織的關鍵屬性與建立方式
+2. 眾多現實案例剖析，無論產業新舊、規模大小或人數多寡，都有足以參考的轉型範本
+3. 符合加速時代的組織管理完整新論述，擘畫出瞬息萬變、資訊變化迅速的年代所需要的組織新模型。
+【在加速化的年代，你的組織需要轉變為「指數型組織」】
+歡迎來到指數時代，在這個加速化的年代中，你要如何掌控這一切？你要如何吸引人才，建立起一家在速度、專業和創新能力上都能與指數時代相配合的企業呢？答案是要建立「指數型組織」！
+指數型組織是指一個組織在使用了新型槓桿化加速技術後，其影響力或產出比同行有不成比例的巨大——至少必須十倍大。
+Google、Amazon、阿里巴巴、蘋果、特斯拉、GE……無論是新創、網路業或傳統產業，它們的業績都能夠創造指數型爆發，其中的祕密就是指數型組織！
+當數位科技以指數型曲線加速變革，企業必須跳脫傳統線性發展思維，成為可以充分擴張、快速發展而且具有智慧的組織，才能在加速創新與競爭的時代成為贏家！</span></p>
+          <div class="book-price-row"><span class="book-price-now">NT$ 355</span></div>
+          <div class="go-buy">立即入手</div>
+        </div>
+        <div class="connect-img"><img src="images/book-01.jpg" alt="指數型組織"></div>
+      </a>
+
+      <a class="connect-item" href="https://www.eslite.com/product/1001116172818609" target="_blank">
+        <div class="item-info">
+          <p><strong>從A到A+</strong><em>Jim Collins</em><span class="book-desc">●第五級領導：能推動企業邁向卓越的領導人員具備什麼樣的特質？他們通常沉默內斂、不愛出風頭，甚至有點害羞，謙沖為懷的人格特質和不屈不撓的專業堅持齊集於一身。 ●先找對人，再決定要做什麼：柯林斯團隊原以為「從優秀到卓越」的領導人上任之初，一定先提出新願景、新策略，卻發現他們忙著找到適合的人上車，請不適任的人下車，並且把對的人放在對的位子上，然後才釐清該把車子開往哪個方向。 ●面對殘酷現實，但絕不喪失信心：所有從「從優秀到卓越」的公司邁向卓越之路，都先從誠實面對眼前的殘酷現實開始。因此，領導人必須塑造能聽到真畫且不掩蓋事實的企業文化。 </span></p>
+          <div class="book-price-row"><span class="book-price-now">NT$ 379</span></div>
+          <div class="go-buy">立即入手</div>
+        </div>
+        <div class="connect-img"><img src="images/book-03.webp" alt="從A到A+"></div>
+      </a>
+
+      <a class="connect-item" href="https://www.eslite.com/product/1001124272682353364008" target="_blank">
+        <div class="item-info">
+          <p><strong>心理安全感的力量</strong><em>Amy C. Edmondson</em><span class="book-desc">在今天合作與創新定成敗的世界，只擁有聰明能幹、企圖心強的人才不見得有績效，更重要的是必須讓聰明又有企圖的人不怕犯錯地把知識用出來、能卸下心防合作，才能在變化中找出新路徑！工業時代，個人完美執行最佳實務就能績效卓越；在知識密集的創新時代，高效率要靠協作、共創，最被忽略的績效要素是團隊中沒有人說出口的「心理安全感」！心理安全感指的是，組織成員相信自己不會因發表了某個想法、疑問、關切，乃至犯錯，而受到懲罰、侮辱或報復。
+</span></p>
+          <div class="book-price-row"><span class="book-price-now">NT$ 379</span></div>
+          <div class="go-buy">立即入手</div>
+        </div>
+        <div class="connect-img"><img src="images/book-04.jpg" alt="心理安全感的力量"></div>
+      </a>
+
+      <a class="connect-item" href="https://www.eslite.com/product/1001112702593286" target="_blank">
+        <div class="item-info">
+          <p><strong>刻意練習</strong><em>Anders Ericsson / Robert Pool</em><span class="book-desc">堆人學鋼琴、小提琴、舞蹈、圍棋、各項運動，為什麼有些人可以有高手級表現，大部分人卻只有「可接受」的水準？多數人相信原因出在天賦，但本書作者安德斯‧艾瑞克森根據三十多年的研究發現，所謂天賦其實是人類大腦和身體的適應力，只要透過正確的練習，亦即「刻意練習」，善用大腦和身體的適應力，每個人都能改善技能，甚至創造出你本來以為自己沒有的能力，達到顛峰表現。本書提供的革命性方法，將告訴你精通幾乎任何事物的訣竅。這可能是人類第一次擁有關於如何練成天才的統一理論！</span></p>
+          <div class="book-price-row"><span class="book-price-now">NT$ 252</span></div>
+          <div class="go-buy">立即入手</div>
+        </div>
+        <div class="connect-img"><img src="images/book-05.webp" alt="刻意練習"></div>
+      </a>
+
+      <a class="connect-item" href="https://www.eslite.com/product/1001180772682193430000" target="_blank">
+        <div class="item-info">
+          <p><strong>愈吵愈有競爭力</strong><em>石井遼介</em><span class="book-desc">根據哈佛商學院教授、全球Thinkers 50管理思想家──艾美‧艾德蒙森的研究，以及Google歷經四年的調查分析「何謂有成效的團隊」，皆指出「心理安全感」才是打造高績效團隊的關鍵，如何建立組織成員的心理安全感，也成為當代管理學研究的焦點。在具有「心理安全感」的工作環境，團隊中的成員可以挺身建言、公開交流、提供想法，遇到失敗與困難，也能坦言求助與提出問題，不用擔心被懲罰、被誤會及冒犯。大家更樂於參與、分享情報，即便是吵架，成員也能貢獻點子，從正反意見中找出更好的解決方法，成為冠軍團隊！
+</span></p>
+          <div class="book-price-row"><span class="book-price-now">NT$ 355</span></div>
+          <div class="go-buy">立即入手</div>
+        </div>
+        <div class="connect-img"><img src="images/book-06.jpg" alt="愈吵愈有競爭力"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="questions-section">
+    <div class="d-section-head">
+      <div class="d-section-title">深度思考問題</div>
+      <div class="d-section-head-line"></div>
+    </div>
+    <div class="question-item">
+      <span class="q-num">01</span>
+      <a href="AIGC.html" target="_blank" class="article-link">
+      <span class="q-text">你的組織目前的學習週期是以「月」還是「週」為單位計算？</span></a>
+    </div>
+    <div class="question-item">
+      <span class="q-num">02</span>
+      <a href="AIGC.html" target="_blank" class="article-link">
+      <span class="q-text">哪些競爭優勢在 AI 普及後反而會成為包袱？</span></a>
+    </div>
+    <div class="question-item">
+      <span class="q-num">03</span>
+      <a href="AIGC.html" target="_blank" class="article-link">
+      <span class="q-text">如果只能保留三項核心能力，你會選擇哪三項？</span></a>
+    </div>
+    <div class="question-item">
+      <span class="q-num">04</span>
+      <a href="AIGC.html" target="_blank" class="article-link">
+      <span class="q-text">你的 KPI 設計是否允許「有意義的失敗」存在？</span></a>
+    </div>
+    <div class="question-item">
+      <span class="q-num">05</span>
+      <a href="AIGC.html" target="_blank" class="article-link">
+      <span class="q-text">組織文化中有哪些隱性規則正在減緩決策速度？</span></a>
+    </div>
+  </div>
+
+
+  <footer class="site-footer">
+    <span>© 2026 <a href="https://www.eslite.com/" target="_blank">誠品線上 eslite.com</a></span>
+    <a href="eslite-radar.html">職場雷達</a>
+  </footer>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var article = document.querySelector('.gvm-article');
+  if (!article) return;
+
+  var LIMIT = 300;
+  var charCount = 0;
+  var found = false;
+  var clampHeight = 0;
+  var articleTop = article.getBoundingClientRect().top;
+
+  function walk(node) {
+    if (found) return;
+    if (node.nodeType === 3) {
+      var text = node.textContent;
+      var nonWS = text.replace(/\s/g, '');
+      if (charCount + nonWS.length >= LIMIT) {
+        var remaining = LIMIT - charCount;
+        var pos = 0, cnt = 0;
+        for (var i = 0; i < text.length; i++) {
+          if (!/\s/.test(text[i])) {
+            cnt++;
+            if (cnt >= remaining) { pos = i + 1; break; }
+          }
+        }
+        var range = document.createRange();
+        range.setStart(node, pos);
+        range.collapse(true);
+        var r = range.getBoundingClientRect();
+        clampHeight = Math.round(r.top - articleTop);
+        found = true;
+      }
+      charCount += nonWS.length;
+    } else if (node.nodeType === 1) {
+      var children = node.childNodes;
+      for (var i = 0; i < children.length; i++) {
+        walk(children[i]);
+        if (found) return;
+      }
+    }
+  }
+
+  walk(article);
+  if (!found || clampHeight <= 0) return;
+
+  var inner = document.createElement('div');
+  inner.className = 'article-inner';
+  inner.style.maxHeight = clampHeight + 'px';
+  while (article.firstChild) inner.appendChild(article.firstChild);
+
+  var fade = document.createElement('div');
+  fade.className = 'article-fade';
+
+  var btn = document.createElement('button');
+  btn.className = 'article-more-btn';
+  btn.textContent = '看更多';
+
+  article.appendChild(inner);
+  article.appendChild(fade);
+  article.appendChild(btn);
+
+  btn.addEventListener('click', function () {
+    var h = inner.scrollHeight;
+    inner.style.maxHeight = h + 'px';
+    fade.style.opacity = '0';
+    btn.style.opacity = '0';
+    btn.style.pointerEvents = 'none';
+    inner.addEventListener('transitionend', function () {
+      inner.style.maxHeight = 'none';
+      fade.remove();
+      btn.remove();
+    }, { once: true });
+  });
+});
+</script>
+
+</body>
+</html>
