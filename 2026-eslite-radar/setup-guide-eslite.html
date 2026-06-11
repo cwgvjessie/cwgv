@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  setup-guide-eslite.html — 誠品工程師設定手冊
+  對象：誠品工程師（Layer 1 負責方）
+  說明：描述如何設定 iframe src URL 及 postMessage 監聽器。
+        誠品端不需安裝 GTM，只需確保 iframe src 正確且帶有 ?partner=eslite.com。
+  相關檔案：eslite.html / eslite-article.html / eslite-aigc.html
+  ============================================================ -->
+<html lang="zh-TW">
+<head>
+<!-- ─── Meta / Charset ─── -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>誠品工程師設定手冊 — 職場雷達合作專案</title>
+<!-- ─── Styles（文件樣式：排版 / badge / arch / 架構圖）─── -->
+<style>
+  body { font-family: -apple-system, "Noto Sans TC", sans-serif; max-width: 860px; margin: 40px auto; padding: 0 24px 80px; color: #1a1a1a; line-height: 1.7; }
+  h1 { font-size: 24px; border-bottom: 2px solid #1a1a1a; padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 40px; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid #2563eb; }
+  h3 { font-size: 15px; margin-top: 24px; margin-bottom: 8px; color: #374151; }
+  .meta { font-size: 13px; color: #6b7280; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+  .badge-eslite { background: #dbeafe; color: #1d4ed8; }
+  .badge-gvm { background: #dcfce7; color: #166534; }
+  .badge-mosso { background: #fef3c7; color: #92400e; }
+  pre { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+  code { font-family: "SF Mono", Consolas, monospace; }
+  .highlight { background: #fef9c3; padding: 2px 4px; border-radius: 3px; }
+  .box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .box.warn { border-color: #f59e0b; background: #fffbeb; }
+  .box.info { border-color: #3b82f6; background: #eff6ff; }
+  .box.ok { border-color: #22c55e; background: #f0fdf4; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th { background: #f9fafb; text-align: left; padding: 10px 12px; border: 1px solid #e5e7eb; }
+  td { padding: 10px 12px; border: 1px solid #e5e7eb; vertical-align: top; }
+  .checklist li { margin: 6px 0; list-style: none; padding-left: 24px; position: relative; }
+  .checklist li::before { content: "☐"; position: absolute; left: 0; }
+  .arch { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 20px; font-family: monospace; font-size: 13px; line-height: 1.8; }
+  .arch .eslite { color: #93c5fd; }
+  .arch .gvm { color: #86efac; }
+  .arch .mosso { color: #fde68a; }
+
+  /* ── AIGC GTM 視覺架構圖 ── */
+  .ag-diagram { font-family: -apple-system, "Noto Sans TC", sans-serif; margin: 20px 0 8px; }
+  .ag-layer { border-radius: 8px; padding: 12px 16px 14px; position: relative; }
+  .ag-layer-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .55; }
+  .ag-box { border-radius: 6px; padding: 9px 13px; font-size: 13px; font-weight: 600; }
+  .ag-box .sub { font-size: 11px; font-weight: 400; margin-top: 2px; opacity: .65; }
+  .ag-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px; margin-left: 8px; vertical-align: middle; letter-spacing: .05em; }
+  .ag-events { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .ag-chip { font-size: 11px; font-family: "SF Mono", Consolas, monospace; padding: 2px 8px; border-radius: 3px; font-weight: 600; }
+
+  .ag-l1 { background: #eff6ff; border: 2px solid #3b82f6; }
+  .ag-l1 .ag-box { background: #dbeafe; border: 1px solid #93c5fd; color: #1e3a8a; }
+  .ag-l1 .ag-badge { background: #1e3a8a; color: #fff; }
+
+  .ag-l2 { background: #f0fdf4; border: 1.5px solid #86efac; margin: 0 24px; }
+  .ag-l2 .ag-box { background: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+  .ag-l2 .ag-badge { background: #15803d; color: #fff; }
+  .ag-gtm-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 7px 13px; font-size: 12px; margin-top: 7px; color: #7c2d12; font-weight: 600; }
+  .ag-gtm-box .ag-badge { background: #ea580c; color: #fff; }
+  .ag-chip-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+
+  .ag-l3 { background: #fdf4ff; border: 1.5px solid #d8b4fe; margin: 0 48px; }
+  .ag-l3 .ag-box { background: #f3e8ff; border: 1px solid #d8b4fe; color: #4a044e; }
+  .ag-l3 .ag-badge { background: #7e22ce; color: #fff; }
+  .ag-chip-purple { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+
+  .ag-arrow { display: flex; flex-direction: column; align-items: center; padding: 2px 0; }
+  .ag-vline { width: 2px; height: 18px; background: #d1d5db; }
+  .ag-pills { display: flex; gap: 12px; margin: 3px 0; }
+  .ag-pill { font-size: 10px; padding: 2px 9px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .ag-pill-down { background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; }
+  .ag-pill-up   { background: #ecfdf5; color: #059669; border: 1px solid #6ee7b7; }
+
+  .ag-ga4 { display: flex; justify-content: center; margin-top: 6px; }
+  .ag-ga4-box { background: #fef9c3; border: 1.5px solid #fde047; border-radius: 7px; padding: 8px 28px; font-size: 13px; font-weight: 700; color: #713f12; }
+
+  /* 高亮本層（加粗外框） */
+  .ag-highlight { border-width: 2.5px !important; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+</style>
+</head>
+<body>
+
+<!-- ─── 頁面標題 + 專案說明 ─── -->
+<h1>誠品工程師設定手冊</h1>
+<p class="meta">
+  專案：職場雷達 × 誠品線上 合作專案 &nbsp;|&nbsp;
+  負責方：<span class="badge badge-eslite">誠品 Eslite</span> &nbsp;|&nbsp;
+  文件版本：2026-06-11
+</p>
+
+<div class="box info">
+  <strong>你的角色</strong>：提供外層頁面框架（shell），把遠見的內容以 <code>&lt;iframe&gt;</code> 嵌入。<br>
+  你的頁面上<strong>不需要</strong>安裝任何 GTM 或 GA4 代碼，追蹤代碼全部在遠見那側。<br>
+  你只需要把 iframe src 的 URL 設定正確，並在 src 後面加一個 query string 參數。
+</div>
+
+<!-- ─── 整體架構（3 層 iframe + GTM 流程視覺圖）─── -->
+<h2>整體架構</h2>
+
+<!-- AIGC GTM 追蹤架構圖 —— 自動生成，勿手動修改 -->
+<div class="ag-diagram">
+
+  <div class="ag-layer ag-l1 ag-highlight">
+    <div class="ag-layer-label">Layer 1 — 誠品環境（你負責）</div>
+    <div class="ag-box">
+      eslite-aigc.html <span class="ag-badge">無 GTM</span>
+      <div class="sub">iframe src → gvm-aigc.html &nbsp;|&nbsp; 只需設定正確 URL</div>
+    </div>
+  </div>
+
+  <div class="ag-arrow">
+    <div class="ag-vline"></div>
+    <div class="ag-pills">
+      <span class="ag-pill ag-pill-down">↓ iframe embed</span>
+      <span class="ag-pill ag-pill-up">↑ iframeHeight postMessage</span>
+    </div>
+    <div class="ag-vline"></div>
+  </div>
+
+  <div class="ag-layer ag-l2">
+    <div class="ag-layer-label">Layer 2 — 遠見中介頁（對方負責）</div>
+    <div class="ag-box">
+      gvm-aigc.html <span class="ag-badge">GTM 在此</span>
+      <div class="sub">接收 postMessage → dataLayer.push() → GA4</div>
+    </div>
+    <div class="ag-gtm-box">GTM-5ZH7TSVB <span class="ag-badge">GTM</span>
+      <div class="ag-events" style="margin-top:5px">
+        <span class="ag-chip ag-chip-orange">aigc_cta_click</span>
+        <span class="ag-chip ag-chip-orange">book_buy_click</span>
+        <span class="ag-chip ag-chip-orange">aigc_question_click</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ag-arrow">
+    <div class="ag-vline"></div>
+    <div class="ag-pills">
+      <span class="ag-pill ag-pill-down">↓ iframe embed</span>
+      <span class="ag-pill ag-pill-up">↑ postMessage(event)</span>
+    </div>
+    <div class="ag-vline"></div>
+  </div>
+
+  <div class="ag-layer ag-l3">
+    <div class="ag-layer-label">Layer 3 — 摩速 AIGC 頁（對方負責）</div>
+    <div class="ag-box">
+      aigc.html <span class="ag-badge">無 GTM</span>
+      <div class="sub">點擊時 postMessage 給父層</div>
+    </div>
+    <div class="ag-events" style="margin-top:8px">
+      <span class="ag-chip ag-chip-purple">.cta-button 回到原始文章</span>
+      <span class="ag-chip ag-chip-purple">.connect-item 書籍卡片</span>
+      <span class="ag-chip ag-chip-purple">.ask 延伸問題</span>
+    </div>
+  </div>
+
+  <div class="ag-arrow"><div class="ag-vline" style="background:#fbbf24;height:14px"></div></div>
+  <div class="ag-ga4"><div class="ag-ga4-box">📊 GA4 — Google Analytics</div></div>
+</div>
+<!-- /AIGC GTM 追蹤架構圖 -->
+
+<!-- ─── ASCII 架構摘要（三方分工速覽）─── -->
+<div class="arch">
+<span class="eslite">誠品 (你負責)</span>
+  eslite.html            → &lt;iframe src="遠見 gvm-radarlist.html<span class="highlight" style="color:#fde68a">?partner=eslite.com</span>"&gt;
+  eslite-article.html    → &lt;iframe src="遠見 gvm-article.html<span class="highlight" style="color:#fde68a">?partner=eslite.com</span>"&gt;
+  eslite-aigc.html       → 獨立頁面，由摩速的問題連結開啟
+
+<span class="gvm">遠見 (對方負責)</span>
+  gvm-radarlist.html      → 有 GTM，追蹤文章列表點擊
+  gvm-article.html → 有 GTM，內嵌摩速的選書模組
+
+<span class="mosso">摩速 (對方負責)</span>
+  aigc-book.html → 選書推薦模組，發送追蹤事件給遠見
+</div>
+
+<!-- ─── 設定步驟（誠品工程師操作指南）─── -->
+<h2>你需要做的事（共 3 個步驟）</h2>
+
+<h3>步驟 1 — eslite.html：嵌入「職場雷達」列表頁</h3>
+<p>在你的 <code>eslite.html</code> 中，將 iframe src 設定為遠見提供的 URL，並在結尾加上 <code>?partner=eslite.com</code>。</p>
+
+<pre><code>&lt;iframe
+  id="contentFrame"
+  class="content-frame"
+  src="<span class="highlight">https://event.gvm.com.tw/…/gvm-radarlist.html?partner=eslite.com</span>"
+  scrolling="no"
+  title="職場雷達內容"
+&gt;&lt;/iframe&gt;</code></pre>
+
+<p>同時加入以下 <code>&lt;script&gt;</code>，讓遠見的 iframe 可以自動調整高度：</p>
+
+<pre><code>&lt;script&gt;
+window.addEventListener('message', function (e) {
+  if (e.data && typeof e.data.iframeHeight === 'number') {
+    document.getElementById('contentFrame').style.height = e.data.iframeHeight + 'px';
+  }
+});
+&lt;/script&gt;</code></pre>
+
+<h3>步驟 2 — eslite-article.html：嵌入「文章內頁」</h3>
+<p>與步驟 1 相同，只是 src 換成文章內頁的 URL：</p>
+
+<pre><code>&lt;iframe
+  id="contentFrame"
+  class="content-frame"
+  src="<span class="highlight">https://event.gvm.com.tw/…/gvm-article.html?partner=eslite.com</span>"
+  scrolling="no"
+  title="職場雷達內容"
+&gt;&lt;/iframe&gt;</code></pre>
+
+<p>同樣加入高度自適應的 <code>&lt;script&gt;</code>（與步驟 1 相同）。</p>
+
+<h3>步驟 3 — eslite-aigc.html：AIGC 深度解析頁</h3>
+<p>這是一個獨立的靜態頁面，由摩速的問題連結以 <code>target="_blank"</code> 開啟。<br>
+你只需要確保這個頁面可以正常存取，<strong>不需要</strong>做任何特別的追蹤設定。</p>
+
+<div class="box ok">
+  <strong>✓ 確認清單</strong>
+  <ul class="checklist" style="margin-top:10px">
+    <li>eslite.html 的 iframe src 結尾有 <code>?partner=eslite.com</code></li>
+    <li>eslite-article.html 的 iframe src 結尾有 <code>?partner=eslite.com</code></li>
+    <li>兩個頁面都有加入 iframeHeight postMessage 監聽器</li>
+    <li>eslite-aigc.html 可正常存取</li>
+  </ul>
+</div>
+
+<!-- ─── 說明：?partner 參數用途 ─── -->
+<h2>為什麼需要 <code>?partner=eslite.com</code>？</h2>
+<p>遠見的 GTM 追蹤代碼需要記錄「這次流量是從哪個合作夥伴網站來的」，以便在 GA4 報表中區分不同合作方的流量。這個值會作為 <code>partner_site</code> 自訂維度傳送到 GA4。</p>
+
+<table>
+  <tr><th>誰設定</th><th>放在哪裡</th><th>值</th></tr>
+  <tr><td>誠品</td><td>iframe src query string</td><td><code>?partner=eslite.com</code></td></tr>
+</table>
+
+<h2>iframe 技術規格</h2>
+<table>
+  <tr><th>屬性</th><th>值</th><th>說明</th></tr>
+  <tr><td><code>scrolling</code></td><td><code>no</code></td><td>由遠見的頁面控制自身捲動</td></tr>
+  <tr><td><code>style.height</code></td><td>由 postMessage 動態設定</td><td>需加入監聽器腳本</td></tr>
+  <tr><td><code>border</code></td><td><code>none</code> / <code>0</code></td><td>視覺整合用</td></tr>
+  <tr><td><code>width</code></td><td><code>100%</code></td><td>RWD 響應式</td></tr>
+</table>
+
+<div class="box warn">
+  <strong>⚠️ 注意</strong>：請勿在 iframe 標籤上設定 <code>referrerpolicy="no-referrer"</code> 或在頁面 <code>&lt;head&gt;</code> 加入 <code>&lt;meta name="referrer" content="no-referrer"&gt;</code>，會影響追蹤功能。
+</div>
+
+<!-- ─── 聯絡窗口 ─── -->
+<h2>聯絡窗口</h2>
+<table>
+  <tr><th>事項</th><th>聯絡方</th></tr>
+  <tr><td>iframe src URL（遠見頁面網址）</td><td>遠見工程師提供</td></tr>
+  <tr><td>GTM / GA4 追蹤問題</td><td>遠見工程師</td></tr>
+  <tr><td>eslite-aigc.html 內容</td><td>誠品自行維護</td></tr>
+</table>
+
+</body>
+</html>
