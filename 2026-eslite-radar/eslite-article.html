@@ -127,6 +127,7 @@ body {
 </div>
 
 <!-- ─── IFRAME 內嵌區塊：gvm-article.html（遠見文章詳情，含 GTM）─── -->
+<!-- src 不含 ?partner=，由下方 JS 動態帶入，確保 partner_site 永遠有值 -->
 <iframe
   id="contentFrame"
   class="content-frame"
@@ -134,6 +135,24 @@ body {
   scrolling="no"
   title="職場雷達內容"
 ></iframe>
+
+<!-- ─── Script：動態將 partner 參數附加至 iframe src ─── -->
+<!-- 邏輯：優先讀本頁 URL 的 ?partner= 參數（社群推播手動指定時使用）；
+     沒有則自動抓目前頁面 hostname（例如 cwgvjessie.github.io）。
+     這樣不管是誠品或未來其他合作夥伴，src 不需手動維護。-->
+<script>
+(function () {
+  var iframe = document.getElementById('contentFrame');
+  var urlParams = new URLSearchParams(window.location.search);
+  // 優先用 URL 帶的 ?partner=，否則自動抓 hostname
+  var partner = urlParams.get('partner') || window.location.hostname;
+  var base = iframe.getAttribute('src');
+  // 避免重複附加（src 已含 partner= 時不再處理）
+  if (base.indexOf('partner=') === -1) {
+    iframe.src = base + (base.indexOf('?') > -1 ? '&' : '?') + 'partner=' + encodeURIComponent(partner);
+  }
+})();
+</script>
 
 <!-- ─── FOOTER（誠品底部版權列）─── -->
 <div class="shell">
