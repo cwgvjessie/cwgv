@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  setup-guide-gvm.html — 遠見工程師設定手冊
+  對象：遠見工程師（Layer 2 負責方）
+  說明：GTM 安裝、dataLayer 頁面參數設定、追蹤事件清單、
+        postMessage 監聽 + 中繼機制。
+  相關檔案：gvm-radarlist.html / gvm-article.html / gvm-aigc.html
+  ============================================================ -->
+<html lang="zh-TW">
+<head>
+<!-- ─── Meta / Charset ─── -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>遠見工程師設定手冊 — 職場雷達合作專案</title>
+<!-- ─── Styles（文件樣式）─── -->
+<style>
+  body { font-family: -apple-system, "Noto Sans TC", sans-serif; max-width: 860px; margin: 40px auto; padding: 0 24px 80px; color: #1a1a1a; line-height: 1.7; }
+  h1 { font-size: 24px; border-bottom: 2px solid #1a1a1a; padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 40px; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid #16a34a; }
+  h3 { font-size: 15px; margin-top: 24px; margin-bottom: 8px; color: #374151; }
+  .meta { font-size: 13px; color: #6b7280; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+  .badge-eslite { background: #dbeafe; color: #1d4ed8; }
+  .badge-gvm { background: #dcfce7; color: #166534; }
+  .badge-mosso { background: #fef3c7; color: #92400e; }
+  pre { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+  code { font-family: "SF Mono", Consolas, monospace; font-size: 13px; }
+  .hl { background: #fef9c3; padding: 1px 4px; border-radius: 3px; }
+  .box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .box.warn { border-color: #f59e0b; background: #fffbeb; }
+  .box.info { border-color: #3b82f6; background: #eff6ff; }
+  .box.ok { border-color: #22c55e; background: #f0fdf4; }
+  .box.red { border-color: #ef4444; background: #fef2f2; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th { background: #f9fafb; text-align: left; padding: 10px 12px; border: 1px solid #e5e7eb; }
+  td { padding: 10px 12px; border: 1px solid #e5e7eb; vertical-align: top; }
+  .checklist li { margin: 6px 0; list-style: none; padding-left: 24px; position: relative; }
+  .checklist li::before { content: "☐"; position: absolute; left: 0; }
+  .arch { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 20px; font-family: monospace; font-size: 13px; line-height: 1.8; }
+  .arch .eslite { color: #93c5fd; }
+  .arch .gvm { color: #86efac; }
+  .arch .mosso { color: #fde68a; }
+  .event-table td:first-child { font-family: monospace; font-size: 12px; }
+  .tag { display: inline-block; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 3px; padding: 1px 6px; font-size: 12px; font-family: monospace; }
+
+  /* ── AIGC GTM 視覺架構圖 ── */
+  .ag-diagram { font-family: -apple-system, "Noto Sans TC", sans-serif; margin: 20px 0 8px; }
+  .ag-layer { border-radius: 8px; padding: 12px 16px 14px; position: relative; }
+  .ag-layer-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .55; }
+  .ag-box { border-radius: 6px; padding: 9px 13px; font-size: 13px; font-weight: 600; }
+  .ag-box .sub { font-size: 11px; font-weight: 400; margin-top: 2px; opacity: .65; }
+  .ag-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px; margin-left: 8px; vertical-align: middle; letter-spacing: .05em; }
+  .ag-events { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .ag-chip { font-size: 11px; font-family: "SF Mono", Consolas, monospace; padding: 2px 8px; border-radius: 3px; font-weight: 600; }
+  .ag-l1 { background: #eff6ff; border: 1.5px solid #93c5fd; }
+  .ag-l1 .ag-box { background: #dbeafe; border: 1px solid #93c5fd; color: #1e3a8a; }
+  .ag-l1 .ag-badge { background: #1e3a8a; color: #fff; }
+  .ag-l2 { background: #f0fdf4; border: 2px solid #22c55e; margin: 0 24px; }
+  .ag-l2 .ag-box { background: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+  .ag-l2 .ag-badge { background: #15803d; color: #fff; }
+  .ag-gtm-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 7px 13px; font-size: 12px; margin-top: 7px; color: #7c2d12; font-weight: 600; }
+  .ag-gtm-box .ag-badge { background: #ea580c; color: #fff; }
+  .ag-chip-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+  .ag-l3 { background: #fdf4ff; border: 1.5px solid #d8b4fe; margin: 0 48px; }
+  .ag-l3 .ag-box { background: #f3e8ff; border: 1px solid #d8b4fe; color: #4a044e; }
+  .ag-l3 .ag-badge { background: #7e22ce; color: #fff; }
+  .ag-chip-purple { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .ag-arrow { display: flex; flex-direction: column; align-items: center; padding: 2px 0; }
+  .ag-vline { width: 2px; height: 18px; background: #d1d5db; }
+  .ag-pills { display: flex; gap: 12px; margin: 3px 0; }
+  .ag-pill { font-size: 10px; padding: 2px 9px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .ag-pill-down { background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; }
+  .ag-pill-up   { background: #ecfdf5; color: #059669; border: 1px solid #6ee7b7; }
+  .ag-ga4 { display: flex; justify-content: center; margin-top: 6px; }
+  .ag-ga4-box { background: #fef9c3; border: 1.5px solid #fde047; border-radius: 7px; padding: 8px 28px; font-size: 13px; font-weight: 700; color: #713f12; }
+  .ag-highlight { border-width: 2.5px !important; box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+</style>
+</head>
+<body>
+
+<!-- ─── 頁面標題 + 專案說明 ─── -->
+<h1>遠見工程師設定手冊</h1>
+<p class="meta">
+  專案：職場雷達 × 誠品線上 合作專案 &nbsp;|&nbsp;
+  負責方：<span class="badge badge-gvm">遠見 GVM</span> &nbsp;|&nbsp;
+  文件版本：2026-06-11
+</p>
+
+<div class="box info">
+  <strong>你的角色</strong>：負責兩支內容頁面（<code>gvm-radarlist.html</code>、<code>gvm-article.html</code>），
+  這兩支頁面安裝了 GTM 追蹤代碼，是整個合作案的<strong>事件追蹤核心</strong>。<br>
+  你需要：正確安裝 GTM、處理來自摩速 iframe 的 postMessage 事件、以及維護所有 dataLayer 事件推送邏輯。
+</div>
+
+<!-- ─── 整體架構（3 層 iframe + GTM 流程視覺圖）─── -->
+<h2>整體架構</h2>
+
+<!-- AIGC GTM 追蹤架構圖 —— 自動生成，勿手動修改 -->
+<div class="ag-diagram">
+
+  <div class="ag-layer ag-l1">
+    <div class="ag-layer-label">Layer 1 — 誠品環境（對方負責）</div>
+    <div class="ag-box">
+      eslite-aigc.html <span class="ag-badge">無 GTM</span>
+      <div class="sub">iframe src → gvm-aigc.html</div>
+    </div>
+  </div>
+
+  <div class="ag-arrow">
+    <div class="ag-vline"></div>
+    <div class="ag-pills">
+      <span class="ag-pill ag-pill-down">↓ iframe embed</span>
+      <span class="ag-pill ag-pill-up">↑ iframeHeight postMessage</span>
+    </div>
+    <div class="ag-vline"></div>
+  </div>
+
+  <div class="ag-layer ag-l2 ag-highlight">
+    <div class="ag-layer-label">Layer 2 — 遠見中介頁（你負責）</div>
+    <div class="ag-box">
+      gvm-aigc.html <span class="ag-badge">GTM 在此</span>
+      <div class="sub">接收 aigc.html postMessage → dataLayer.push() → GTM → GA4</div>
+    </div>
+    <div class="ag-gtm-box">GTM-5ZH7TSVB <span class="ag-badge">GTM</span> &nbsp;→&nbsp; G-WRLDT210S3
+      <div class="ag-events" style="margin-top:5px">
+        <span class="ag-chip ag-chip-orange">aigc_cta_click</span>
+        <span class="ag-chip ag-chip-orange">book_buy_click</span>
+        <span class="ag-chip ag-chip-orange">aigc_question_click</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ag-arrow">
+    <div class="ag-vline"></div>
+    <div class="ag-pills">
+      <span class="ag-pill ag-pill-down">↓ iframe embed</span>
+      <span class="ag-pill ag-pill-up">↑ postMessage(event)</span>
+    </div>
+    <div class="ag-vline"></div>
+  </div>
+
+  <div class="ag-layer ag-l3">
+    <div class="ag-layer-label">Layer 3 — 摩速 AIGC 頁（對方負責）</div>
+    <div class="ag-box">
+      aigc.html <span class="ag-badge">無 GTM</span>
+      <div class="sub">點擊時 postMessage 給父層</div>
+    </div>
+    <div class="ag-events" style="margin-top:8px">
+      <span class="ag-chip ag-chip-purple">.cta-button 回到原始文章</span>
+      <span class="ag-chip ag-chip-purple">.connect-item 書籍卡片</span>
+      <span class="ag-chip ag-chip-purple">.ask 延伸問題</span>
+    </div>
+  </div>
+
+  <div class="ag-arrow"><div class="ag-vline" style="background:#fbbf24;height:14px"></div></div>
+  <div class="ag-ga4"><div class="ag-ga4-box">📊 GA4 — Google Analytics</div></div>
+</div>
+<!-- /AIGC GTM 追蹤架構圖 -->
+
+<!-- ─── GTM 設定資訊 ─── -->
+<div class="arch">
+<span class="eslite">誠品 (對方負責)</span>
+  eslite.html          → &lt;iframe src="你的 gvm-radarlist.html?partner=eslite.com"&gt;
+  eslite-article.html  → &lt;iframe src="你的 gvm-article.html?partner=eslite.com"&gt;
+
+<span class="gvm">遠見 (你負責) ← GTM 在這裡</span>
+  gvm-radarlist.html         → GTM-5ZH7TSVB 安裝於此，追蹤文章列表互動
+  gvm-article.html  → GTM-5ZH7TSVB 安裝於此，接收摩速的 postMessage
+
+<span class="mosso">摩速 (對方負責)</span>
+  aigc-book.html  → 嵌入在你的 article-main 內，發 postMessage 回來
+</div>
+
+<h2>GTM 設定資訊</h2>
+<table>
+  <tr><th>項目</th><th>值</th></tr>
+  <tr><td>GTM 容器 ID</td><td><code>GTM-5ZH7TSVB</code></td></tr>
+  <tr><td>GA4 Measurement ID</td><td><code>G-WRLDT210S3</code></td></tr>
+  <tr><td>容器名稱</td><td>遠見 Aigc 外部合作</td></tr>
+</table>
+
+<div class="box warn">
+  <strong>⚠️ 重要</strong>：GTM 代碼段必須安裝在兩支頁面上。沒有 GTM，所有 GA4 事件都不會發送。
+</div>
+
+<!-- ─── 檔案一：gvm-radarlist.html 設定細節 ─── -->
+<h2>檔案一：gvm-radarlist.html（職場雷達列表頁）</h2>
+
+<h3>1-1 GTM 代碼段安裝位置</h3>
+<p>在 <code>&lt;head&gt;</code> 最頂端（其他 script 之前）先推送 dataLayer 初始化，再放 GTM 代碼段：</p>
+
+<pre><code>&lt;!-- 【必須在 GTM 之前】頁面類型標記 --&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ page_type: 'radar_list' });
+&lt;/script&gt;
+
+&lt;!-- Google Tag Manager --&gt;
+&lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5ZH7TSVB');&lt;/script&gt;
+&lt;!-- End Google Tag Manager --&gt;</code></pre>
+
+<p>在 <code>&lt;body&gt;</code> 開頭加 noscript 備援：</p>
+<pre><code>&lt;noscript&gt;&lt;iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZH7TSVB"
+height="0" width="0" style="display:none;visibility:hidden"&gt;&lt;/iframe&gt;&lt;/noscript&gt;</code></pre>
+
+<h3>1-2 事件追蹤腳本</h3>
+<p>在 <code>&lt;/body&gt;</code> 前加入以下追蹤腳本：</p>
+
+<pre><code>&lt;script&gt;
+(function () {
+  window.dataLayer = window.dataLayer || [];
+
+  // 主列表文章點擊
+  document.querySelectorAll('.articles-wrap .article-link').forEach(function (link, idx) {
+    link.addEventListener('click', function () {
+      window.dataLayer.push({
+        event: 'radar_article_click',
+        click_area: 'main_list',
+        article_position: idx + 1,
+        article_category: (link.querySelector('.cat-pill') || {}).textContent || '',
+        article_title: (link.querySelector('.article-headline') || {}).textContent || '',
+        link_url: link.href
+      });
+    });
+  });
+
+  // 近期熱門文章按鈕點擊
+  var recentBtn = document.getElementById('recentBtn');
+  if (recentBtn) {
+    recentBtn.addEventListener('click', function () {
+      window.dataLayer.push({ event: 'radar_recent_open' });
+    });
+  }
+
+  // Modal 內文章點擊（事件委派）
+  var modalBody = document.getElementById('modalBody');
+  if (modalBody) {
+    modalBody.addEventListener('click', function (e) {
+      var row = e.target.closest('.article-row');
+      if (!row) return;
+      var section = row.closest('.date-section');
+      var rows = section ? Array.prototype.slice.call(section.querySelectorAll('.article-row')) : [];
+      window.dataLayer.push({
+        event: 'radar_article_click',
+        click_area: 'recent_modal',
+        article_position: rows.indexOf(row) + 1,
+        recent_reco_date: section ? (section.querySelector('.date-heading') || {}).textContent || '' : '',
+        article_category: (row.querySelector('.cat-pill') || {}).textContent || '',
+        article_title: (row.querySelector('.article-row-title') || {}).textContent || '',
+        link_url: row.href
+      });
+    });
+  }
+})();
+&lt;/script&gt;</code></pre>
+
+<h3>1-3 iframe 高度回傳（給誠品用）</h3>
+<pre><code>&lt;script&gt;
+(function () {
+  function sendHeight() {
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    window.parent.postMessage({ iframeHeight: h }, '*');
+  }
+  window.addEventListener('load', function () {
+    sendHeight();
+    setTimeout(sendHeight, 600);
+  });
+  window.addEventListener('resize', sendHeight);
+  new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
+})();
+&lt;/script&gt;</code></pre>
+
+<!-- ─── 檔案二：gvm-article.html 設定細節 ─── -->
+<h2>檔案二：gvm-article.html（文章內頁）</h2>
+
+<h3>2-1 GTM 代碼段安裝</h3>
+<p>與 gvm-radarlist.html 相同，但 <code>page_type</code> 值不同：</p>
+<pre><code>&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ page_type: 'gvm-article' });  // ← 注意這裡不同
+&lt;/script&gt;
+&lt;!-- 接著放 GTM 代碼段（同上）--&gt;</code></pre>
+
+<h3>2-2 嵌入摩速的選書模組</h3>
+<p>在頁面適當位置嵌入摩速的 iframe（URL 由摩速提供）：</p>
+<pre><code>&lt;iframe
+  id="book-frame"
+  src="<span class="hl">https://[摩速提供的網域]/aigc-book.html</span>"
+  width="100%"
+  scrolling="no"
+  style="border:none;"
+  title="誠品選書推薦"
+&gt;&lt;/iframe&gt;</code></pre>
+
+<h3>2-3 postMessage 監聽器（接收摩速事件 + 高度）</h3>
+<p>這段程式碼讓你的頁面能接收摩速 iframe 傳來的事件，並 push 到 GTM dataLayer：</p>
+<pre><code>&lt;script&gt;
+(function () {
+  window.addEventListener('message', function (e) {
+    // 高度自適應
+    if (e.data && e.data.iframeHeight) {
+      var f = document.getElementById('book-frame');
+      if (f) f.style.height = e.data.iframeHeight + 'px';
+    }
+    // 接收摩速的追蹤事件，轉發到 GTM dataLayer
+    if (e.data && e.data.event === 'book_buy_click') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: e.data.event }, e.data));
+    }
+  });
+})();
+&lt;/script&gt;</code></pre>
+
+<div class="box red">
+  <strong>⚠️ 安全性注意</strong>：目前監聽器沒有限制 postMessage 來源（<code>origin</code> 為 <code>*</code>）。<br>
+  如需加強安全性，可改為：<code>if (e.origin !== '摩速的網域') return;</code>
+</div>
+
+<h3>2-4 「繼續閱讀」展開追蹤</h3>
+<pre><code>&lt;script&gt;
+document.getElementById('readMoreBtn').addEventListener('click', function () {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'article_read_more' });
+});
+&lt;/script&gt;</code></pre>
+
+<h3>2-5 iframe 高度回傳（給誠品用）</h3>
+<p>與 gvm-radarlist.html 相同的 sendHeight 腳本（見 1-3）。</p>
+
+<!-- ─── 檔案三：gvm-aigc.html 設定細節 ─── -->
+<h2>檔案三：gvm-aigc.html（AIGC 深度解析中介頁）</h2>
+
+<h3>3-1 GTM 代碼段安裝</h3>
+<p>與其他兩支頁面相同，但 <code>page_type</code> 值為 <code>aigc-article</code>：</p>
+<pre><code>&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ page_type: 'aigc-article' });  // ← AIGC 深度解析頁專用
+&lt;/script&gt;
+&lt;!-- 接著放 GTM 代碼段（同上）--&gt;</code></pre>
+
+<h3>3-2 postMessage 監聽器（接收 aigc.html 事件）</h3>
+<p>本頁直接嵌入摩速的 <code>aigc.html</code>（Layer 3），需監聽其傳出的事件並 push 至 dataLayer：</p>
+<pre><code>&lt;script&gt;
+(function () {
+  window.dataLayer = window.dataLayer || [];
+
+  var ALLOWED_EVENTS = [
+    'aigc_back-to-article_click',  // 「回到原始文章」CTA 點擊
+    'book_buy_click'               // 誠品選書「立即入手」點擊
+  ];
+
+  window.addEventListener('message', function (e) {
+    var data = e.data;
+    if (!data || typeof data !== 'object') return;
+
+    // 高度自適應：中繼給上層 eslite-aigc.html
+    if (typeof data.iframeHeight === 'number') {
+      var frame = document.getElementById('aigcFrame');
+      if (frame) frame.style.height = data.iframeHeight + 'px';
+      try { window.parent.postMessage({ iframeHeight: data.iframeHeight }, '*'); } catch (_) {}
+      return;
+    }
+
+    // 白名單事件 push 至 GTM dataLayer
+    if (data.event && ALLOWED_EVENTS.indexOf(data.event) !== -1) {
+      window.dataLayer.push(data);
+    }
+  });
+})();
+&lt;/script&gt;</code></pre>
+
+<h2>所有 GA4 事件一覽</h2>
+<table class="event-table">
+  <tr><th>事件名稱</th><th>觸發時機</th><th>關鍵參數</th><th>來源</th></tr>
+  <tr>
+    <td><code>page_view</code></td>
+    <td>頁面載入</td>
+    <td><code>page_type</code>、<code>partner_site</code></td>
+    <td>GTM 自動</td>
+  </tr>
+  <tr>
+    <td><code>radar_article_click</code></td>
+    <td>點擊文章列表或 Modal 內文章</td>
+    <td><code>click_area</code>、<code>article_position</code>、<code>article_category</code>、<code>article_title</code>、<code>link_url</code></td>
+    <td>gvm-radarlist.html 腳本</td>
+  </tr>
+  <tr>
+    <td><code>radar_recent_open</code></td>
+    <td>點擊「近期熱門文章」按鈕</td>
+    <td>—</td>
+    <td>gvm-radarlist.html 腳本</td>
+  </tr>
+  <tr>
+    <td><code>article_read_more</code></td>
+    <td>點擊「繼續閱讀」展開文章</td>
+    <td>—</td>
+    <td>gvm-article.html 腳本</td>
+  </tr>
+  <tr>
+    <td><code>book_buy_click</code></td>
+    <td>點擊「立即入手」</td>
+    <td><code>book_title</code>、<code>link_url</code></td>
+    <td>摩速 → postMessage → 你的 listener</td>
+  </tr>
+  <tr>
+    <td><code>aigc_back-to-article_click</code></td>
+    <td>點擊「回到原始文章」CTA</td>
+    <td><code>link_text</code>、<code>link_url</code></td>
+    <td>摩速 aigc.html → postMessage → gvm-aigc.html listener</td>
+  </tr>
+</table>
+
+<h2>partner_site 說明</h2>
+<p><code>partner_site</code> 是 GTM 自訂 JavaScript 變數，讀取 URL 的 <code>?partner=</code> 參數，用來區分是哪個合作夥伴嵌入了你的頁面。</p>
+
+<table>
+  <tr><th>合作夥伴</th><th>iframe src 範例</th><th>GA4 記錄值</th></tr>
+  <tr><td>誠品</td><td><code>gvm-radarlist.html?partner=eslite.com</code></td><td><code>eslite.com</code></td></tr>
+  <tr><td>其他未來合作方 A</td><td><code>gvm-radarlist.html?partner=partner-a.com</code></td><td><code>partner-a.com</code></td></tr>
+</table>
+
+<p>如果誠品沒有傳 <code>?partner=</code> 參數，GA4 會記錄 <code>(none)</code>。請提醒誠品工程師加上此參數。</p>
+
+<div class="box ok">
+  <strong>✓ 上線前確認清單</strong>
+  <ul class="checklist" style="margin-top:10px">
+    <li>gvm-radarlist.html 已安裝 GTM-5ZH7TSVB，page_type: 'radar_list'</li>
+    <li>gvm-article.html 已安裝 GTM-5ZH7TSVB，page_type: 'gvm-article'</li>
+    <li>gvm-aigc.html 已安裝 GTM-5ZH7TSVB，page_type: 'aigc-article'</li>
+    <li>GTM 代碼段在 dataLayer 初始化之後</li>
+    <li>gvm-article.html 的 postMessage listener 已加入（book_buy_click）</li>
+    <li>gvm-aigc.html 的 postMessage listener 已加入（aigc_back-to-article_click、book_buy_click）</li>
+    <li>book-frame iframe src 指向正確的摩速網址</li>
+    <li>三支頁面都有 sendHeight postMessage 腳本</li>
+    <li>在 Tag Assistant 測試所有事件</li>
+  </ul>
+</div>
+
+<h2>聯絡窗口</h2>
+<table>
+  <tr><th>事項</th><th>聯絡方</th></tr>
+  <tr><td>誠品 iframe URL 確認（需要 ?partner= 參數）</td><td>誠品工程師</td></tr>
+  <tr><td>摩速 book.html iframe URL</td><td>摩速工程師</td></tr>
+  <tr><td>GTM 容器管理</td><td>遠見 DDC</td></tr>
+  <tr><td>GA4 報表</td><td>遠見 DDC</td></tr>
+</table>
+
+</body>
+</html>

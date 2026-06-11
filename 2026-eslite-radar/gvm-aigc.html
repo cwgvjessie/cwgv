@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  gvm-aigc.html — 遠見 GTM 中介頁（Layer 2）
+  用途：作為誠品（Layer 1）與摩速（Layer 3）之間的 GTM 事件中繼站。
+        本頁由遠見工程師控制，負責：
+          1. 載入 GTM-5ZH7TSVB（連結 GA4 G-WRLDT210S3）
+          2. 內嵌摩速 aigc.html（Layer 3）
+          3. 接收 aigc.html 的 postMessage → push 至 dataLayer
+          4. 中繼 iframeHeight → 往上傳給 eslite-aigc.html（Layer 1）
+
+  追蹤事件（ALLOWED_EVENTS）：
+    - aigc_back-to-article_click  「回到原始文章」CTA 點擊
+    - book_buy_click              誠品選書「立即入手」點擊
+  ============================================================ -->
+<html lang="zh-Hant">
+<head>
+  <!-- ─── Meta / Charset ─── -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>GVM AIGC Proxy</title>
+
+  <!-- ─── Google Tag Manager（GTM-5ZH7TSVB）─── -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5ZH7TSVB');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- ─── Styles：透明容器讓 iframe 撐滿視窗 ─── -->
+  <style>
+    /* ── Reset ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; }
+    /* ── aigcFrame：無邊框全寬 iframe，高度由 JS 動態設定 ── */
+    iframe#aigcFrame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── GTM noscript（停用 JS 時的備援觸發 pixel）─── -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZH7TSVB"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- ─── 開發說明標示（測試用，可移除）─── -->
+<P> ↓ ↓ 內嵌摩速aigc頁 https://jessie79279-d9f4cd.gitlab.io/2026-eslite-radar/aigc.html" <p>
+
+<!-- ─── IFRAME 內嵌區塊：aigc.html（摩速 AIGC 內容頁，Layer 3）─── -->
+<iframe
+  id="aigcFrame"
+  src="https://jessie79279-d9f4cd.gitlab.io/2026-eslite-radar/aigc.html"
+  scrolling="no"
+  title="深度解析內容"
+></iframe>
+
+<!-- ─── Script：postMessage 中繼 + GTM 事件接收 ─── -->
+<script>
+(function () {
+  'use strict';
+
+  // 初始化 GTM dataLayer（GTM 載入後會自動使用）
+  window.dataLayer = window.dataLayer || [];
+
+  /* ── 監聽來自 aigc.html（Layer 3）的 postMessage ── */
+  window.addEventListener('message', function (e) {
+    var data = e.data;
+    // 忽略非物件訊息（例如字串型的第三方訊息）
+    if (!data || typeof data !== 'object') return;
+
+    /* 1. iframeHeight 中繼：
+          - 更新本頁 #aigcFrame 的高度
+          - 往上轉發給 eslite-aigc.html（Layer 1）*/
+    if (typeof data.iframeHeight === 'number') {
+      var frame = document.getElementById('aigcFrame');
+      if (frame) frame.style.height = data.iframeHeight + 'px';
+      try { window.parent.postMessage({ iframeHeight: data.iframeHeight }, '*'); } catch (_) {}
+      return;
+    }
+
+    /* 2. GA4 追蹤事件：白名單過濾後 push 至 dataLayer（由 GTM 觸發 GA4）*/
+    var ALLOWED_EVENTS = [
+      'aigc_back-to-article_click',  // 「回到原始文章」CTA 點擊
+      'book_buy_click'               // 誠品選書「立即入手」點擊
+    ];
+    if (data.event && ALLOWED_EVENTS.indexOf(data.event) !== -1) {
+      window.dataLayer.push(data);
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>

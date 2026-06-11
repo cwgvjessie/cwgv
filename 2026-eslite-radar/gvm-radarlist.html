@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  gvm-radarlist.html — 遠見文章列表頁（Layer 2）
+  用途：職場雷達文章列表，由誠品 eslite.html（Layer 1）iframe 內嵌。
+  GTM：GTM-5ZH7TSVB → GA4 G-WRLDT210S3
+  頁面參數：page_type = 'radar_list'
+
+  追蹤事件：
+    - radar_article_click   文章列表點擊（click_area: main_list）
+    - radar_recent_open     近期熱門文章 Modal 開啟
+    - radar_article_click   Modal 內文章點擊（click_area: recent_modal）
+
+  功能：
+    - 三類別文章列表（高階決策 / 管理實務 / 職場成長）
+    - 近期熱門文章 Modal（14 天資料，按日期分組）
+    - postMessage sendHeight：自動回報頁面高度給 eslite.html
+  ============================================================ -->
+<html lang="zh-TW">
+<head>
+<!-- ─── Meta / Charset ─── -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>文章列表 — 職場雷達 — 誠品線上</title>
+<!-- ─── Google Fonts ─── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Noto+Sans+TC:ital,wght@0,300;0,400;0,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+
+
+<!-- ─── dataLayer 頁面參數預設：須在 GTM 載入前 push，page_view 才讀得到 ─── -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ page_type: 'radar_list' });
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5ZH7TSVB');</script>
+<!-- End Google Tag Manager -->
+
+
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+/* 強制防止瀏覽器合成斜體 */
+* { font-style: normal; font-synthesis: none; }
+
+:root {
+  --white: #FFFFFF;
+  --off-white: #F9F7F4;
+  --rule-light: #E8E4DC;
+  --rule: #D4CEC4;
+  --text-hint: #AFA9A0;
+  --text-muted: #847E76;
+  --text-body: #3D3830;
+  --text-head: #1A1710;
+  --c-high: #2B1F5C;
+  --c-high-bg: #F0EEF8;
+  --c-mgmt: #0D3D2E;
+  --c-mgmt-bg: #EAF3EE;
+  --c-grow: #5C2800;
+  --c-grow-bg: #F5EDE4;
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--white);
+  color: var(--text-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  border-bottom: 1px solid var(--text-head);
+}
+.navbar-left { display: flex; align-items: center; gap: 20px; }
+.navbar-brand {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  color: var(--text-head);
+  text-transform: uppercase;
+}
+.navbar-divider { width: 1px; height: 12px; background: var(--rule); }
+.navbar-sub { font-size: 14px; letter-spacing: 0.08em; color: var(--text-muted); text-decoration: none; }
+.navbar-sub:hover { color: var(--text-head); }
+.navbar-right { font-size: 14px; letter-spacing: 0.1em; color: var(--text-hint); }
+
+.hero {
+  padding: 44px 0 36px;
+  border-bottom: 0.5px solid var(--rule-light);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+}
+.hero-eyebrow {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  color: var(--text-hint);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--text-head);
+  line-height: 1.1;
+}
+.hero-title em { font-style: normal; font-weight: 600; }
+.hero-date-block { text-align: right; }
+.hero-date-num {
+  font-family: 'EB Garamond', serif;
+  font-size: 28px;
+  color: var(--text-head);
+  letter-spacing: 0.02em;
+  display: block;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.hero-date-label { font-size: 14px; letter-spacing: 0.14em; color: var(--text-hint); text-transform: uppercase; }
+
+.articles-wrap { display: grid; grid-template-columns: 1fr; }
+
+.section-row {
+  border-bottom: 0.5px solid var(--rule-light);
+}
+
+.article-link {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  align-items: center;
+  gap: 0 20px;
+  padding: 28px 20px 28px 28px;
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--transition);
+}
+.article-link:hover { background: var(--off-white); }
+
+.article-thumb {
+  width: 130px;
+  aspect-ratio: 756/592;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+
+.cat-pill {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  padding: 3px 9px;
+  border-radius: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.high .cat-pill { background: var(--c-high-bg); color: var(--c-high); }
+.mgmt .cat-pill { background: var(--c-mgmt-bg); color: var(--c-mgmt); }
+.grow .cat-pill { background: var(--c-grow-bg); color: var(--c-grow); }
+
+.article-headline {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--text-head);
+  margin-bottom: 10px;
+  max-width: 560px;
+}
+.article-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  max-width: 520px;
+  margin-bottom: 16px;
+}
+.article-meta { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-hint); letter-spacing: 0.04em; }
+
+/* ── 近期熱門文章按鈕 ── */
+.recent-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--text-head);
+  background: transparent;
+  border: 0.5px solid var(--text-head);
+  border-radius: 2px;
+  padding: 5px 12px;
+  cursor: pointer;
+  text-transform: none;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: background var(--transition), color var(--transition);
+  margin-bottom: 8px;
+}
+.recent-btn:hover { background: var(--text-head); color: var(--white); }
+.recent-btn::after { content: '›'; font-size: 14px; line-height: 1; }
+
+/* ── Modal overlay ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 23, 16, 0.48);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+  padding: 48px 20px 40px;
+  overflow-y: auto;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal-card {
+  background: var(--white);
+  width: 100%;
+  max-width: 600px;
+  border-radius: 3px;
+  overflow: hidden;
+  transform: translateY(14px);
+  transition: transform 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: 82vh;
+}
+.modal-overlay.open .modal-card { transform: translateY(0); }
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.modal-header-left {}
+.modal-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-head);
+  letter-spacing: 0.05em;
+}
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 0 2px 8px;
+  transition: color var(--transition);
+}
+.modal-close:hover { color: var(--text-head); }
+
+.modal-body { overflow-y: auto; flex: 1; }
+
+/* ── Modal date section ── */
+.date-section {}
+.date-heading {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  padding: 12px 24px 9px;
+  background: var(--off-white);
+  border-top: 0.5px solid var(--rule-light);
+  border-bottom: 0.5px solid var(--rule-light);
+}
+.date-section:first-child .date-heading { border-top: none; }
+
+.article-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 24px;
+  border-bottom: 0.5px solid var(--rule-light);
+  transition: background var(--transition);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.article-row:last-child { border-bottom: none; }
+.article-row:hover { background: var(--off-white); }
+
+.article-row .cat-pill {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  align-self: center;
+  min-width: 54px;
+  text-align: center;
+}
+.article-row-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--text-head);
+  flex: 1;
+}
+
+/* ── Footer ── */
+.site-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--rule-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.06em;
+}
+.site-footer a {
+  color: var(--text-hint);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.site-footer a:hover { color: var(--text-head); }
+@media (max-width: 600px) {
+  .container { padding: 0 20px 60px; }
+  .hero-title { font-size: 30px; }
+  .article-link { grid-template-columns: 1fr; }
+  .article-thumb { display: none; }
+  .article-link { padding: 28px 0; }
+}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZH7TSVB"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- ─── 主要內容容器（最大寬度 800px）─── -->
+<div class="container">
+
+  <!-- ─── HERO 區：頁面標題 + 近期熱門文章按鈕 + 日期 ─── -->
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">遠見雜誌</div>
+      <a href="gvm-radarlist.html" style="text-decoration:none;color:inherit;"><div class="hero-title"><em>職場雷達</div></a>
+    </div>
+    <div class="hero-date-block">
+      <button class="recent-btn" id="recentBtn">近期熱門文章</button>
+      <span class="hero-date-num" id="heroDate"></span>
+    </div>
+  </div>
+
+  <!-- ─── 文章列表（三類別：高階決策 / 管理實務 / 職場成長）─── -->
+  <div class="articles-wrap">
+
+    <!-- 高階決策 -->
+    <div class="section-row high">
+      <a class="article-link" href="https://cwgvjessie.github.io/cwgv/2026-eslite-radar/eslite-article.html" target="_top">
+        <div>
+          <div class="cat-pill">高階決策</div>
+          <div class="article-headline">AI競賽白熱化！台積電美國擴廠背後盤算曝光</div>
+          <div class="article-desc">台積電加速擴大美國投資，亞利桑那的第三座晶圓廠提前封頂，顯示在 AI 浪潮下，全球供應鏈布局正式升級。面對地緣政治壓力與客戶需求劇變，美國布局已成…</div>
+        </div>
+        <img class="article-thumb" src="images/cover-1.jpg" alt="AI競賽白熱化！台積電美國擴廠背後盤算曝光">
+      </a>
+    </div>
+
+    <!-- 管理實務 -->
+    <div class="section-row mgmt">
+      <a class="article-link" href="https://cwgvjessie.github.io/cwgv/2026-eslite-radar/eslite-article.html" target="_top">
+        <div>
+          <div class="cat-pill">管理實務</div>
+          <div class="article-headline">人際間合不來就「停損」？與其忍無可忍才斷交，不如先修復失衡關係</div>
+          <div class="article-desc">在人際關係中，「停損」常被濫用為逃避衝突的藉口。然而，忍耐至極限才爆發往往導致關係破裂，而非真正解決問題。在不適感出現時便練習「表達」，清楚溝通…</div>
+        </div>
+        <img class="article-thumb" src="images/cover-2.jpg" alt="人際間合不來就「停損」？與其忍無可忍才斷交，不如先修復失衡關係">
+      </a>
+    </div>
+
+    <!-- 職場成長 -->
+    <div class="section-row grow">
+      <a class="article-link" href="https://cwgvjessie.github.io/cwgv/2026-eslite-radar/eslite-article.html" target="_top">
+        <div>
+          <div class="cat-pill">職場成長</div>
+          <div class="article-headline">AI Agent 如何管理？企業導入前必懂安全三防線</div>
+          <div class="article-desc">當 AI 從「回答問題的顧問」變成「自動執行任務的實習生」，企業面對的不再只是幻覺與資料外洩，而是系統可能在幾秒鐘內被摧毀的營運危機。給予 AI…</div>
+        </div>
+        <img class="article-thumb" src="images/cover-3.jpg" alt="AI Agent 如何管理？企業導入前必懂安全三防線">
+      </a>
+    </div>
+
+  </div>
+
+
+</div>
+
+<!-- ── 近期熱門文章 Modal ── -->
+<div class="modal-overlay" id="recentModal">
+  <div class="modal-card" id="recentModalCard">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-title">近期熱門文章</div>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="關閉">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ─── Script：近期熱門文章 Modal（資料定義 + 建立 DOM + 開關控制 + 歷史紀錄）─── -->
+<script>
+// 近 14 天文章資料（手動更新）
+const ARTICLES = [
+  { date: '2026.06.03', items: [
+    { cat: 'high', label: '高階決策', title: '台積電與三星的地緣博弈：先進製程版圖爭奪進入白熱化' },
+    { cat: 'mgmt', label: '管理實務', title: '主管最怕聽到「我盡力了」：如何讓團隊真正承擔結果？' },
+    { cat: 'grow', label: '職場成長', title: '職場新人如何在90天內建立不可取代的核心定位？' },
+  ]},
+  { date: '2026.06.02', items: [
+    { cat: 'high', label: '高階決策', title: '輝達黃仁勳的下一步：AI晶片霸主如何守住護城河？' },
+    { cat: 'mgmt', label: '管理實務', title: '混合辦公兩年後的真相：哪些管理方法已徹底失效？' },
+    { cat: 'grow', label: '職場成長', title: '用ChatGPT寫報告的人越來越多，你的思考力還剩幾成？' },
+  ]},
+  { date: '2026.06.01', items: [
+    { cat: 'high', label: '高階決策', title: '台灣AI新創融資破紀錄：哪些賽道已悄悄被外資卡位？' },
+    { cat: 'mgmt', label: '管理實務', title: '一對一面談做了反效果？主管常犯的三個心理錯誤' },
+    { cat: 'grow', label: '職場成長', title: '中年轉職潮再起：45歲後的職涯，靠什麼重新起步？' },
+  ]},
+  { date: '2026.05.31', items: [
+    { cat: 'high', label: '高階決策', title: '日本半導體復甦計畫全面啟動，Rapidus背後的國家押注' },
+    { cat: 'mgmt', label: '管理實務', title: 'OKR導入後三個月無感？失敗原因幾乎都在這裡' },
+    { cat: 'grow', label: '職場成長', title: '讀了很多書卻沒有用？知識轉化成行動的三個關鍵步驟' },
+  ]},
+  { date: '2026.05.30', items: [
+    { cat: 'high', label: '高階決策', title: '馬斯克的政治豪賭後遺症：特斯拉品牌信任度重建之路' },
+    { cat: 'mgmt', label: '管理實務', title: '「不喜歡給回饋」的主管，正在悄悄逼走你的A級人才' },
+    { cat: 'grow', label: '職場成長', title: 'AI工具已成辦公室標配，你的工作流還沒升級？' },
+  ]},
+  { date: '2026.05.29', items: [
+    { cat: 'high', label: '高階決策', title: '東南亞供應鏈崛起：台灣製造業的機會還是威脅？' },
+    { cat: 'mgmt', label: '管理實務', title: '會議效率低落根源在哪？砍掉這三種無效會議立見成效' },
+    { cat: 'grow', label: '職場成長', title: '你是工作狂還是高效者？辨別真正的生產力與自我感動' },
+  ]},
+  { date: '2026.05.28', items: [
+    { cat: 'high', label: '高階決策', title: 'OpenAI與微軟的裂痕擴大：AI王國的合作與競爭重新定義' },
+    { cat: 'mgmt', label: '管理實務', title: '新世代主管養成術：Z世代員工要的，和你以為的差很遠' },
+    { cat: 'grow', label: '職場成長', title: '簡報高手的秘訣：讓老闆三分鐘內點頭的結構化表達法' },
+  ]},
+  { date: '2026.05.27', items: [
+    { cat: 'high', label: '高階決策', title: 'AI競賽白熱化！台積電美國擴廠背後盤算曝光' },
+    { cat: 'mgmt', label: '管理實務', title: '人際間合不來就「停損」？與其忍無可忍才斷交，不如先修復失衡關係' },
+    { cat: 'grow', label: '職場成長', title: 'AI Agent 如何管理？企業導入前必懂安全三防線' },
+  ]},
+  { date: '2026.05.26', items: [
+    { cat: 'high', label: '高階決策', title: '三星晶片危機深化：良率問題如何動搖全球供應鏈信心？' },
+    { cat: 'mgmt', label: '管理實務', title: '組織變革的沉沒成本陷阱：為何明知方向錯還繼續推？' },
+    { cat: 'grow', label: '職場成長', title: '跨部門溝通總是卡關？學會這個框架，讓對方自動配合你' },
+  ]},
+  { date: '2026.05.25', items: [
+    { cat: 'high', label: '高階決策', title: '美中科技戰新前線：軟體出口管制對台灣的潛在衝擊' },
+    { cat: 'mgmt', label: '管理實務', title: '「授權」不等於「放牛吃草」：主管如何做到放手又不失控？' },
+    { cat: 'grow', label: '職場成長', title: '為什麼努力工作還是升不上去？關鍵在你不知道的職場政治' },
+  ]},
+  { date: '2026.05.24', items: [
+    { cat: 'high', label: '高階決策', title: '歐盟AI法規正式上路：台灣出口企業不可不知的合規地雷' },
+    { cat: 'mgmt', label: '管理實務', title: '高壓時代的心理安全感：主管如何在截止期前不壓垮團隊？' },
+    { cat: 'grow', label: '職場成長', title: '習慣養成的科學：為何「21天法則」是騙人的？' },
+  ]},
+  { date: '2026.05.23', items: [
+    { cat: 'high', label: '高階決策', title: '比亞迪攻台供應鏈：電動車生態系的下一場地盤爭奪戰' },
+    { cat: 'mgmt', label: '管理實務', title: '新人入職三個月就離職？留才問題的根源從面試就埋下了' },
+    { cat: 'grow', label: '職場成長', title: '斜槓還是深耕？選錯方向可能讓你兩頭空十年' },
+  ]},
+  { date: '2026.05.22', items: [
+    { cat: 'high', label: '高階決策', title: '軟銀孫正義的千億美元AI豪賭：成功機率有多高？' },
+    { cat: 'mgmt', label: '管理實務', title: '績效考核讓員工不滿意的真正原因：不是標準，是信任' },
+    { cat: 'grow', label: '職場成長', title: '不懂財報的主管，正在做錯所有資源分配決策' },
+  ]},
+  { date: '2026.05.21', items: [
+    { cat: 'high', label: '高階決策', title: '台灣IC設計業的全球卡位戰：在AI應用時代誰能脫穎而出？' },
+    { cat: 'mgmt', label: '管理實務', title: '遠距團隊協作三年後：哪些默契需要重建，哪些已永遠改變？' },
+    { cat: 'grow', label: '職場成長', title: '職涯焦慮的解藥不是更努力，而是這個被忽略的核心能力' },
+  ]},
+];
+
+(function () {
+  const today = new Date();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  document.getElementById('heroDate').textContent =
+    `${today.getFullYear()}.${mm}.${dd}`;
+
+  const overlay  = document.getElementById('recentModal');
+  const card     = document.getElementById('recentModalCard');
+  const body     = document.getElementById('modalBody');
+  const btn      = document.getElementById('recentBtn');
+  const closeBtn = document.getElementById('modalClose');
+
+  function getWindowDates() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const result = [];
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      result.push(`${d.getFullYear()}.${mm}.${dd}`);
+    }
+    return result;
+  }
+
+  function buildModal() {
+    const validDates = new Set(getWindowDates());
+    const filtered = ARTICLES.filter(g => validDates.has(g.date));
+
+    if (filtered.length === 0) {
+      body.innerHTML = '<p style="padding:32px 24px;color:var(--text-hint);font-size:14px;">暫無資料</p>';
+      return;
+    }
+
+    body.innerHTML = filtered.map(group => `
+      <div class="date-section">
+        <div class="date-heading">${group.date}</div>
+        ${group.items.map(item => `
+          <a class="article-row ${item.cat}" href="https://cwgvjessie.github.io/cwgv/2026-eslite-radar/eslite-article.html" target="_top">
+            <span class="cat-pill">${item.label}</span>
+            <span class="article-row-title">${item.title}</span>
+          </a>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function openModal() {
+    buildModal();
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (location.hash !== '#modal') {
+      history.pushState({ modal: true }, '', '#modal');
+    }
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (location.hash === '#modal') {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) {
+    if (!card.contains(e.target)) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  window.addEventListener('popstate', function () {
+    if (location.hash === '#modal') {
+      buildModal();
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  window.addEventListener('pageshow', function () {
+    if (location.hash === '#modal') {
+      buildModal();
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+})();
+</script>
+
+<!-- ─── Script：sendHeight — 回報頁面實際高度給父層 eslite.html（自動撐高 iframe）─── -->
+<script>
+(function () {
+  function sendHeight() {
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    window.parent.postMessage({ iframeHeight: h }, '*');
+  }
+  var timer;
+  function debouncedSend() { clearTimeout(timer); timer = setTimeout(sendHeight, 100); }
+
+  window.addEventListener('load', function () {
+    sendHeight();
+    setTimeout(sendHeight, 200);
+    setTimeout(sendHeight, 600);
+    setTimeout(sendHeight, 1200);
+  });
+  window.addEventListener('resize', debouncedSend);
+  new MutationObserver(debouncedSend).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
+
+<!-- ===== GA4 / GTM 事件追蹤 ===== -->
+<script>
+(function () {
+  window.dataLayer = window.dataLayer || [];
+  function push(obj) { window.dataLayer.push(obj); }
+  function text(el) { return el ? el.textContent.trim() : ''; }
+
+  // 1. 主列表三篇文章點擊
+  var mainLinks = document.querySelectorAll('.articles-wrap .article-link');
+  mainLinks.forEach(function (link, idx) {
+    link.addEventListener('click', function () {
+      push({
+        event: 'radar_article_click',
+        click_area: 'main_list',
+        article_position: idx + 1,
+        article_category: text(link.querySelector('.cat-pill')),
+        article_title: text(link.querySelector('.article-headline')),
+        link_url: link.href
+      });
+    });
+  });
+
+  // 2. 近期熱門文章按鈕
+  var recentBtn = document.getElementById('recentBtn');
+  if (recentBtn) {
+    recentBtn.addEventListener('click', function () {
+      push({ event: 'radar_recent_open' });
+    });
+  }
+
+  // 3. Modal（近期熱門）內文章點擊 — 內容為動態產生，採事件委派
+  var modalBody = document.getElementById('modalBody');
+  if (modalBody) {
+    modalBody.addEventListener('click', function (e) {
+      var row = e.target.closest('.article-row');
+      if (!row) return;
+      var section = row.closest('.date-section');
+      var rows = section ? Array.prototype.slice.call(section.querySelectorAll('.article-row')) : [];
+      push({
+        event: 'radar_article_click',
+        click_area: 'recent_modal',
+        article_position: rows.indexOf(row) + 1,
+        recent_reco_date: section ? text(section.querySelector('.date-heading')) : '',
+        article_category: text(row.querySelector('.cat-pill')),
+        article_title: text(row.querySelector('.article-row-title')),
+        link_url: row.href
+      });
+    });
+  }
+})();
+</script>
+<!-- ===== /GA4 事件追蹤 ===== -->
+</body>
+</html>
