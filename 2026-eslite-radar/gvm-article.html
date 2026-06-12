@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  gvm-article.html — 遠見文章詳情頁（Layer 2）
+  用途：職場雷達單篇文章，由誠品 eslite-article.html（Layer 1）iframe 內嵌。
+  GTM：GTM-5ZH7TSVB → GA4 G-WRLDT210S3
+  頁面參數：page_type = 'article_detail'，article_title / article_category
+            ↑ 從 <meta name="article:category"> 和 <title> 自動讀取
+
+  換文章只需更新：<meta name="article:category"> + <title> + 文章內文
+
+  追蹤事件：
+    - article_read_more     「看更多」展開點擊
+    - article_source_click  「遠見原始文章出處」連結點擊
+    - book_buy_click        誠品選書「立即入手」（由摩速 aigc-book.html postMessage）
+    - aigc_question_click   深度思考問題點擊（由摩速 aigc-book.html postMessage）
+
+  功能：
+    - 文章展開（前 300 字截斷 + 看更多）
+    - 內嵌摩速 aigc-book.html（選書 + 深度問題）
+    - postMessage 雙向：接收 aigc-book.html 高度 & 事件，回報本頁高度給 eslite-article.html
+  ============================================================ -->
+<html lang="zh-TW">
+<head>
+<!-- ─── Meta / Charset ─── -->
+<!-- ↓ 換文章時更新 article:category 和 title 即可，dataLayer 會自動讀取 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="article:category" content="高階決策">
+<title>AI競賽白熱化！台積電美國擴廠背後盤算曝光 — 職場雷達</title>
+<!-- ─── Google Fonts ─── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Noto+Sans+TC:ital,wght@0,300;0,400;0,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+
+<!-- ─── dataLayer 頁面參數預設：須在 GTM 載入前 push，page_view 才讀得到 ─── -->
+<!-- 換文章時只需更新 <meta name="article:category"> 和 <title> 即可，不用動這段 script -->
+<!-- shell_pageview：讀取 eslite-article.html 帶入的 ?page_url= 參數，覆寫 GA4 page_location 為殼頁 URL -->
+<script>
+  (function () {
+    var title = document.title.replace(/\s*[—–-].*$/, '').trim();
+    var categoryMeta = document.querySelector('meta[name="article:category"]');
+    var category = categoryMeta ? categoryMeta.getAttribute('content') : '';
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      page_type: 'article_detail',
+      article_title: title,
+      article_category: category
+    });
+    var shellUrl = new URLSearchParams(window.location.search).get('page_url');
+    if (shellUrl) {
+      window.dataLayer.push({
+        event: 'shell_pageview',
+        page_location: decodeURIComponent(shellUrl),
+        page_title: document.title
+      });
+    }
+  })();
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5ZH7TSVB');</script>
+<!-- End Google Tag Manager -->
+
+
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+/* 強制防止瀏覽器合成斜體 */
+* { font-style: normal; font-synthesis: none; }
+
+:root {
+  --white: #FFFFFF;
+  --off-white: #F9F7F4;
+  --rule-light: #E8E4DC;
+  --rule: #D4CEC4;
+  --text-hint: #AFA9A0;
+  --text-muted: #847E76;
+  --text-body: #3D3830;
+  --text-head: #1A1710;
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--white);
+  color: var(--text-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+}
+
+/* navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  border-bottom: 1px solid var(--text-head);
+}
+.navbar-left { display: flex; align-items: center; gap: 20px; }
+.navbar-brand {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  color: var(--text-head);
+  text-transform: uppercase;
+}
+.navbar-divider { width: 1px; height: 12px; background: var(--rule); }
+.navbar-sub { font-size: 14px; letter-spacing: 0.08em; color: var(--text-muted); text-decoration: none; }
+.navbar-sub:hover { color: var(--text-head); }
+.navbar-right { font-size: 14px; letter-spacing: 0.1em; color: var(--text-hint); }
+
+/* detail hero */
+.detail-hero {
+  padding: 40px 0 36px;
+  margin-bottom: 0;
+}
+.detail-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.detail-cat-pill {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 1px;
+  background: #F0EEF8;
+  color: #2B1F5C;
+}
+.detail-cover {
+  width: 100%;
+  aspect-ratio: 756/592;
+  overflow: hidden;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-cover-caption {
+  font-size: 13px;
+  color: var(--text-hint);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+.detail-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--text-head);
+  margin-bottom: 24px;
+}
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.04em;
+}
+.meta-dot { width: 2px; height: 2px; border-radius: 50%; background: var(--rule); display: inline-block; }
+
+/* full article */
+.gvm-article {
+  font-size: 16px;
+  line-height: 2;
+  color: var(--text-body);
+  margin-bottom: 48px;
+  border-top: 2px solid var(--text-head);
+  padding-top: 28px;
+}
+.gvm-article p { margin-bottom: 1.6em; }
+.gvm-article h2 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-head);
+  margin: 2em 0 0.8em;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--rule-light);
+  letter-spacing: 0.02em;
+}
+.gvm-lede {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.9;
+  padding: 16px 20px;
+  border-left: 3px solid var(--rule);
+  background: var(--off-white);
+  margin-bottom: 2em;
+}
+
+/* article read-more */
+.article-inner {
+  overflow: hidden;
+  transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.article-fade {
+  height: 96px;
+  margin-top: -96px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 100%);
+  position: relative;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.article-more-btn {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+  padding: 8px 32px;
+  background: transparent;
+  border: 0.5px solid var(--text-head);
+  color: #1A1710;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: opacity var(--transition);
+}
+.article-more-btn:hover { opacity: 0.5; }
+
+/* original link */
+.original-link {
+  display: flex;
+  width: fit-content;
+  margin-left: auto;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-head);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--text-head);
+  padding-bottom: 2px;
+  margin-bottom: 60px;
+  transition: opacity var(--transition);
+}
+.original-link:hover { opacity: 0.5; }
+.original-link svg { width: 10px; height: 10px; }
+
+/* section heading */
+.d-section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.d-section-head-line { flex: 1; height: 0.5px; background: var(--rule-light); }
+.d-section-title {
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-hint);
+  white-space: nowrap;
+}
+
+/* books */
+.books-section { margin-bottom: 60px; }
+
+/* questions */
+.questions-section { margin-bottom: 60px; }
+.question-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 16px;
+  padding: 18px 0;
+  border-bottom: 0.5px solid var(--rule-light);
+  align-items: start;
+}
+.q-num { font-family: 'EB Garamond', serif; font-size: 16px; color: var(--text-hint); padding-top: 1px; }
+.q-text { font-size: 16px; line-height: 1.75; color: var(--text-body); }
+.article-link { text-decoration: none; color: inherit; }
+
+/* footer */
+.site-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--rule-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.06em;
+}
+.site-footer a {
+  color: var(--text-hint);
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+.site-footer a:hover { color: var(--text-head); }
+
+@media (max-width: 600px) {
+  .container { padding: 0 20px 60px; }
+  .detail-title { font-size: 24px; }
+}
+
+/* ── connect-item 書籍列表（不只讀新聞風格）── */
+.connect-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.connect-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  width: 50%;
+  padding: 20px 0;
+  border-bottom: 0.5px solid var(--rule-light);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--transition);
+  position: relative;
+}
+.connect-item:nth-of-type(odd) {
+  padding-right: 24px;
+  border-right: 0.5px solid var(--rule-light);
+}
+.connect-item:nth-of-type(even) { padding-left: 24px; }
+.connect-item:last-child,
+.connect-item:nth-last-child(2) { border-bottom: none !important; }
+.connect-item:hover .item-info p { color: var(--text-head); }
+.connect-item:hover .connect-img img { transform: translateY(-3px); }
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.item-info p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  transition: color var(--transition);
+}
+.item-info p strong {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-head);
+  display: block;
+  margin-bottom: 3px;
+}
+.item-info p em {
+  font-style: normal;
+  font-size: 14px;
+  color: var(--text-hint);
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.connect-img {
+  flex-shrink: 0;
+  width: 108px;
+  height: 144px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--off-white);
+}
+.connect-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.book-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.book-price-now {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-head);
+}
+
+.go-buy {
+  margin-top: 12px;
+  display: inline-block;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-head);
+  border: 1px solid var(--text-head);
+  padding: 7px 16px;
+  width: fit-content;
+  transition: background var(--transition), color var(--transition);
+}
+.go-buy:hover {
+  background: var(--text-head);
+  color: var(--white);
+}
+
+/* 只有第一本（指數型組織）全寬，其餘修正左右欄對應 */
+.connect-item:nth-of-type(1) { width: 100%; padding-right: 0 !important; padding-left: 0 !important; border-right: none !important; padding-bottom: 32px !important; }
+.connect-item:nth-of-type(1) .connect-img { width: 141px !important; height: 188px !important; }
+.connect-item:nth-of-type(2), .connect-item:nth-of-type(4), .connect-item:nth-of-type(6) { padding-right: 24px; padding-left: 0; border-right: 0.5px solid var(--rule-light); }
+.connect-item:nth-of-type(3), .connect-item:nth-of-type(5) { padding-left: 24px; padding-right: 12px; border-right: none; }
+.connect-item:nth-of-type(5) { border-bottom: 0.5px solid var(--rule-light); }
+/* line-clamp — 只套用在描述文字 .book-desc */
+.book-desc { display: block; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.connect-item:nth-of-type(1) .book-desc { -webkit-line-clamp: 5; }
+.connect-item:not(:nth-of-type(1)) .book-desc { -webkit-line-clamp: 3; }
+@media (max-width: 600px) {
+  .connect-item:nth-of-type(1) .book-desc { -webkit-line-clamp: 10; }
+  .connect-item:not(:nth-of-type(1)) .book-desc { -webkit-line-clamp: 4; }
+}
+@media (max-width: 600px) {
+  .connect-item {
+    width: 100%;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    border-right: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZH7TSVB"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- ─── 主要內容容器（最大寬度 800px）─── -->
+<div class="container">
+
+  <!-- ─── HERO 區：文章分類 + 標題 + 封面圖 + 作者資訊 ─── -->
+  <div class="detail-hero">
+    <div class="detail-eyebrow">
+      <span class="detail-cat-pill">高階決策</span>
+    </div>
+        <h1 class="detail-title">AI競賽白熱化！台積電美國擴廠背後盤算曝光</h1>
+
+    <div class="detail-cover">
+      <img src="images/cover-1.jpg" alt="AI競賽白熱化！台積電美國擴廠背後盤算曝光">
+    </div>
+    <p class="detail-cover-caption">台積電加碼美國投資，亞利桑那廠成全球半導體供應鏈重組的重要據點。張智傑攝</p>
+  </div>
+      <div class="detail-meta">
+      <span>作者</span>
+      <span class="meta-dot"></span>
+      <span>劉佩真 廖綉玉 賴昀 </span>
+    </div>
+
+  <!-- ─── 文章全文（前 300 字截斷，展開由 JS 控制）─── -->
+  <div class="gvm-article">
+
+    <p class="gvm-lede">編按：台積電加速擴大美國投資。亞利桑那的第三座晶圓廠提前封頂，顯示在AI浪潮下，全球供應鏈布局正式升級。畢竟，在面對地緣政治與客戶需求變化，美國布局已成關鍵戰略核心。</p>
+    <p>台積電指出，2026年5月5日，是亞利桑那工廠的重要里程碑，當天舉行位於鳳凰城的第三座晶圓廠（P3）封頂儀式，代表大樓主體結構的完成。亞利桑那P3廠進度的顯著提前，象徵台積電在美國布局先進製程，已從試水溫進入全面深耕階段。</p>
+    <p>事實上，在當前全球地緣政治與AI科技浪潮交織的關鍵時刻，台積電持續上修對美投資規模，已不再僅是單純的商業產能擴張，而是一場深謀遠慮的戰略轉骨，隨著矽盾的概念，從防禦性屏障演變為全球供應鏈的韌性基石，台積電必須在追求技術領先的同時，精準對接全球頂尖客戶對於供應鏈地理靈活性的剛性需求。</p>
+    <h2>台積電美國布局進入深水區</h2>
+    <p>這場橫跨太平洋的布局，不僅象徵半導體製造，從集中化效率轉向分散化安全的典範轉移，更反映企業在維持台灣核心研發動能，與滿足大國地緣利益之間的精妙平衡，進而確保其在未來AI霸權爭奪戰中，立於不可撼動的制高點。</p>
+    <p>從近期侯永清副共同營運長的表態來看，台積電可能再加碼美國的核心動力，早已超越單純的補助誘因，而是深度綁定於客戶韌性與AI市場需求。隨著全球大型雲端服務商，如微軟（Microsoft）、Google、Meta（臉書母公司）等，將AI視為軍備競賽，這些頂尖客戶對供應鏈的安全性與地理靈活性要求極高。將最尖端的2奈米、甚至更先進的製程移往美國，能讓台積電在第一時間貼近矽谷的創新核心，並消除客戶對台海情勢可能導致供應中斷的疑慮，從而鞏固其在晶圓代工市場的絕對統治力。</p>
+    <p>就影響面而言，台積電在亞利桑那州打造的獨立超大晶圓廠聚落，將從單純的代工中心轉型為集研發、製造、封裝於一體的全功能生態系。這種規模的投資案，將帶動大量台灣供應鏈業者跟進赴美；雖然初期會面臨高昂的建置成本與文化磨合，但長期來看，此則有助於台積電掌握全球關鍵人才與研發資源，將其企業影響力從台灣延伸至全球經濟的心臟地帶。</p>
+    <h2>台灣研發、全球生產成新模式</h2>
+    <p>至於外界最擔心的，排擠台灣投資或去台化問題，現階段雖然看來更多是資源的共榮與延伸，然而，其後續對台灣本土半導體業的群聚效益、上中下游的協作效率及其他負面後座力的影響，仍不容忽視。特別是當半導體產業投資往美國的方向確立、投資規模不斷擴大，台灣本土對半導體產業的政策主導性與彈性調整空間，相對將遭對壓縮。</p>
+    <p>所幸台積電一向堅持根留台灣，最前瞻的技術研發與首波量產基地依然穩坐台灣。而透過將部分產能外移，台灣總部能騰出空間專注於下一個世代的技術突破，如埃米，甚至更先進的製程。期望台灣作為大腦的核心地位依舊穩固，美國廠則扮演全球戰略側翼的角色，協助台積電在分散風險的同時，獲取最大化的股東利益與市場份額。</p>
+    <p>整體來說，加碼美國是台積電在複雜政經環境下的出擊，這不僅是為了回應美國政府的期待，更是為確保在未來的AI競賽中，台積電依然是全球科技巨人唯一且不可替代的盟友，而這種台灣研發、全球生產的模式，正是台積電邁向世界級企業新高峰的關鍵轉型。</p>
+  </div>
+
+  <a href="https://www.gvm.com.tw/article/130163" target="_blank" class="original-link">
+    遠見原始文章出處
+    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 10L10 2M6.5 2H10v3.5"/>
+    </svg>
+  </a>
+  <!-- ─── 開發說明標示（測試用，可移除）─── -->
+  <P> ↓ ↓ 內嵌  摩速 iframe  "https://jessie79279-d9f4cd.gitlab.io/2026-eslite-radar/aigc-book.html" </p>
+  <!-- ─── IFRAME 內嵌區塊：aigc-book.html（摩速選書 + 深度問題）─── -->
+  <iframe id="book-frame" src="https://jessie79279-d9f4cd.gitlab.io/2026-eslite-radar/aigc-book.html"
+    style="width:100%;border:none;display:block;overflow:hidden;"
+    scrolling="no" title="誠品選書推薦"></iframe>
+
+</div>
+
+<!-- ─── Script：文章展開（read-more）— 前 300 字截斷，點「看更多」展開全文 ─── -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var article = document.querySelector('.gvm-article');
+  if (!article) return;
+
+  var LIMIT = 300; // 顯示的非空白字元上限
+  var charCount = 0;
+  var found = false;
+  var clampHeight = 0;
+  var articleTop = article.getBoundingClientRect().top;
+
+  function walk(node) {
+    if (found) return;
+    if (node.nodeType === 3) {
+      var text = node.textContent;
+      var nonWS = text.replace(/\s/g, '');
+      if (charCount + nonWS.length >= LIMIT) {
+        var remaining = LIMIT - charCount;
+        var pos = 0, cnt = 0;
+        for (var i = 0; i < text.length; i++) {
+          if (!/\s/.test(text[i])) {
+            cnt++;
+            if (cnt >= remaining) { pos = i + 1; break; }
+          }
+        }
+        var range = document.createRange();
+        range.setStart(node, pos);
+        range.collapse(true);
+        var r = range.getBoundingClientRect();
+        clampHeight = Math.round(r.top - articleTop);
+        found = true;
+      }
+      charCount += nonWS.length;
+    } else if (node.nodeType === 1) {
+      var children = node.childNodes;
+      for (var i = 0; i < children.length; i++) {
+        walk(children[i]);
+        if (found) return;
+      }
+    }
+  }
+
+  walk(article);
+  if (!found || clampHeight <= 0) return;
+
+  var inner = document.createElement('div');
+  inner.className = 'article-inner';
+  inner.style.maxHeight = clampHeight + 'px';
+  while (article.firstChild) inner.appendChild(article.firstChild);
+
+  var fade = document.createElement('div');
+  fade.className = 'article-fade';
+
+  var btn = document.createElement('button');
+  btn.className = 'article-more-btn';
+  btn.textContent = '看更多';
+
+  article.appendChild(inner);
+  article.appendChild(fade);
+  article.appendChild(btn);
+
+  btn.addEventListener('click', function () {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'article_read_more' });
+    var h = inner.scrollHeight;
+    inner.style.maxHeight = h + 'px';
+    fade.style.opacity = '0';
+    btn.style.opacity = '0';
+    btn.style.pointerEvents = 'none';
+    inner.addEventListener('transitionend', function () {
+      inner.style.maxHeight = 'none';
+      fade.remove();
+      btn.remove();
+    }, { once: true });
+  });
+});
+</script>
+
+<!-- ─── Script：postMessage 接收 — 處理來自 aigc-book.html（摩速）的訊息 ─── -->
+<!-- 1. iframeHeight → 更新 #book-frame 高度                                -->
+<!-- 2. book_buy_click / aigc_question_click → push 至本頁 GTM dataLayer    -->
+<script>
+(function () {
+  window.addEventListener('message', function (e) {
+    // 檢查並校驗數值合理性，更新 #book-frame 高度
+    if (e.data && typeof e.data.iframeHeight === 'number' && Number.isFinite(e.data.iframeHeight) && e.data.iframeHeight > 0 && e.data.iframeHeight <= 20000) {
+      var f = document.getElementById('book-frame');
+      if (f) f.style.height = e.data.iframeHeight + 'px';
+    }
+    // 轉發摩速 postMessage 事件至本頁 dataLayer（GTM 負責送 GA4）
+    if (e.data && (e.data.event === 'book_buy_click' || e.data.event === 'aigc_question_click')) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: e.data.event }, e.data));
+    }
+  });
+})();
+</script>
+
+<!-- ─── Script：sendHeight — 回報頁面實際高度給父層 eslite-article.html（自動撐高 iframe）─── -->
+<script>
+(function () {
+  function sendHeight() {
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    window.parent.postMessage({ iframeHeight: h }, '*');
+  }
+  var timer;
+  function debouncedSend() { clearTimeout(timer); timer = setTimeout(sendHeight, 100); }
+
+  window.addEventListener('load', function () {
+    sendHeight();
+    setTimeout(sendHeight, 200);
+    setTimeout(sendHeight, 600);
+    setTimeout(sendHeight, 1200);
+  });
+  window.addEventListener('resize', debouncedSend);
+  new MutationObserver(debouncedSend).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
+<!-- ===== GA4 / GTM 事件追蹤 ===== -->
+<script>
+(function () {
+  window.dataLayer = window.dataLayer || [];
+  function push(obj) { window.dataLayer.push(obj); }
+
+  // 遠見原始文章出處 連結點擊
+  var sourceLink = document.querySelector('.original-link');
+  if (sourceLink) {
+    sourceLink.addEventListener('click', function () {
+      push({
+        event: 'article_source_click',
+        link_url: sourceLink.href
+      });
+    });
+  }
+})();
+</script>
+<!-- ===== /GA4 事件追蹤 ===== -->
+</body>
+</html>
