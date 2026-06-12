@@ -131,7 +131,7 @@ body {
 
 <!-- ─── 開發說明標示（測試用，可移除）─── -->
 <div style="text-align: center;">
-  <P> ↓ ↓ 內嵌  GVM GTM中介頁  https://event.gvm.com.tw/ddc_test/0Jessie/2026-eslite-radar/gvm-aigc.html" <p>
+  <P> ↓ ↓ 內嵌  GVM GTM中介頁  https://event.gvm.com.tw/ddc_test/0Jessie/2026-eslite-radar/gvm-aigc.html" </p>
 </div>
 
 <!-- ─── IFRAME 內嵌區塊：gvm-aigc.html（遠見 GTM 中介頁，Layer 2）─── -->
@@ -181,8 +181,8 @@ body {
 <!-- ─── Script：接收 gvm-aigc.html 中繼轉發的 iframeHeight，自動撐高 #contentFrame ─── -->
 <script>
 window.addEventListener('message', function (e) {
-  // 接收 iframeHeight，並校驗數值合理性才更新高度（由 gvm-aigc.html 從 aigc.html 中繼轉發）
-  if (e.data && typeof e.data.iframeHeight === 'number' && Number.isFinite(e.data.iframeHeight) && e.data.iframeHeight > 0 && e.data.iframeHeight <= 20000) {
+  // 接收 iframeHeight，自動更新高度（由 gvm-aigc.html 從 aigc.html 中繼轉發）
+  if (e.data && typeof e.data.iframeHeight === 'number') {
     document.getElementById('contentFrame').style.height = e.data.iframeHeight + 'px';
   }
 });
