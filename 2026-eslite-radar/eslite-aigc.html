@@ -145,15 +145,15 @@ body {
 ></iframe>
 
 <!-- ─── Script：動態將 partner 參數附加至 iframe src ─── -->
-<!-- 邏輯：優先讀本頁 URL 的 ?partner= 參數（社群推播手動指定時使用）；
+<!-- 邏輯：優先自動抓目前頁面 hostname（例如 cwgvjessie.github.io）；
      沒有則自動抓目前頁面 hostname（例如 cwgvjessie.github.io）。
      這樣不管是誠品或未來其他合作夥伴，src 不需手動維護。-->
 <script>
 (function () {
   var iframe = document.getElementById('contentFrame');
   var urlParams = new URLSearchParams(window.location.search);
-  // 優先用 URL 帶的 ?partner=，否則自動抓 hostname
-  var partner = urlParams.get('partner') || window.location.hostname;
+  // 優先自動抓 hostname，否則用 URL 帶的 ?partner=
+  var partner = window.location.hostname || urlParams.get('partner');
   var base = iframe.getAttribute('src');
   // 避免重複附加（src 已含 partner= 時不再處理）
   if (base.indexOf('partner=') === -1) {
