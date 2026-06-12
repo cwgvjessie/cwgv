@@ -7,7 +7,7 @@
   3-Layer 架構：
     [Layer 1] eslite-aigc.html（本頁，誠品）
       └─ iframe → [Layer 2] gvm-aigc.html（遠見，含 GTM-5ZH7TSVB）
-                    └─ iframe → [Layer 3] aigc.html（摩速，postMessage 傳事件）
+                    └─ iframe → [Layer 3] aigc-article.html（摩速，postMessage 傳事件）
 
   GTM：無（GA4 追蹤由 Layer 2 gvm-aigc.html 負責）
   postMessage：接收 iframeHeight 以自動撐高 #contentFrame
@@ -181,8 +181,8 @@ body {
 <!-- ─── Script：接收 gvm-aigc.html 中繼轉發的 iframeHeight，自動撐高 #contentFrame ─── -->
 <script>
 window.addEventListener('message', function (e) {
-  // 接收 iframeHeight（由 gvm-aigc.html 從 aigc.html 中繼轉發）
-  if (e.data && typeof e.data.iframeHeight === 'number') {
+  // 接收 iframeHeight，並校驗數值合理性才更新高度（由 gvm-aigc.html 從 aigc.html 中繼轉發）
+  if (e.data && typeof e.data.iframeHeight === 'number' && Number.isFinite(e.data.iframeHeight) && e.data.iframeHeight > 0 && e.data.iframeHeight <= 20000) {
     document.getElementById('contentFrame').style.height = e.data.iframeHeight + 'px';
   }
 });

@@ -81,6 +81,7 @@ body {
   width: 100%;
   border: none;
   overflow: hidden;
+  min-height: 600px;
 }
 
 /* ── Footer ── */
@@ -169,8 +170,8 @@ body {
 <!-- ─── Script：接收子 iframe 的 iframeHeight postMessage，自動撐高 #contentFrame ─── -->
 <script>
 window.addEventListener('message', function (e) {
-  // 檢查 message 包含 iframeHeight 數值才更新高度
-  if (e.data && typeof e.data.iframeHeight === 'number') {
+  // 檢查 message 包含 iframeHeight 數值，並校驗數值合理性才更新高度
+  if (e.data && typeof e.data.iframeHeight === 'number' && Number.isFinite(e.data.iframeHeight) && e.data.iframeHeight > 0 && e.data.iframeHeight <= 20000) {
     document.getElementById('contentFrame').style.height = e.data.iframeHeight + 'px';
   }
 });
