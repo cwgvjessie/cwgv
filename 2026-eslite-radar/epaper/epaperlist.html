@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-style:normal;font-synthesis:none;}
+html{font-size:16px;}
+body{font-family:'Noto Sans TC',sans-serif;background:#fff;color:#3D3830;line-height:1.7;-webkit-font-smoothing:antialiased;}
+</style>
+</helmet>
+
+<div style="max-width:800px;margin:0 auto;padding:0 32px 40px;">
+
+  <!-- ── 誠品外殼 navbar ── -->
+  <nav style="display:flex;align-items:center;height:52px;border-bottom:1px solid #1A1710;gap:20px;">
+    <a href="https://www.eslite.com/" target="_blank" rel="noopener noreferrer" style="font-family:'EB Garamond',serif;font-size:14px;letter-spacing:.14em;color:#1A1710;text-transform:uppercase;text-decoration:none;">誠品線上</a>
+    <span style="width:1px;height:12px;background:#D4CEC4;"></span>
+    <a href="index.html" style="font-size:14px;color:#847E76;text-decoration:none;">職場雷達</a>
+    <span style="font-size:12px;color:#C9C3B8;">（誠品外殼·列表）</span>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div style="padding:44px 0 36px;border-bottom:.5px solid #E8E4DC;display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;">
+    <div>
+      <div style="font-family:'EB Garamond',serif;font-size:14px;letter-spacing:.22em;color:#AFA9A0;text-transform:uppercase;margin-bottom:10px;">遠見雜誌</div>
+      <div style="font-family:'Noto Serif TC',serif;font-size:40px;font-weight:600;letter-spacing:.04em;color:#1A1710;line-height:1.1;">職場雷達</div>
+    </div>
+    <div style="text-align:right;">
+      <button onClick="{{ openModal }}" style="display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;letter-spacing:.18em;color:#1A1710;background:transparent;border:.5px solid #1A1710;border-radius:2px;padding:5px 12px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;" style-hover="background:#1A1710;color:#FFFFFF;">近期熱門文章 <span style="font-size:14px;line-height:1;">›</span></button>
+      <span style="display:block;font-family:'EB Garamond',serif;font-size:28px;color:#1A1710;letter-spacing:.02em;line-height:1;margin-top:10px;">{{ heroDate }}</span>
+    </div>
+  </div>
+
+  <!-- ── ARTICLE LIST ── -->
+  <div style="border-bottom:.5px solid #E8E4DC;">
+    <a href="https://api.gvm.com.tw/eslite/article/240611" target="_blank" style="display:grid;grid-template-columns:1fr 130px;align-items:center;gap:0 20px;padding:28px 20px 28px 28px;text-decoration:none;color:inherit;" style-hover="background:#F9F7F4;">
+      <div>
+        <span style="display:inline-block;font-size:14px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-bottom:14px;background:#F0EEF8;color:#2B1F5C;">高階決策</span>
+        <div style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:500;line-height:1.55;color:#1A1710;margin-bottom:10px;max-width:560px;">AI競賽白熱化！台積電美國擴廠背後盤算曝光</div>
+        <div style="font-size:14px;color:#847E76;line-height:1.75;max-width:520px;">台積電加速擴大美國投資，亞利桑那的第三座晶圓廠提前封頂，顯示在 AI 浪潮下，全球供應鏈布局正式升級。面對地緣政治壓力與客戶需求劇變，美國布局已成…</div>
+      </div>
+      <img src="images/cover-1.jpg" alt="" style="width:130px;aspect-ratio:756/592;object-fit:cover;display:block;border-radius:2px;">
+    </a>
+  </div>
+
+  <div style="border-bottom:.5px solid #E8E4DC;">
+    <a href="https://api.gvm.com.tw/eslite/article/240612" target="_blank" style="display:grid;grid-template-columns:1fr 130px;align-items:center;gap:0 20px;padding:28px 20px 28px 28px;text-decoration:none;color:inherit;" style-hover="background:#F9F7F4;">
+      <div>
+        <span style="display:inline-block;font-size:14px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-bottom:14px;background:#EAF3EE;color:#0D3D2E;">管理實務</span>
+        <div style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:500;line-height:1.55;color:#1A1710;margin-bottom:10px;max-width:560px;">人際間合不來就「停損」？與其忍無可忍才斷交，不如先修復失衡關係</div>
+        <div style="font-size:14px;color:#847E76;line-height:1.75;max-width:520px;">在人際關係中，「停損」常被濫用為逃避衝突的藉口。然而，忍耐至極限才爆發往往導致關係破裂，而非真正解決問題。在不適感出現時便練習「表達」，清楚溝通…</div>
+      </div>
+      <img src="images/cover-2.jpg" alt="" style="width:130px;aspect-ratio:756/592;object-fit:cover;display:block;border-radius:2px;">
+    </a>
+  </div>
+
+  <div style="border-bottom:.5px solid #E8E4DC;">
+    <a href="https://api.gvm.com.tw/eslite/article/240613" target="_blank" style="display:grid;grid-template-columns:1fr 130px;align-items:center;gap:0 20px;padding:28px 20px 28px 28px;text-decoration:none;color:inherit;" style-hover="background:#F9F7F4;">
+      <div>
+        <span style="display:inline-block;font-size:14px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-bottom:14px;background:#F5EDE4;color:#5C2800;">職場成長</span>
+        <div style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:500;line-height:1.55;color:#1A1710;margin-bottom:10px;max-width:560px;">AI Agent 如何管理？企業導入前必懂安全三防線</div>
+        <div style="font-size:14px;color:#847E76;line-height:1.75;max-width:520px;">當 AI 從「回答問題的顧問」變成「自動執行任務的實習生」，企業面對的不再只是幻覺與資料外洩，而是系統可能在幾秒鐘內被摧毀的營運危機。給予 AI…</div>
+      </div>
+      <img src="images/cover-3.jpg" alt="" style="width:130px;aspect-ratio:756/592;object-fit:cover;display:block;border-radius:2px;">
+    </a>
+  </div>
+
+  <!-- ══════ 趨勢週報 ══════ -->
+  <section style="margin:52px 0 0;">
+
+    <div style="padding-bottom:26px;border-bottom:1px solid #1A1710;">
+      
+      <div style="font-family:'Noto Serif TC',serif;font-size:32px;font-weight:600;letter-spacing:.04em;color:#1A1710;line-height:1.1;">趨勢週報</div>
+    </div>
+
+    <!-- 版型切換 -->
+    <div style="display:flex;gap:8px;align-items:center;padding:18px 0 0;">
+      <span style="font-size:12px;letter-spacing:.14em;color:#AFA9A0;margin-right:4px;">版型</span>
+      <button onClick="{{ setA }}" style="{{ tabA }}">A 三欄卡片</button>
+      <button onClick="{{ setB }}" style="{{ tabB }}">B 重點頭條</button>
+      <button onClick="{{ setC }}" style="{{ tabC }}">C 類別分欄</button>
+    </div>
+
+    <!-- ─── 版型 A：三欄卡片網格 ─── -->
+    <sc-if value="{{ isA }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:30px;">
+
+        <a href="epaper.html" target="_blank" style="display:flex;flex-direction:column;text-decoration:none;color:inherit;" style-hover="opacity:.82">
+          <img src="images/cover-1.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+          <span style="align-self:flex-start;display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-top:16px;background:#EAEFF5;color:#1F3A5C;">國際</span>
+          <div style="font-size:12px;letter-spacing:.03em;color:#9C968C;margin-top:9px;">遠見國際趨勢報・每週三發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ intlDate }}</span></div>
+          <h3 style="font-family:'Noto Serif TC',serif;font-size:19px;font-weight:600;line-height:1.45;color:#1A1710;margin-top:12px;">中東停火生變，國際油價單週飆漲逾一成</h3>
+          <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:7px;">荷莫茲海峽情勢升溫，全球能源供應鏈再度拉響警報</h4>
+          <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:13px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">中東地緣政治再度成為全球市場焦點。本週以色列與伊朗的停火協議出現鬆動跡象，雙方在邊境的零星衝突引發外界對區域全面開戰的疑慮。受此影響，國際原油價格單週飆漲逾一成，布蘭特原油重返每桶九十美元關卡。市場最擔憂的，是占全球石油運輸近三成的荷莫茲海峽一旦遭封鎖，將直接衝擊亞洲主要進口國的能源安全。歐洲多國已啟動戰略儲油釋出機制，試圖平抑油價；亞洲各國央行則密切關注輸入性通膨壓力。</p>
+        </a>
+
+        <a href="epaper.html" target="_blank" style="display:flex;flex-direction:column;text-decoration:none;color:inherit;" style-hover="opacity:.82">
+          <img src="images/cover-2.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+          <span style="align-self:flex-start;display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-top:16px;background:#F5EAEC;color:#5C1F2B;">金融</span>
+          <div style="font-size:12px;letter-spacing:.03em;color:#9C968C;margin-top:9px;">遠見金融趨勢報・每週一發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ finDate }}</span></div>
+          <h3 style="font-family:'Noto Serif TC',serif;font-size:19px;font-weight:600;line-height:1.45;color:#1A1710;margin-top:12px;">聯準會按兵不動，台股強攻兩萬四千點</h3>
+          <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:7px;">資金行情延燒，外資連五週買超台積電</h4>
+          <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:13px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">美國聯準會在最新一次利率決策會議中決定維持基準利率不變，符合市場預期，但主席在記者會上對通膨的措辭明顯轉趨溫和，市場解讀為年底前可能啟動降息。受惠於這波資金行情，台股本週氣勢如虹，加權指數首度站上兩萬四千點大關，成交量同步放大。外資展現強勁買盤，已連續五週買超台積電，半導體與AI供應鏈個股成為盤面主流。然而部分法人提醒，指數短線漲幅已大，追高時仍須留意賣壓。</p>
+        </a>
+
+        <a href="epaper.html" target="_blank" style="display:flex;flex-direction:column;text-decoration:none;color:inherit;" style-hover="opacity:.82">
+          <img src="images/cover-3.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+          <span style="align-self:flex-start;display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-top:16px;background:#E8F2F4;color:#0D4D5C;">科技</span>
+          <div style="font-size:12px;letter-spacing:.03em;color:#9C968C;margin-top:9px;">遠見科技趨勢報・每週五發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ techDate }}</span></div>
+          <h3 style="font-family:'Noto Serif TC',serif;font-size:19px;font-weight:600;line-height:1.45;color:#1A1710;margin-top:12px;">AI算力需求爆發，台積電CoWoS產能再擴三成</h3>
+          <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:7px;">輝達、超微訂單湧入，先進封裝成兵家必爭之地</h4>
+          <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:13px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">人工智慧浪潮帶動的算力需求，正持續改寫半導體產業版圖。本週傳出台積電為因應輝達、超微等大客戶的爆量訂單，將再度擴增CoWoS先進封裝產能達三成，預計明年產能仍將供不應求。先進封裝已成為各大晶圓代工廠競逐的新戰場，三星與英特爾也積極投入，試圖在這塊高成長領域分一杯羹。市場研究機構預估，資料中心對高階運算晶片的需求未來三年將維持雙位數成長。</p>
+        </a>
+
+      </div>
+    </sc-if>
+
+    <!-- ─── 版型 B：重點頭條（頭條大圖 ＋ 兩則卡片）─── -->
+    <sc-if value="{{ isB }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;">
+
+        <a href="epaper.html" target="_blank" style="display:grid;grid-template-columns:340px 1fr;gap:32px;align-items:center;padding:32px 0;border-bottom:.5px solid #E8E4DC;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+          <img src="images/cover-1.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+          <div style="min-width:0;">
+            <span style="display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;background:#EAEFF5;color:#1F3A5C;">國際．本週頭條</span>
+            <div style="font-size:12.5px;letter-spacing:.03em;color:#9C968C;margin-top:11px;">遠見國際趨勢報・每週三發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ intlDate }}</span></div>
+            <h3 style="font-family:'Noto Serif TC',serif;font-size:28px;font-weight:600;line-height:1.35;color:#1A1710;margin:14px 0 0;">中東停火生變，國際油價單週飆漲逾一成</h3>
+            <h4 style="font-family:'Noto Serif TC',serif;font-size:16px;font-weight:400;line-height:1.6;color:#847E76;margin:9px 0 0;">荷莫茲海峽情勢升溫，全球能源供應鏈再度拉響警報</h4>
+            <p style="font-size:14px;color:#3D3830;line-height:1.9;margin-top:14px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">中東地緣政治再度成為全球市場焦點。本週以色列與伊朗的停火協議出現鬆動跡象，雙方在邊境的零星衝突引發外界對區域全面開戰的疑慮。受此影響，國際原油價格單週飆漲逾一成，布蘭特原油重返每桶九十美元關卡。市場最擔憂的，是占全球石油運輸近三成的荷莫茲海峽一旦遭封鎖，將直接衝擊亞洲主要進口國的能源安全。歐洲多國已啟動戰略儲油釋出機制，試圖平抑油價；亞洲各國央行則密切關注輸入性通膨壓力。</p>
+          </div>
+        </a>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;padding-top:30px;">
+
+          <a href="epaper.html" target="_blank" style="display:flex;flex-direction:column;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+            <img src="images/cover-2.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+            <span style="align-self:flex-start;display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-top:15px;background:#F5EAEC;color:#5C1F2B;">金融</span>
+            <div style="font-size:12px;letter-spacing:.03em;color:#9C968C;margin-top:9px;">遠見金融趨勢報・每週一發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ finDate }}</span></div>
+            <h3 style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:600;line-height:1.45;color:#1A1710;margin-top:11px;">聯準會按兵不動，台股強攻兩萬四千點</h3>
+            <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:7px;">資金行情延燒，外資連五週買超台積電</h4>
+            <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:12px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">美國聯準會在最新一次利率決策會議中決定維持基準利率不變，符合市場預期，但主席在記者會上對通膨的措辭明顯轉趨溫和，市場解讀為年底前可能啟動降息。受惠於這波資金行情，台股本週氣勢如虹，加權指數首度站上兩萬四千點大關，成交量同步放大。外資展現強勁買盤，已連續五週買超台積電，半導體與AI供應鏈個股成為盤面主流。然而部分法人提醒，指數短線漲幅已大，追高時仍須留意賣壓。</p>
+          </a>
+
+          <a href="epaper.html" target="_blank" style="display:flex;flex-direction:column;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+            <img src="images/cover-3.jpg" alt="" style="width:100%;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+            <span style="align-self:flex-start;display:inline-block;font-size:13px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;margin-top:15px;background:#E8F2F4;color:#0D4D5C;">科技</span>
+            <div style="font-size:12px;letter-spacing:.03em;color:#9C968C;margin-top:9px;">遠見科技趨勢報・每週五發報　<span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ techDate }}</span></div>
+            <h3 style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:600;line-height:1.45;color:#1A1710;margin-top:11px;">AI算力需求爆發，台積電CoWoS產能再擴三成</h3>
+            <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:7px;">輝達、超微訂單湧入，先進封裝成兵家必爭之地</h4>
+            <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:12px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">人工智慧浪潮帶動的算力需求，正持續改寫半導體產業版圖。本週傳出台積電為因應輝達、超微等大客戶的爆量訂單，將再度擴增CoWoS先進封裝產能達三成，預計明年產能仍將供不應求。先進封裝已成為各大晶圓代工廠競逐的新戰場，三星與英特爾也積極投入，試圖在這塊高成長領域分一杯羹。市場研究機構預估，資料中心對高階運算晶片的需求未來三年將維持雙位數成長。</p>
+          </a>
+
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ─── 版型 C：類別分欄 ─── -->
+    <sc-if value="{{ isC }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;">
+
+        <a href="epaper.html" target="_blank" style="display:grid;grid-template-columns:116px 1fr;gap:30px;align-items:start;padding:28px 0;border-bottom:.5px solid #E8E4DC;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+          <div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:26px;font-weight:600;line-height:1.2;color:#1F3A5C;">國際</div>
+            <div style="width:30px;height:3px;background:#1F3A5C;margin-top:11px;"></div>
+            <div style="font-family:'EB Garamond',serif;font-size:13px;letter-spacing:.12em;color:#9C968C;margin-top:13px;line-height:1.5;">每週三發報<br><span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ intlDate }}</span></div>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;gap:20px;align-items:flex-start;">
+              <div style="flex:1;min-width:0;">
+                <h3 style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;line-height:1.4;color:#1A1710;">中東停火生變，國際油價單週飆漲逾一成</h3>
+                <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:8px;">荷莫茲海峽情勢升溫，全球能源供應鏈再度拉響警報</h4>
+              </div>
+              <img src="images/cover-1.jpg" alt="" style="flex:none;width:148px;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+            </div>
+            <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:14px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">中東地緣政治再度成為全球市場焦點。本週以色列與伊朗的停火協議出現鬆動跡象，雙方在邊境的零星衝突引發外界對區域全面開戰的疑慮。受此影響，國際原油價格單週飆漲逾一成，布蘭特原油重返每桶九十美元關卡。市場最擔憂的，是占全球石油運輸近三成的荷莫茲海峽一旦遭封鎖，將直接衝擊亞洲主要進口國的能源安全。歐洲多國已啟動戰略儲油釋出機制，試圖平抑油價；亞洲各國央行則密切關注輸入性通膨壓力。</p>
+          </div>
+        </a>
+
+        <a href="epaper.html" target="_blank" style="display:grid;grid-template-columns:116px 1fr;gap:30px;align-items:start;padding:28px 0;border-bottom:.5px solid #E8E4DC;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+          <div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:26px;font-weight:600;line-height:1.2;color:#5C1F2B;">金融</div>
+            <div style="width:30px;height:3px;background:#5C1F2B;margin-top:11px;"></div>
+            <div style="font-family:'EB Garamond',serif;font-size:13px;letter-spacing:.12em;color:#9C968C;margin-top:13px;line-height:1.5;">每週一發報<br><span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ finDate }}</span></div>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;gap:20px;align-items:flex-start;">
+              <div style="flex:1;min-width:0;">
+                <h3 style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;line-height:1.4;color:#1A1710;">聯準會按兵不動，台股強攻兩萬四千點</h3>
+                <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:8px;">資金行情延燒，外資連五週買超台積電</h4>
+              </div>
+              <img src="images/cover-2.jpg" alt="" style="flex:none;width:148px;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+            </div>
+            <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:14px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">美國聯準會在最新一次利率決策會議中決定維持基準利率不變，符合市場預期，但主席在記者會上對通膨的措辭明顯轉趨溫和，市場解讀為年底前可能啟動降息。受惠於這波資金行情，台股本週氣勢如虹，加權指數首度站上兩萬四千點大關，成交量同步放大。外資展現強勁買盤，已連續五週買超台積電，半導體與AI供應鏈個股成為盤面主流。然而部分法人提醒，指數短線漲幅已大，技術面浮現過熱訊號，投資人追高時仍須留意獲利了結賣壓。</p>
+          </div>
+        </a>
+
+        <a href="epaper.html" target="_blank" style="display:grid;grid-template-columns:116px 1fr;gap:30px;align-items:start;padding:28px 0;text-decoration:none;color:inherit;" style-hover="opacity:.85">
+          <div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:26px;font-weight:600;line-height:1.2;color:#0D4D5C;">科技</div>
+            <div style="width:30px;height:3px;background:#0D4D5C;margin-top:11px;"></div>
+            <div style="font-family:'EB Garamond',serif;font-size:13px;letter-spacing:.12em;color:#9C968C;margin-top:13px;line-height:1.5;">每週五發報<br><span style="font-family:'EB Garamond',serif;color:#6E6A62;letter-spacing:.02em;">{{ techDate }}</span></div>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;gap:20px;align-items:flex-start;">
+              <div style="flex:1;min-width:0;">
+                <h3 style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;line-height:1.4;color:#1A1710;">AI算力需求爆發，台積電CoWoS產能再擴三成</h3>
+                <h4 style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:400;line-height:1.6;color:#847E76;margin-top:8px;">輝達、超微訂單湧入，先進封裝成兵家必爭之地</h4>
+              </div>
+              <img src="images/cover-3.jpg" alt="" style="flex:none;width:148px;aspect-ratio:792/555;object-fit:cover;border-radius:2px;display:block;">
+            </div>
+            <p style="font-size:13.5px;color:#3D3830;line-height:1.85;margin-top:14px;text-align:justify;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">人工智慧浪潮帶動的算力需求，正持續改寫半導體產業版圖。本週傳出台積電為因應輝達、超微等大客戶的爆量訂單，將再度擴增CoWoS先進封裝產能達三成，預計明年產能仍將供不應求。先進封裝已成為各大晶圓代工廠競逐的新戰場，三星與英特爾也積極投入，試圖在這塊高成長領域分一杯羹。市場研究機構預估，資料中心對高階運算晶片的需求未來三年將維持雙位數成長。</p>
+          </div>
+        </a>
+
+      </div>
+    </sc-if>
+
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer style="margin-top:40px;padding:20px 0 0;border-top:.5px solid #E8E4DC;display:flex;align-items:center;justify-content:space-between;font-size:14px;color:#AFA9A0;letter-spacing:.06em;">
+    <span>© 2026 <a href="https://www.eslite.com/" target="_blank" rel="noopener noreferrer" style="color:#AFA9A0;text-decoration:none;">誠品線上 eslite.com</a></span>
+    <a href="index.html" style="color:#AFA9A0;text-decoration:none;">職場雷達</a>
+  </footer>
+
+</div>
+
+<!-- ── 近期熱門文章 Modal ── -->
+<sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,16,.48);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:48px 20px 40px;overflow-y:auto;">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;width:100%;max-width:600px;border-radius:3px;overflow:hidden;display:flex;flex-direction:column;max-height:82vh;">
+      <div style="padding:20px 24px 16px;border-bottom:1px solid #D4CEC4;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;">
+        <div style="font-family:'Noto Serif TC',serif;font-size:17px;font-weight:500;color:#1A1710;letter-spacing:.05em;">近期熱門文章</div>
+        <button onClick="{{ closeModal }}" style="background:none;border:none;cursor:pointer;color:#847E76;font-size:20px;line-height:1;padding:2px 0 2px 8px;">×</button>
+      </div>
+      <div style="overflow-y:auto;flex:1;">
+        <sc-for list="{{ modalGroups }}" as="group" hint-placeholder-count="4">
+          <div>
+            <div style="font-size:13px;letter-spacing:.16em;color:#847E76;padding:12px 24px 9px;background:#F9F7F4;border-top:.5px solid #E8E4DC;border-bottom:.5px solid #E8E4DC;">{{ group.date }}</div>
+            <sc-for list="{{ group.items }}" as="item" hint-placeholder-count="3">
+              <a href="{{ item.url }}" target="_blank" style="display:flex;align-items:flex-start;gap:12px;padding:11px 24px;border-bottom:.5px solid #E8E4DC;text-decoration:none;color:inherit;cursor:pointer;" style-hover="background:#F9F7F4">
+                <span style="flex-shrink:0;align-self:center;min-width:54px;text-align:center;font-size:14px;font-weight:500;letter-spacing:.16em;padding:3px 9px;border-radius:1px;background:{{ item.catBg }};color:{{ item.catColor }};">{{ item.label }}</span>
+                <span style="font-family:'Noto Serif TC',serif;font-size:14px;line-height:1.65;color:#1A1710;flex:1;">{{ item.title }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:880,&quot;height&quot;:1500}}">
+class Component extends DCLogic {
+  state = { modalOpen: false, layout: 'A' };
+
+  tabOn = 'font-size:13px;letter-spacing:.1em;padding:5px 14px;border-radius:1px;cursor:pointer;border:.5px solid #1A1710;background:#1A1710;color:#fff;font-family:"Noto Sans TC",sans-serif;';
+  tabOff = 'font-size:13px;letter-spacing:.1em;padding:5px 14px;border-radius:1px;cursor:pointer;border:.5px solid #C9C3B8;background:transparent;color:#847E76;font-family:"Noto Sans TC",sans-serif;';
+
+  componentDidMount() {
+    this._onKey = (e) => { if (e.key === 'Escape') this.setState({ modalOpen: false }); };
+    document.addEventListener('keydown', this._onKey);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this._onKey);
+  }
+
+  fmt(d) {
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}.${mm}.${dd}`;
+  }
+
+  get ARTICLES() {
+    return [
+      { date: '2026.06.22', items: [
+        { id: 240701, cat: 'high', label: '高階決策', title: '台積電與三星的地緣博弈：先進製程版圖爭奪進入白熱化' },
+        { id: 240702, cat: 'mgmt', label: '管理實務', title: '主管最怕聽到「我盡力了」：如何讓團隊真正承擔結果？' },
+        { id: 240703, cat: 'grow', label: '職場成長', title: '職場新人如何在90天內建立不可取代的核心定位？' },
+      ]},
+      { date: '2026.06.21', items: [
+        { id: 240711, cat: 'high', label: '高階決策', title: '輝達黃仁勳的下一步：AI晶片霸主如何守住護城河？' },
+        { id: 240712, cat: 'mgmt', label: '管理實務', title: '混合辦公兩年後的真相：哪些管理方法已徹底失效？' },
+        { id: 240713, cat: 'grow', label: '職場成長', title: '用ChatGPT寫報告的人越來越多，你的思考力還剩幾成？' },
+      ]},
+      { date: '2026.06.20', items: [
+        { id: 240721, cat: 'high', label: '高階決策', title: '台灣AI新創融資破紀錄：哪些賽道已悄悄被外資卡位？' },
+        { id: 240722, cat: 'mgmt', label: '管理實務', title: '一對一面談做了反效果？主管常犯的三個心理錯誤' },
+        { id: 240723, cat: 'grow', label: '職場成長', title: '中年轉職潮再起：45歲後的職涯，靠什麼重新起步？' },
+      ]},
+      { date: '2026.06.19', items: [
+        { id: 240731, cat: 'high', label: '高階決策', title: '日本半導體復甦計畫全面啟動，Rapidus背後的國家押注' },
+        { id: 240732, cat: 'mgmt', label: '管理實務', title: 'OKR導入後三個月無感？失敗原因幾乎都在這裡' },
+        { id: 240733, cat: 'grow', label: '職場成長', title: '讀了很多書卻沒有用？知識轉化成行動的三個關鍵步驟' },
+      ]},
+      { date: '2026.06.18', items: [
+        { id: 240741, cat: 'high', label: '高階決策', title: '馬斯克的政治豪賭後遺症：特斯拉品牌信任度重建之路' },
+        { id: 240742, cat: 'mgmt', label: '管理實務', title: '「不喜歡給回饋」的主管，正在悄悄逼走你的A級人才' },
+        { id: 240743, cat: 'grow', label: '職場成長', title: 'AI工具已成辦公室標配，你的工作流還沒升級？' },
+      ]},
+      { date: '2026.06.17', items: [
+        { id: 240751, cat: 'high', label: '高階決策', title: '東南亞供應鏈崛起：台灣製造業的機會還是威脅？' },
+        { id: 240752, cat: 'mgmt', label: '管理實務', title: '會議效率低落根源在哪？砍掉這三種無效會議立見成效' },
+        { id: 240753, cat: 'grow', label: '職場成長', title: '你是工作狂還是高效者？辨別真正的生產力與自我感動' },
+      ]},
+      { date: '2026.06.16', items: [
+        { id: 240761, cat: 'high', label: '高階決策', title: 'OpenAI與微軟的裂痕擴大：AI王國的合作與競爭重新定義' },
+        { id: 240762, cat: 'mgmt', label: '管理實務', title: '新世代主管養成術：Z世代員工要的，和你以為的差很遠' },
+        { id: 240763, cat: 'grow', label: '職場成長', title: '簡報高手的秘訣：讓老闆三分鐘內點頭的結構化表達法' },
+      ]},
+    ];
+  }
+
+  recentWeekday(targetDow) {
+    const d = new Date();
+    const diff = (d.getDay() - targetDow + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    return this.fmt(d);
+  }
+
+  renderVals() {
+    const today = new Date();
+    const heroDate = this.fmt(today);
+
+    const finDate = this.recentWeekday(1);   // 金融 每週一
+    const intlDate = this.recentWeekday(3);  // 國際 每週三
+    const techDate = this.recentWeekday(5);  // 科技 每週五
+
+    const CAT = {
+      high: { catBg: '#F0EEF8', catColor: '#2B1F5C' },
+      mgmt: { catBg: '#EAF3EE', catColor: '#0D3D2E' },
+      grow: { catBg: '#F5EDE4', catColor: '#5C2800' },
+    };
+
+    const valid = new Set();
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      valid.add(this.fmt(d));
+    }
+    const modalGroups = this.ARTICLES.filter(g => valid.has(g.date)).map(g => ({
+      date: g.date,
+      items: g.items.map(it => ({
+        label: it.label,
+        title: it.title,
+        url: `https://api.gvm.com.tw/eslite/article/${it.id}`,
+        catBg: CAT[it.cat].catBg,
+        catColor: CAT[it.cat].catColor,
+      })),
+    }));
+
+    const layout = this.state.layout;
+
+    return {
+      heroDate,
+      finDate,
+      intlDate,
+      techDate,
+      modalOpen: this.state.modalOpen,
+      modalGroups,
+      openModal: () => this.setState({ modalOpen: true }),
+      closeModal: () => this.setState({ modalOpen: false }),
+      stop: (e) => e.stopPropagation(),
+      isA: layout === 'A',
+      isB: layout === 'B',
+      isC: layout === 'C',
+      tabA: layout === 'A' ? this.tabOn : this.tabOff,
+      tabB: layout === 'B' ? this.tabOn : this.tabOff,
+      tabC: layout === 'C' ? this.tabOn : this.tabOff,
+      setA: () => this.setState({ layout: 'A' }),
+      setB: () => this.setState({ layout: 'B' }),
+      setC: () => this.setState({ layout: 'C' }),
+    };
+  }
+}
+</script>
+</body>
+</html>
