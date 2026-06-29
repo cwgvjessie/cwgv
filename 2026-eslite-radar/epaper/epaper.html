@@ -15,6 +15,23 @@
 html{font-size:16px;}
 body{font-family:'Noto Sans TC',sans-serif;background:#fff;color:#2B2B2B;line-height:1.7;-webkit-font-smoothing:antialiased;}
 a{color:inherit;}
+
+/* ─── RWD：手機版（≤600px）─────────────────────────── */
+@media (max-width:600px){
+  /* 共用：縮減側邊距 44px → 16px */
+  .ep-padded { padding-left:16px !important; padding-right:16px !important; }
+
+  /* 版型 A 經典：縮小縮圖、縮文章間距 */
+  .ep-a-list             { grid-template-columns:72px 1fr !important; gap:14px !important; }
+  .ep-a-list > image-slot{ width:72px !important; }
+
+  /* 版型 B 雜誌：本期精選 隱藏右側縮圖欄 */
+  .ep-b-row              { grid-template-columns:46px 1fr !important; gap:14px !important; }
+  .ep-b-row > image-slot { display:none !important; }
+
+  /* 版型 B 頭條大圖 overlay h1 字體縮小 */
+  .ep-b-h1    { font-size:20px !important; }
+}
 </style>
 <script src="image-slot.js"></script>
 </helmet>
@@ -48,7 +65,7 @@ a{color:inherit;}
 
     <!-- masthead -->
     <div style="height:9px;background:linear-gradient(90deg,#B98F2E,#E6CE82 45%,#B98F2E);"></div>
-    <div style="padding:34px 44px 0;">
+    <div class="ep-padded" style="padding:34px 44px 0;">
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;">
         <div style="flex:1;height:1px;background:#C9A84C;"></div>
         <div style="display:flex;align-items:baseline;gap:9px;white-space:nowrap;">
@@ -62,7 +79,7 @@ a{color:inherit;}
     </div>
 
     <!-- hero -->
-    <div style="padding:22px 44px 40px;">
+    <div class="ep-padded" style="padding:22px 44px 40px;">
       <image-slot id="ep-hero" shape="rect" src="images/cover-1.jpg" placeholder="頭條圖片" style="width:100%;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       <h1 style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:25px;line-height:1.5;color:#1A1A1A;text-align:center;margin-top:26px;text-wrap:balance;">遺產怎麼分？繼承順位有新制，這「動作」決定房子給誰</h1>
       <p style="font-size:15px;color:#6E6A62;line-height:1.95;margin-top:18px;text-align:justify;">六月以來，全球金融市場持續動盪。從台股單日重挫逾1500點、券商系統大當機，到AI浪潮推升科技巨頭身價再創新高，投資人一方面面對市場劇烈波動，另一方面也看見財富快速重組的新時代正在來臨。當全球首富競逐進入新階段，馬斯克因SpaceX估值再創高峰，甚至被預測有望成為史上首位兆元富豪；另一方面，台灣投資人最熟悉的台積電，董事長魏哲家則以實際行動展現對企業長期價值的信心。給投資人最大的啟示應該是，在市場恐慌與機會並存的環境下，長期投資與資產配置的重要性愈發凸顯。</p>
@@ -76,10 +93,10 @@ a{color:inherit;}
     </div>
 
     <!-- article list -->
-    <div style="padding:0 44px 8px;">
+    <div class="ep-padded" style="padding:0 44px 8px;">
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
-        <image-slot id="ep-a1" shape="rect" src="images/cover-2.jpg" placeholder="圖片" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-a-list" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+        <image-slot id="ep-a1" shape="rect" src="images/cover-2.jpg" placeholder="圖片" class="ep-a-thumb" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
         <div>
           <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">投資理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:8px;">尊重資本市場專業，避免省小錢、賠大錢</h3>
@@ -87,8 +104,8 @@ a{color:inherit;}
         </div>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
-        <image-slot id="ep-a2" shape="rect" src="images/cover-3.jpg" placeholder="圖片" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-a-list" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+        <image-slot id="ep-a2" shape="rect" src="images/cover-3.jpg" placeholder="圖片" class="ep-a-thumb" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
         <div>
           <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">時事</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:8px;">搶救少子化大作戰！房價高昂、托育缺口，害年輕人「不婚不生」？</h3>
@@ -96,8 +113,8 @@ a{color:inherit;}
         </div>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
-        <image-slot id="ep-a3" shape="rect" src="images/cover-1.jpg" placeholder="圖片" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-a-list" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+        <image-slot id="ep-a3" shape="rect" src="images/cover-1.jpg" placeholder="圖片" class="ep-a-thumb" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
         <div>
           <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">退休理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:8px;">人生最後階段才要用的「退休金」，為何反而要放資產規劃「第一位」？</h3>
@@ -105,8 +122,8 @@ a{color:inherit;}
         </div>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
-        <image-slot id="ep-a4" shape="rect" src="images/cover-2.jpg" placeholder="圖片" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-a-list" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+        <image-slot id="ep-a4" shape="rect" src="images/cover-2.jpg" placeholder="圖片" class="ep-a-thumb" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
         <div>
           <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">投資理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:8px;">努力存錢卻錯過人生？YOLO還是FIRE？聰明人都有2個重要的理財水缸</h3>
@@ -114,8 +131,8 @@ a{color:inherit;}
         </div>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
-        <image-slot id="ep-a5" shape="rect" src="images/cover-3.jpg" placeholder="圖片" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-a-list" style="display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;padding:24px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
+        <image-slot id="ep-a5" shape="rect" src="images/cover-3.jpg" placeholder="圖片" class="ep-a-thumb" style="width:150px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
         <div>
           <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">產業趨勢</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:8px;">魏哲家加碼自家股票！台積電董座的買進訊號，透露什麼長線布局？</h3>
@@ -133,7 +150,7 @@ a{color:inherit;}
   <div style="max-width:680px;margin:0 auto;background:#fff;">
 
     <!-- masthead 左對齊 -->
-    <div style="padding:32px 44px 0;">
+    <div class="ep-padded" style="padding:32px 44px 0;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;">
         <div style="display:flex;align-items:baseline;gap:9px;">
           <span style="font-family:'Noto Serif TC',serif;font-weight:900;font-size:21px;color:#13357A;letter-spacing:.04em;">遠見</span>
@@ -150,11 +167,11 @@ a{color:inherit;}
       <image-slot id="ep-hero" shape="rect" src="images/cover-1.jpg" placeholder="頭條圖片" style="width:100%;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       <div style="position:absolute;left:0;right:0;bottom:0;padding:60px 44px 28px;background:linear-gradient(to top,rgba(10,8,4,.9),rgba(10,8,4,.5) 55%,transparent);pointer-events:none;">
         <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;color:#E6CE82;border:1px solid rgba(230,206,130,.6);padding:3px 10px;">本週頭條</span>
-        <h1 style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:27px;line-height:1.45;color:#fff;margin-top:14px;text-wrap:balance;">遺產怎麼分？繼承順位有新制，這「動作」決定房子給誰</h1>
+        <h1 class="ep-b-h1" style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:27px;line-height:1.45;color:#fff;margin-top:14px;text-wrap:balance;">遺產怎麼分？繼承順位有新制，這「動作」決定房子給誰</h1>
       </div>
     </div>
 
-    <div style="padding:26px 44px 6px;">
+    <div class="ep-padded" style="padding:26px 44px 6px;">
       <p style="font-size:15px;color:#6E6A62;line-height:1.95;text-align:justify;">六月以來，全球金融市場持續動盪。從台股單日重挫逾1500點、券商系統大當機，到AI浪潮推升科技巨頭身價再創新高，投資人一方面面對市場劇烈波動，另一方面也看見財富快速重組的新時代正在來臨。當全球首富競逐進入新階段，馬斯克因SpaceX估值再創高峰，甚至被預測有望成為史上首位兆元富豪；另一方面，台灣投資人最熟悉的台積電，董事長魏哲家則以實際行動展現對企業長期價值的信心。給投資人最大的啟示應該是，在市場恐慌與機會並存的環境下，長期投資與資產配置的重要性愈發凸顯。</p>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:22px;">
         <div style="display:flex;align-items:center;gap:11px;">
@@ -166,57 +183,57 @@ a{color:inherit;}
     </div>
 
     <!-- 本期精選 編號清單 -->
-    <div style="padding:34px 44px 10px;">
+    <div class="ep-padded" style="padding:34px 44px 10px;">
       <div style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:15px;letter-spacing:.16em;color:#B98F2E;margin-bottom:6px;">本期精選</div>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-b-row" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
         <span style="font-family:'EB Garamond',serif;font-size:30px;color:#D8C089;line-height:1;">01</span>
         <div>
           <div style="font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">投資理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:6px;">尊重資本市場專業，避免省小錢、賠大錢</h3>
           <div style="font-size:13px;color:#9A9387;margin-top:7px;">By <u style="text-underline-offset:2px;">楊應超</u></div>
         </div>
-        <image-slot id="ep-a1" shape="rect" src="images/cover-2.jpg" placeholder="圖" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+        <image-slot id="ep-a1" shape="rect" src="images/cover-2.jpg" placeholder="圖" class="ep-b-thumb" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-b-row" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
         <span style="font-family:'EB Garamond',serif;font-size:30px;color:#D8C089;line-height:1;">02</span>
         <div>
           <div style="font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">時事</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:6px;">搶救少子化大作戰！房價高昂、托育缺口，害年輕人「不婚不生」？</h3>
           <div style="font-size:13px;color:#9A9387;margin-top:7px;">By <u style="text-underline-offset:2px;">周彥妤</u></div>
         </div>
-        <image-slot id="ep-a2" shape="rect" src="images/cover-3.jpg" placeholder="圖" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+        <image-slot id="ep-a2" shape="rect" src="images/cover-3.jpg" placeholder="圖" class="ep-b-thumb" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-b-row" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;text-decoration:none;">
         <span style="font-family:'EB Garamond',serif;font-size:30px;color:#D8C089;line-height:1;">03</span>
         <div>
           <div style="font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">退休理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:6px;">人生最後階段才要用的「退休金」，為何反而要放資產規劃「第一位」？</h3>
           <div style="font-size:13px;color:#9A9387;margin-top:7px;">By <u style="text-underline-offset:2px;">遠見好讀</u></div>
         </div>
-        <image-slot id="ep-a3" shape="rect" src="images/cover-1.jpg" placeholder="圖" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+        <image-slot id="ep-a3" shape="rect" src="images/cover-1.jpg" placeholder="圖" class="ep-b-thumb" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-b-row" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
         <span style="font-family:'EB Garamond',serif;font-size:30px;color:#D8C089;line-height:1;">04</span>
         <div>
           <div style="font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">投資理財</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:6px;">努力存錢卻錯過人生？YOLO還是FIRE？聰明人都有2個重要的理財水缸</h3>
           <div style="font-size:13px;color:#9A9387;margin-top:7px;">By <u style="text-underline-offset:2px;">遠見好讀</u></div>
         </div>
-        <image-slot id="ep-a4" shape="rect" src="images/cover-2.jpg" placeholder="圖" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+        <image-slot id="ep-a4" shape="rect" src="images/cover-2.jpg" placeholder="圖" class="ep-b-thumb" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       </a>
 
-      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
+      <a href="https://api.gvm.com.tw/eslite/article/130982" target="_blank" class="ep-b-row" style="display:grid;grid-template-columns:46px 1fr 92px;gap:18px;align-items:center;padding:22px 0;border-top:1px solid #ECE8E0;border-bottom:1px solid #ECE8E0;text-decoration:none;">
         <span style="font-family:'EB Garamond',serif;font-size:30px;color:#D8C089;line-height:1;">05</span>
         <div>
           <div style="font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#B98F2E;">產業趨勢</div>
           <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.5;color:#1A1A1A;margin-top:6px;">魏哲家加碼自家股票！台積電董座的買進訊號，透露什麼長線布局？</h3>
           <div style="font-size:13px;color:#9A9387;margin-top:7px;">By <u style="text-underline-offset:2px;">遠見好讀</u></div>
         </div>
-        <image-slot id="ep-a5" shape="rect" src="images/cover-3.jpg" placeholder="圖" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
+        <image-slot id="ep-a5" shape="rect" src="images/cover-3.jpg" placeholder="圖" class="ep-b-thumb" style="width:92px;height:auto;aspect-ratio:792/555;display:block;"></image-slot>
       </a>
 
     </div>
