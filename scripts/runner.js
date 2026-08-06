@@ -20,7 +20,7 @@ async function run() {
   const prompt = `
 你是一位資深軟體工程師。
 
-根據以下 GitHub Issue，請輸出 JSON。
+請根據以下 GitHub Issue 輸出 JSON。
 
 Issue Title:
 ${title}
@@ -28,37 +28,67 @@ ${title}
 Issue Body:
 ${body}
 
-請只輸出 JSON。
+請只輸出 JSON，不要輸出 Markdown。
 
-格式如下：
+格式：
 
 {
   "filename": "hello.txt",
-  "content": "Hello CWGV"
+  "content": "Hello from Gemini API!"
 }
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
-    contents: prompt
-  });
+  const candidateModels = [
+    "gemini-2.5-pro",
+    "gemini-2.5-flash"
+  ];
+
+  let response = null;
+  let lastError = null;
+
+  for (const model of candidateModels) {
+    try {
+      console.log(`🚀 嘗試模型: ${model}`);
+
+      response = await ai.models.generateContent({
+        model,
+        contents: prompt
+      });
+
+      console.log(`✅ 成功使用模型: ${model}`);
+      break;
+
+    } catch (err) {
+      console.log(`❌ 模型失敗: ${model}`);
+      console.log(err.message);
+      lastError = err;
+    }
+  }
+
+  if (!response) {
+    console.error("所有模型皆失敗");
+    console.error(lastError);
+    process.exit(1);
+  }
 
   const text = response.text
     .replace(/```json/g, "")
     .replace(/```/g, "")
     .trim();
 
-  console.log("Gemini 回應：");
+  console.log("===== Gemini 回應 =====");
   console.log(text);
+  console.log("======================");
 
   const result = JSON.parse(text);
 
   fs.writeFileSync(
     result.filename,
-    result.content
+    result.content,
+    "utf8"
   );
 
-  console.log(`✅ 已建立檔案 ${result.filename}`);
+  console.log(`✅ 已建立檔案: ${result.filename}`);
 }
 
 run().catch((err) => {
