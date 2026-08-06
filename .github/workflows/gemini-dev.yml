@@ -8,6 +8,7 @@ on:
 jobs:
   gemini-dev:
     if: github.event.label.name == 'ai-dev'
+
     runs-on: ubuntu-latest
 
     permissions:
@@ -19,102 +20,45 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: 22
 
-      - name: Install Google GenAI SDK
+      - name: Install SDK
         run: npm install @google/genai
+
+      - name: Create Branch
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
+
+          git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
 
       - name: Run Gemini
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
+
+        run: |
+          node scripts/runner.js
+
+      - name: Commit Changes
+        env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
 
         run: |
           BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
-
-          cat > runner.js <<'EOF'
-          const { GoogleGenAI } = require("@google/genai");
-          const fs = require("fs");
-
-          const apiKey = process.env.GEMINI_API_KEY;
-
-          if (!apiKey) {
-            console.error("❌ GEMINI_API_KEY 未設定");
-            process.exit(1);
-          }
-
-          console.log("✅ API Key 已讀取");
-
-          const ai = new GoogleGenAI({
-            apiKey
-          });
-
-          async function run() {
-
-            const title = process.env.ISSUE_TITLE || "";
-            const body = process.env.ISSUE_BODY || "";
-
-            console.log("Issue Title:", title);
-
-            const prompt =
-              "你是一位資深軟體工程師。\n\n" +
-              "根據以下 GitHub Issue 產生 JSON。\n\n" +
-              "Issue Title:\n" +
-              title +
-              "\n\nIssue Body:\n" +
-              body +
-              "\n\n請只輸出 JSON。\n\n" +
-              '{"filename":"hello.txt","content":"Hello CWGV"}';
-
-            const response =
-              await ai.models.generateContent({
-                model: "gemini-2.5-flash",
-                contents: prompt
-              });
-
-            const text =
-              response.text
-                .replace(/```json/g, "")
-                .replace(/```/g, "")
-                .trim();
-
-            console.log("Gemini 回應：");
-            console.log(text);
-
-            const result = JSON.parse(text);
-
-            fs.writeFileSync(
-              result.filename,
-              result.content
-            );
-
-            console.log(
-              `✅ 已建立檔案 ${result.filename}`
-            );
-          }
-
-          run().catch((err) => {
-            console.error(err);
-            process.exit(1);
-          });
-          EOF
-
-          node runner.js
-
           git add .
 
           if git diff --cached --quiet; then
-            echo "沒有變更"
+            echo "No changes"
             exit 0
           fi
 
@@ -122,4 +66,16 @@ jobs:
 
           git push origin $BRANCH_NAME
 
-      - name: 
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+        run: |
+          BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
+
+          gh pr create \
+            --title "Gemini Auto Fix #${ISSUE_NUMBER}" \
+            --body "此 PR 由 Gemini 自動產生" \
+            --base main \
+ 
