@@ -49,18 +49,18 @@ jobs:
             process.exit(1);
           }
 
-          const ai = new GoogleGenAI({ apiKey });
+          // 指定 apiVersion 為 v1beta 避免預設走 alpha 導致空清單
+          const ai = new GoogleGenAI({ apiKey, apiVersion: "v1beta" });
 
           async function run() {
             const title = process.env.ISSUE_TITLE || "";
             const body = process.env.ISSUE_BODY || "";
 
-            console.log("🔍 正在向 API 查詢帳號下可用的模型清單...");
+            console.log("🔍 正在向 v1beta 查詢可用的模型清單...");
             let availableModels = [];
             try {
               const listResp = await ai.models.list();
               for await (const m of listResp) {
-                // 篩選出支援生成內容的模型
                 if (m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent")) {
                   const cleanName = m.name.replace(/^models\//, "");
                   availableModels.push(cleanName);
@@ -68,13 +68,13 @@ jobs:
               }
               console.log("📋 偵測到可用模型清單：", availableModels);
             } catch (err) {
-              console.warn("⚠️ 自動取得模型清單失敗，改嘗試預設名稱:", err.message);
-              availableModels = ["gemini-2.0-flash", "gemini-1.5-flash"];
+              console.warn("⚠️ 自動取得模型清單失敗，改嘗試 fallback 機制:", err.message);
             }
 
+            // 若無法自動取得清單，直接備用已知免費層模型
             if (availableModels.length === 0) {
-              console.error("❌ 找不到任何可用的 generateContent 模型，請檢查 API Key 狀態。");
-              process.exit(1);
+              console.log("ℹ️ 清單為空，套用預設模型陣列...");
+              availableModels = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
             }
 
             const prompt = `你是一位自動化開發工程師。請根據以下 Issue 需求，輸出要新增或修改的檔案路徑與內容。
@@ -87,7 +87,6 @@ jobs:
             let response = null;
             let successModel = "";
 
-            // 自動輪詢可用模型，直到成功為止
             for (const modelName of availableModels) {
               try {
                 console.log(`🚀 嘗試呼叫模型: ${modelName}...`);
@@ -99,12 +98,12 @@ jobs:
                 console.log(`✅ 成功使用 ${modelName} 取得回應！`);
                 break;
               } catch (err) {
-                console.warn(`⚠️ 模型 ${modelName} 呼叫失敗 (${err.message})，嘗試下一個...`);
+                console.warn(`⚠️ 模型 ${modelName} 失敗: ${err.message}`);
               }
             }
 
             if (!response || !response.text) {
-              console.error("❌ 所有可用模型嘗試皆失敗，請確認 API Key 的配額限制。");
+              console.error("❌ 所有模型嘗試皆失敗。");
               process.exit(1);
             }
 
