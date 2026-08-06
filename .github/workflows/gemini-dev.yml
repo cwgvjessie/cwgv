@@ -1,0 +1,72 @@
+name: Gemini Auto Dev Workflow
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  gemini-dev:
+    if: github.event.label.name == 'ai-dev'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Google Gen AI SDK
+        run: |
+          npm install @google/genai
+
+      - name: Run Gemini to Process Issue
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b $BRANCH_NAME
+
+          # 執行 Node.js 腳本呼叫 Gemini 進行處理
+          node -e '
+          const { GoogleGenAI } = require("@google/genai");
+          const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+          async function run() {
+            const prompt = `你是一位資深工程師。請根據以下 Issue 需求進行處理：\n標題: ${process.env.ISSUE_TITLE}\n內容: ${process.env.ISSUE_BODY}`;
+            const response = await ai.models.generateContent({
+              model: "gemini-2.5-pro",
+              contents: prompt,
+            });
+            console.log("Gemini 處理完成：", response.text);
+          }
+          run().catch(err => { console.error(err); process.exit(1); });
+          '
+
+          git add .
+          git commit -m "feat: auto resolution for Issue #${ISSUE_NUMBER} by Gemini" || exit 0
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
+          gh pr create \
+            --title "Fix/Feat: Issue #${ISSUE_NUMBER} (Gemini Generated)" \
+            --body "此 PR 由 Gemini 自動生成，回應 Issue #${ISSUE_NUMBER}。" \
+            --base main \
+            --head $BRANCH_NAME
