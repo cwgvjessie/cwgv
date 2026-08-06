@@ -62,8 +62,8 @@ jobs:
           請嚴格僅輸出標準 JSON 格式（不要包含任何 Markdown 標記，如 \`\`\`json）：
           {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
 
-            // 依序測試標準模型名稱
-            const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+            // 改試 Lite 與 Experimental 版本模型
+            const candidateModels = ["gemini-2.0-flash-lite", "gemini-2.0-flash-exp"];
             let response = null;
             let lastError = null;
 
