@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Google Gen AI SDK
         run: |
@@ -39,24 +39,61 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b $BRANCH_NAME
 
-          # 執行 Node.js 腳本呼叫 Gemini 進行處理
-          node -e '
+          # 建立獨立 runner.js 腳本，避免 Shell 符號跳脱問題
+          cat << 'EOF' > runner.js
           const { GoogleGenAI } = require("@google/genai");
-          const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+          const fs = require("fs");
+
+          const apiKey = process.env.GEMINI_API_KEY;
+          if (!apiKey) {
+            console.error("錯誤：未能讀取到 GEMINI_API_KEY Secrets");
+            process.exit(1);
+          }
+
+          const ai = new GoogleGenAI({ apiKey });
 
           async function run() {
-            const prompt = `你是一位資深工程師。請根據以下 Issue 需求進行處理：\n標題: ${process.env.ISSUE_TITLE}\n內容: ${process.env.ISSUE_BODY}`;
+            const title = process.env.ISSUE_TITLE || "";
+            const body = process.env.ISSUE_BODY || "";
+
+            const prompt = `你是一位自動化開發工程師。請根據以下 Issue 需求，輸出要新增或修改的檔案路徑與內容。
+          標題: ${title}
+          內容: ${body}
+
+          請嚴格僅輸出標準 JSON 格式（不可以包含任何 Markdown 標籤或字串）：
+          {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
+
+            console.log("正在傳送請求給 Gemini API...");
             const response = await ai.models.generateContent({
               model: "gemini-2.5-pro",
               contents: prompt,
             });
-            console.log("Gemini 處理完成：", response.text);
+
+            console.log("Gemini 回應內容：\n", response.text);
+
+            try {
+              const cleanText = response.text.replace(/```json|```/g, "").trim();
+              const result = JSON.parse(cleanText);
+              fs.writeFileSync(result.filename, result.content);
+              console.log(`成功自動寫入檔案: ${result.filename}`);
+            } catch (e) {
+              console.error("解析 JSON 失敗：", e.message);
+              process.exit(1);
+            }
           }
-          run().catch(err => { console.error(err); process.exit(1); });
-          '
+
+          run().catch(err => {
+            console.error("執行遭遇異常：", err);
+            process.exit(1);
+          });
+          EOF
+
+          # 執行 Node 腳本並清理暫存檔
+          node runner.js
+          rm runner.js
 
           git add .
-          git commit -m "feat: auto resolution for Issue #${ISSUE_NUMBER} by Gemini" || exit 0
+          git commit -m "feat: auto resolution for Issue #${ISSUE_NUMBER} by Gemini"
           git push origin $BRANCH_NAME
 
       - name: Create Pull Request
