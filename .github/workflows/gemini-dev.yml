@@ -2,7 +2,8 @@ name: Gemini Auto Dev Workflow
 
 on:
   issues:
-    types: [labeled]
+    types:
+      - labeled
 
 jobs:
   gemini-dev:
@@ -34,7 +35,6 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
 
         run: |
-
           BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
 
           git config user.name "github-actions[bot]"
@@ -42,8 +42,7 @@ jobs:
 
           git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
 
-          cat > runner.js << 'EOF'
-
+          cat > runner.js <<'EOF'
           const { GoogleGenAI } = require("@google/genai");
           const fs = require("fs");
 
@@ -57,7 +56,7 @@ jobs:
           console.log("✅ API Key 已讀取");
 
           const ai = new GoogleGenAI({
-            apiKey: apiKey
+            apiKey
           });
 
           async function run() {
@@ -67,34 +66,19 @@ jobs:
 
             console.log("Issue Title:", title);
 
-            const prompt = `
-你是一位資深軟體工程師。
-
-請依據以下 GitHub Issue 產生 JSON。
-
-Issue Title:
-${title}
-
-Issue Body:
-${body}
-
-請只輸出 JSON。
-
-格式：
-
-{
-  "filename": "hello.txt",
-  "content": "Hello World"
-}
-`;
-
-            const modelName = "gemini-2.5-flash";
-
-            console.log("🚀 使用模型:", modelName);
+            const prompt =
+              "你是一位資深軟體工程師。\n\n" +
+              "根據以下 GitHub Issue 產生 JSON。\n\n" +
+              "Issue Title:\n" +
+              title +
+              "\n\nIssue Body:\n" +
+              body +
+              "\n\n請只輸出 JSON。\n\n" +
+              '{"filename":"hello.txt","content":"Hello CWGV"}';
 
             const response =
               await ai.models.generateContent({
-                model: modelName,
+                model: "gemini-2.5-flash",
                 contents: prompt
               });
 
@@ -104,7 +88,7 @@ ${body}
                 .replace(/```/g, "")
                 .trim();
 
-            console.log("Gemini 回應:");
+            console.log("Gemini 回應：");
             console.log(text);
 
             const result = JSON.parse(text);
@@ -123,11 +107,19 @@ ${body}
             console.error(err);
             process.exit(1);
           });
-
           EOF
 
           node runner.js
 
           git add .
 
-          git
+          if git diff --cached --quiet; then
+            echo "沒有變更"
+            exit 0
+          fi
+
+          git commit -m "feat: Gemini issue #${ISSUE_NUMBER}"
+
+          git push origin $BRANCH_NAME
+
+      - name: 
