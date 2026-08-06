@@ -62,11 +62,11 @@ jobs:
           請嚴格僅輸出標準 JSON 格式（不要包含任何 Markdown 標記，如 \`\`\`json）：
           {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
 
-            console.log("🚀 正在送出請求至 Gemini API (gemini-2.0-flash)...");
+            console.log("🚀 正在送出請求至 Gemini API (gemini-1.5-flash)...");
             
-            // 使用支援免費層級額度的 gemini-2.0-flash
+            // 使用支援免費層級額度的 gemini-1.5-flash
             const response = await ai.models.generateContent({
-              model: "gemini-2.0-flash",
+              model: "gemini-1.5-flash",
               contents: prompt,
             });
 
