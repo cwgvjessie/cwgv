@@ -64,7 +64,7 @@ jobs:
 
             console.log("🚀 正在送出請求至 Gemini API (gemini-1.5-flash)...");
             
-            // 使用支援免費層級額度的 gemini-1.5-flash
+            // 改用全區開館免費層額度的 gemini-1.5-flash
             const response = await ai.models.generateContent({
               model: "gemini-1.5-flash",
               contents: prompt,
