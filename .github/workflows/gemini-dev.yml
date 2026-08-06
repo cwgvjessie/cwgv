@@ -45,37 +45,15 @@ jobs:
 
           const apiKey = process.env.GEMINI_API_KEY;
           if (!apiKey) {
-            console.error("❌ 錯誤：未讀取到 GEMINI_API_KEY Secrets");
+            console.error("❌ 錯誤：GEMINI_API_KEY 未設定");
             process.exit(1);
           }
 
-          // 指定 apiVersion 為 v1beta 避免預設走 alpha 導致空清單
-          const ai = new GoogleGenAI({ apiKey, apiVersion: "v1beta" });
+          const ai = new GoogleGenAI({ apiKey });
 
           async function run() {
             const title = process.env.ISSUE_TITLE || "";
             const body = process.env.ISSUE_BODY || "";
-
-            console.log("🔍 正在向 v1beta 查詢可用的模型清單...");
-            let availableModels = [];
-            try {
-              const listResp = await ai.models.list();
-              for await (const m of listResp) {
-                if (m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent")) {
-                  const cleanName = m.name.replace(/^models\//, "");
-                  availableModels.push(cleanName);
-                }
-              }
-              console.log("📋 偵測到可用模型清單：", availableModels);
-            } catch (err) {
-              console.warn("⚠️ 自動取得模型清單失敗，改嘗試 fallback 機制:", err.message);
-            }
-
-            // 若無法自動取得清單，直接備用已知免費層模型
-            if (availableModels.length === 0) {
-              console.log("ℹ️ 清單為空，套用預設模型陣列...");
-              availableModels = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
-            }
 
             const prompt = `你是一位自動化開發工程師。請根據以下 Issue 需求，輸出要新增或修改的檔案路徑與內容。
           標題: ${title}
@@ -84,26 +62,28 @@ jobs:
           請嚴格僅輸出標準 JSON 格式（不要包含任何 Markdown 標記，如 \`\`\`json）：
           {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
 
+            // 依序測試標準模型名稱
+            const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
             let response = null;
-            let successModel = "";
+            let lastError = null;
 
-            for (const modelName of availableModels) {
+            for (const modelName of candidateModels) {
               try {
                 console.log(`🚀 嘗試呼叫模型: ${modelName}...`);
                 response = await ai.models.generateContent({
                   model: modelName,
                   contents: prompt,
                 });
-                successModel = modelName;
                 console.log(`✅ 成功使用 ${modelName} 取得回應！`);
                 break;
               } catch (err) {
-                console.warn(`⚠️ 模型 ${modelName} 失敗: ${err.message}`);
+                console.warn(`⚠️ 模型 ${modelName} 呼叫失敗: ${err.message}`);
+                lastError = err;
               }
             }
 
             if (!response || !response.text) {
-              console.error("❌ 所有模型嘗試皆失敗。");
+              console.error("❌ 所有模型嘗試皆失敗。最後遇到的錯誤詳情：\n", lastError);
               process.exit(1);
             }
 
