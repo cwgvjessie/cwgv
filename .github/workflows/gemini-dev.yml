@@ -21,106 +21,113 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
-      - name: Install Google Gen AI SDK
-        run: |
-          npm install @google/genai
+      - name: Install Google GenAI SDK
+        run: npm install @google/genai
 
-      - name: Run Gemini to Process Issue
+      - name: Run Gemini
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+
         run: |
+
           BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
 
-          cat << 'EOF' > runner.js
+          cat > runner.js << 'EOF'
+
           const { GoogleGenAI } = require("@google/genai");
           const fs = require("fs");
 
           const apiKey = process.env.GEMINI_API_KEY;
+
           if (!apiKey) {
-            console.error("❌ 錯誤：GEMINI_API_KEY 未設定");
+            console.error("❌ GEMINI_API_KEY 未設定");
             process.exit(1);
           }
 
-          const ai = new GoogleGenAI({ apiKey });
+          console.log("✅ API Key 已讀取");
+
+          const ai = new GoogleGenAI({
+            apiKey: apiKey
+          });
 
           async function run() {
+
             const title = process.env.ISSUE_TITLE || "";
             const body = process.env.ISSUE_BODY || "";
 
-            const prompt = `你是一位自動化開發工程師。請根據以下 Issue 需求，輸出要新增或修改的檔案路徑與內容。
-          標題: ${title}
-          內容: ${body}
+            console.log("Issue Title:", title);
 
-          請嚴格僅輸出標準 JSON 格式（不要包含任何 Markdown 標記，如 \`\`\`json）：
-          {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
+            const prompt = `
+你是一位資深軟體工程師。
 
-            // 改試 Lite 與 Experimental 版本模型
-            const candidateModels = ["gemini-2.0-flash-lite", "gemini-2.0-flash-exp"];
-            let response = null;
-            let lastError = null;
+請依據以下 GitHub Issue 產生 JSON。
 
-            for (const modelName of candidateModels) {
-              try {
-                console.log(`🚀 嘗試呼叫模型: ${modelName}...`);
-                response = await ai.models.generateContent({
-                  model: modelName,
-                  contents: prompt,
-                });
-                console.log(`✅ 成功使用 ${modelName} 取得回應！`);
-                break;
-              } catch (err) {
-                console.warn(`⚠️ 模型 ${modelName} 呼叫失敗: ${err.message}`);
-                lastError = err;
-              }
-            }
+Issue Title:
+${title}
 
-            if (!response || !response.text) {
-              console.error("❌ 所有模型嘗試皆失敗。最後遇到的錯誤詳情：\n", lastError);
-              process.exit(1);
-            }
+Issue Body:
+${body}
 
-            console.log("📝 Gemini 回應內容：\n", response.text);
+請只輸出 JSON。
 
-            try {
-              const cleanText = response.text.replace(/```json|```/g, "").trim();
-              const result = JSON.parse(cleanText);
-              fs.writeFileSync(result.filename, result.content);
-              console.log(`✅ 成功寫入檔案: ${result.filename}`);
-            } catch (e) {
-              console.error("解析 JSON 失敗：", e.message);
-              process.exit(1);
-            }
+格式：
+
+{
+  "filename": "hello.txt",
+  "content": "Hello World"
+}
+`;
+
+            const modelName = "gemini-2.5-flash";
+
+            console.log("🚀 使用模型:", modelName);
+
+            const response =
+              await ai.models.generateContent({
+                model: modelName,
+                contents: prompt
+              });
+
+            const text =
+              response.text
+                .replace(/```json/g, "")
+                .replace(/```/g, "")
+                .trim();
+
+            console.log("Gemini 回應:");
+            console.log(text);
+
+            const result = JSON.parse(text);
+
+            fs.writeFileSync(
+              result.filename,
+              result.content
+            );
+
+            console.log(
+              `✅ 已建立檔案 ${result.filename}`
+            );
           }
 
-          run().catch(err => {
-            console.error("執行過程發生異常：", err);
+          run().catch((err) => {
+            console.error(err);
             process.exit(1);
           });
+
           EOF
 
           node runner.js
-          rm runner.js
 
           git add .
-          git commit -m "feat: auto resolution for Issue #${ISSUE_NUMBER} by Gemini"
-          git push origin $BRANCH_NAME
 
-      - name: Create Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
-          gh pr create \
-            --title "Fix/Feat: Issue #${ISSUE_NUMBER} (Gemini Generated)" \
-            --body "此 PR 由 Gemini 自動生成，回應 Issue #${ISSUE_NUMBER}。" \
-            --base main \
-            --head $BRANCH_NAME
+          git
