@@ -37,16 +37,15 @@ jobs:
           BRANCH_NAME="feature/issue-$ISSUE_NUMBER"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b $BRANCH_NAME
+          git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
 
-          # 建立獨立 runner.js 腳本，避免 Shell 符號跳脱問題
           cat << 'EOF' > runner.js
           const { GoogleGenAI } = require("@google/genai");
           const fs = require("fs");
 
           const apiKey = process.env.GEMINI_API_KEY;
           if (!apiKey) {
-            console.error("錯誤：未能讀取到 GEMINI_API_KEY Secrets");
+            console.error("❌ 錯誤：未讀取到 GEMINI_API_KEY Secrets");
             process.exit(1);
           }
 
@@ -60,22 +59,24 @@ jobs:
           標題: ${title}
           內容: ${body}
 
-          請嚴格僅輸出標準 JSON 格式（不可以包含任何 Markdown 標籤或字串）：
+          請嚴格僅輸出標準 JSON 格式（不要包含任何 Markdown 標記，如 \`\`\`json）：
           {"filename": "hello.txt", "content": "Hello from Gemini API!"}`;
 
-            console.log("正在傳送請求給 Gemini API...");
+            console.log("🚀 正在送出請求至 Gemini API (gemini-2.0-flash)...");
+            
+            // 使用支援免費層級額度的 gemini-2.0-flash
             const response = await ai.models.generateContent({
-              model: "gemini-2.5-pro",
+              model: "gemini-2.0-flash",
               contents: prompt,
             });
 
-            console.log("Gemini 回應內容：\n", response.text);
+            console.log("📝 Gemini 回應內容：\n", response.text);
 
             try {
               const cleanText = response.text.replace(/```json|```/g, "").trim();
               const result = JSON.parse(cleanText);
               fs.writeFileSync(result.filename, result.content);
-              console.log(`成功自動寫入檔案: ${result.filename}`);
+              console.log(`✅ 成功寫入檔案: ${result.filename}`);
             } catch (e) {
               console.error("解析 JSON 失敗：", e.message);
               process.exit(1);
@@ -83,12 +84,11 @@ jobs:
           }
 
           run().catch(err => {
-            console.error("執行遭遇異常：", err);
+            console.error("執行過程發生異常：", err);
             process.exit(1);
           });
           EOF
 
-          # 執行 Node 腳本並清理暫存檔
           node runner.js
           rm runner.js
 
