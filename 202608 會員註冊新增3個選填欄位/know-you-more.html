@@ -74,6 +74,7 @@ var base_url = 'https://dev-member.gvm.com.tw/';
     font-weight:500;
     margin-bottom:8px;
 }
+.form-label-gvm .required{ color:#d0021b; margin-left:2px; }
 .form-label-gvm .optional{ color:#999; font-weight:400; font-size:.9rem; margin-left:4px; }
 .form-control-gvm{
     width:100%;
@@ -113,7 +114,7 @@ select.form-control-gvm{
     font-size:1.125rem;
     color:#fff;
     background-color:#9b9b9b;
-    cursor:not-allowed;
+    cursor:pointer;
     transition:background-color .2s ease;
 }
 .btn-main-gvm.active{
@@ -172,7 +173,7 @@ select.form-control-gvm{
                 <div class="form-group row mx-n1 mb-0">
 
                     <div class="col-lg-12 form-col px-1">
-                        <p class="profile-subtitle">恭喜您完成註冊。為了更了解您，					請填寫以下欄位(皆為選填)，填寫越完整，我們越能為您推薦符合需求的文章內容與優惠訊息。</p>
+                        <p class="profile-subtitle">恭喜您完成註冊。為了更了解您，請填寫以下欄位，我們將為您推薦更符合需求的文章內容與優惠訊息。</p>
                     </div>
 
 
@@ -180,7 +181,7 @@ select.form-control-gvm{
                     <!-- 產業別 -->
                     <div class="col-lg-12 form-col px-1">
                         <div class="form-row-gvm">
-                            <label class="form-label-gvm" for="industry">您工作的產業別<span class="optional">（選填）</span></label>
+                            <label class="form-label-gvm" for="industry">您工作的產業別<span class="required">*</span></label>
                             <select class="form-control-gvm" id="industry" name="industry">
                                 <option value="">請選擇產業別</option>
                                 <option value="1">資訊科技／軟體服務</option>
@@ -207,7 +208,7 @@ select.form-control-gvm{
                     <!-- 職位別 -->
                     <div class="col-lg-12 form-col px-1">
                         <div class="form-row-gvm">
-                            <label class="form-label-gvm" for="jobtitle">您工作的職位別<span class="optional">（選填）</span></label>
+                            <label class="form-label-gvm" for="jobtitle">您工作的職位別<span class="required">*</span></label>
                             <select class="form-control-gvm" id="jobtitle" name="jobtitle">
                                 <option value="">請選擇職位別</option>
                                 <option value="1">負責人／董事長</option>
@@ -243,7 +244,7 @@ select.form-control-gvm{
 
                     <!-- 按鈕 -->
                     <div class="col-lg-12 form-col px-1">
-                        <button type="submit" class="btn-main-gvm" id="submit_btn" disabled>送出</button>
+                        <button type="submit" class="btn-main-gvm" id="submit_btn" aria-disabled="true">送出</button>
                         <a href="https://dev-www.gvm.com.tw" class="btn-sub-gvm" id="home_btn">回遠見網站</a>
                         <p class="member-notice">您提供的資料僅供遠見天下文化事業群依 <a target="_blank" href="https://dev-www.gvm.com.tw/privacy_policy">隱私權政策</a> 使用。</p>
                     </div>
@@ -294,43 +295,74 @@ $(document).ready(function () {
 
     // 手機號碼只允許數字
     $mobile.on('input', function () {
-        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+        clearError($mobile, 'mobile');
         checkForm();
     });
 
+    $mobile.on('keyup change', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    });
+
     $industry.add($jobtitle).on('change', function () {
-        $(this).removeClass('is-error');
-        $('#' + this.id + '_error').hide();
+        clearError($(this), this.id);
         checkForm();
     });
 
     function isMobileValid() {
-        return /^09\d{8}$/.test($mobile.val());
+        return /^09\d{8}$/.test($.trim($mobile.val()));
     }
 
-    // 三欄皆為選填：任一欄有填即可送出；手機若有填則需格式正確
+    function showError($el, id, msg) {
+        $el.addClass('is-error');
+        $('#' + id + '_error').text(msg).show();
+    }
+
+    function clearError($el, id) {
+        $el.removeClass('is-error');
+        $('#' + id + '_error').hide();
+    }
+
+    // 只切換按鈕外觀（維持可點擊，未填時按下會跳紅字提示）
     function checkForm() {
-        var mobile_val = $.trim($mobile.val());
-        var has_any = (mobile_val !== '') || ($industry.val() !== '') || ($jobtitle.val() !== '');
-        var mobile_ok = (mobile_val === '') || isMobileValid();
-        var ok = has_any && mobile_ok;
-        $submit.prop('disabled', !ok).toggleClass('active', ok);
+        var mobile_ok = ($.trim($mobile.val()) === '') || isMobileValid(); // 手機為選填
+        var ok = mobile_ok && $industry.val() !== '' && $jobtitle.val() !== '';
+        $submit.toggleClass('active', ok).attr('aria-disabled', ok ? 'false' : 'true');
         return ok;
     }
 
+    // 逐欄驗證，show=true 時顯示紅字提示並聚焦第一個錯誤欄位
+    function validateAll(show) {
+        var first_error = null;
+
+        if ($industry.val() === '') {
+            if (show) { showError($industry, 'industry', '請選擇您工作的產業別'); first_error = first_error || $industry; }
+        } else { clearError($industry, 'industry'); }
+
+        if ($jobtitle.val() === '') {
+            if (show) { showError($jobtitle, 'jobtitle', '請選擇您工作的職位別'); first_error = first_error || $jobtitle; }
+        } else { clearError($jobtitle, 'jobtitle'); }
+
+        if ($.trim($mobile.val()) === '') {
+            clearError($mobile, 'mobile'); // 手機為選填，空白不擋
+        } else if (!isMobileValid()) {
+            if (show) { showError($mobile, 'mobile', '請輸入正確的手機號碼格式（09 開頭共 10 碼）'); first_error = first_error || $mobile; }
+        } else { clearError($mobile, 'mobile'); }
+
+        if (first_error) { first_error.focus(); }
+        return checkForm();
+    }
+
     $mobile.on('blur', function () {
-        if ($mobile.val() !== '' && !isMobileValid()) {
-            $mobile.addClass('is-error');
-            $('#mobile_error').show();
+        if ($.trim($mobile.val()) !== '' && !isMobileValid()) {
+            showError($mobile, 'mobile', '請輸入正確的手機號碼格式（09 開頭共 10 碼）');
         } else {
-            $mobile.removeClass('is-error');
-            $('#mobile_error').hide();
+            clearError($mobile, 'mobile');
         }
     });
 
     $('#profile_form').on('submit', function (e) {
         e.preventDefault();
-        if (!checkForm()) { return false; }
+        if (!validateAll(true)) { return false; }
 
         var post_data = {
             mobile:   $.trim($mobile.val()),
@@ -346,6 +378,8 @@ $(document).ready(function () {
 
         console.log('submit', post_data);
     });
+
+    checkForm();
 
 });
 </script>
